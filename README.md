@@ -1,5 +1,6 @@
 # StudyProcessManagement
 #Font chữ : Time new roman
+#Quy tắc đặt tên File,Folder:ngôn ngữ tiếng anh, chữ cái in hoa đầu 
 #Quy tắc đặt tên các nút: 
 - phần hiển thị : tiếng việt
 - Phần code : Tiếng anh
