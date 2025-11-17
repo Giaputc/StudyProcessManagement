@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using StudyProcessManagement.Views.Login;
+using StudyProcessManagement.Views.Teacher;
 namespace StudyProcessManagement
 {
     internal static class Program
@@ -16,7 +17,8 @@ namespace StudyProcessManagement
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Login());
+            // Temporarily run Form1 for testing the new UI instead of Login
+            Application.Run(new Form1());
         }
     }
 }
