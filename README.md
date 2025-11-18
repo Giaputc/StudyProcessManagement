@@ -1,12 +1,8 @@
-n# StudyProcessManagement
+# StudyProcessManagement
 #Font chữ : Time new roman
-<<<<<<< HEAD
 #Quy tắc đặt tên các nút:
-
-=======
 #Quy tắc đặt tên File,Folder:ngôn ngữ tiếng anh, chữ cái in hoa đầu 
 #Quy tắc đặt tên các nút: 
->>>>>>> 069f66b1a88a1f5a0dc1c778d59464fe79de3f62
 - phần hiển thị : tiếng việt
 - Phần code : Tiếng anh
 - Tên các nút, thành phần trong code(đều phải viết hoa chữ cái đầu) :
