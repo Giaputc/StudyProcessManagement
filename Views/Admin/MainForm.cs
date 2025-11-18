@@ -1,4 +1,5 @@
-﻿using StudyProcessManagement.Views.Admin.Dashboard;
+﻿using StudyProcessManagement.Views.Admin.Course;
+using StudyProcessManagement.Views.Admin.Dashboard;
 using StudyProcessManagement.Views.Admin.Student.StudentManagement;
 using StudyProcessManagement.Views.Admin.Teacher.TeacherMangement;
 using StudyProcessManagement.Views.Admin.User;
@@ -83,6 +84,11 @@ namespace StudyProcessManagement.Views.Admin
         {
 
             OpenChildForm(new StudentManagement());
+        }
+
+        private void btnMenuCourses_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new CourseManagement());
         }
     }
 }

@@ -114,6 +114,7 @@
             this.btnMenuCourses.Size = new System.Drawing.Size(75, 23);
             this.btnMenuCourses.TabIndex = 4;
             this.btnMenuCourses.Text = "📚 Danh sách khóa học";
+            this.btnMenuCourses.Click += new System.EventHandler(this.btnMenuCourses_Click);
             // 
             // btnLogout
             // 
