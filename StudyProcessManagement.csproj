@@ -296,7 +296,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-<<<<<<< HEAD
     <Compile Include="Views\Admin\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -315,7 +314,6 @@
     <EmbeddedResource Include="Views\Admin\User\UserManagement.resx">
       <DependentUpon>UserManagement.cs</DependentUpon>
     </EmbeddedResource>
-=======
     <Compile Include="Views\Teacher\Controls\AssessmentControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -340,7 +338,6 @@
     <Compile Include="Views\Teacher\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
->>>>>>> 069f66b1a88a1f5a0dc1c778d59464fe79de3f62
     <EmbeddedResource Include="Views\Login\Login.resx">
       <DependentUpon>Login.cs</DependentUpon>
     </EmbeddedResource>
@@ -353,16 +350,13 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-<<<<<<< HEAD
     <EmbeddedResource Include="Views\Admin\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
-=======
     <EmbeddedResource Include="Views\Teacher\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
->>>>>>> 069f66b1a88a1f5a0dc1c778d59464fe79de3f62
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
