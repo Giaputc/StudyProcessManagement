@@ -1,7 +1,6 @@
 ﻿-- =============================================
 -- 1. TẠO DATABASE (Nếu chưa có)
--- =============================================
--- DROP DATABASE LMS_DB; -- Bỏ comment dòng này nếu muốn xóa database cũ làm lại từ đầu
+
 CREATE DATABASE StudyProcess;
 GO
 USE StudyProcess;
