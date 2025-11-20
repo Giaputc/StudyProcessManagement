@@ -90,6 +90,7 @@ namespace StudyProcessManagement.Views.Admin.User
             this.dataGridViewUsers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewUsers.Size = new System.Drawing.Size(1306, 476);
             this.dataGridViewUsers.TabIndex = 2;
+            this.dataGridViewUsers.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewUsers_CellContentClick_1);
             // 
             // colId
             // 
@@ -189,11 +190,12 @@ namespace StudyProcessManagement.Views.Admin.User
             // 
             this.txtSearch.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.txtSearch.ForeColor = System.Drawing.Color.Gray;
-            this.txtSearch.Location = new System.Drawing.Point(50, 22);
+            this.txtSearch.Location = new System.Drawing.Point(57, 23);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(300, 30);
             this.txtSearch.TabIndex = 0;
             this.txtSearch.Text = "Tìm kiếm người dùng...";
+            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged_1);
             // 
             // btnExportExcel
             // 

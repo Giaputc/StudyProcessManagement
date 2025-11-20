@@ -38,7 +38,35 @@ CREATE TABLE Users (
         FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
 );
 GO
+/* ======================
+   CẬP NHẬT RÀNG BUỘC KHÓA NGOẠI
+   ====================== */
+-- 1. Xóa cái ràng buộc khóa ngoại cũ đang gây lỗi
+ALTER TABLE Users DROP CONSTRAINT FK_Users_Accounts;
+GO
 
+-- 2. Tạo lại ràng buộc mới có thêm tính năng "ON DELETE CASCADE"
+ALTER TABLE Users ADD CONSTRAINT FK_Users_Accounts
+FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
+ON DELETE CASCADE;
+
+ALTER TABLE Enrollments DROP CONSTRAINT FK_Enrollments_Users;
+ALTER TABLE Enrollments ADD CONSTRAINT FK_Enrollments_Users
+    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
+
+-- 2. Cho phép xóa User -> tự động xóa Submissions (Bài nộp)
+ALTER TABLE Submissions DROP CONSTRAINT FK_Submissions_Users;
+ALTER TABLE Submissions ADD CONSTRAINT FK_Submissions_Users
+    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
+
+-- 3. Cho phép xóa User -> tự động xóa ActivityLogs (Nhật ký)
+ALTER TABLE ActivityLogs DROP CONSTRAINT FK_ActivityLogs_Users;
+ALTER TABLE ActivityLogs ADD CONSTRAINT FK_ActivityLogs_Users
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
+GO
 /* ======================
    DANH MỤC & KHÓA HỌC
    ====================== */
