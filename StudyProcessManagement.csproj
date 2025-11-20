@@ -264,6 +264,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Business\Admin\AccountService.cs" />
+    <Compile Include="Business\Admin\UserSevice.cs" />
+    <Compile Include="Business\DataProcess.cs" />
     <Compile Include="Views\Admin\Course\CourseManagement.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -380,11 +383,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Business\" />
-    <Folder Include="Data\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\StudyProcess_Complete.sql" />
     <Content Include="Resource\picture\admin2.jpg" />
     <Content Include="Resource\picture\blue.jpg" />
   </ItemGroup>
