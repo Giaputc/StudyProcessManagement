@@ -13,7 +13,6 @@ namespace StudyProcessManagement.Business.Admin
         {
             List<Users> userList = new List<Users>();
 
-            // Câu lệnh SQL (Vẫn như cũ)
             string sql = @"
                 SELECT u.UserID, u.FullName, a.Email, a.Role, a.IsActive
                 FROM Users u 
@@ -71,48 +70,63 @@ namespace StudyProcessManagement.Business.Admin
         public Users GetUserById(string userId)
         {
             string sql = @"
-                SELECT u.UserID, u.FullName, u.PhoneNumber, a.AccountID, a.Email, a.Role, a.IsActive 
-                FROM Users u
-                JOIN Accounts a ON u.AccountID = a.AccountID
-                WHERE u.UserID = @UserID";
+            SELECT u.UserID, u.FullName, u.PhoneNumber, u.Address, u.DateOfBirth, 
+                   a.AccountID, a.Email, a.Role, a.IsActive 
+            FROM Users u
+            JOIN Accounts a ON u.AccountID = a.AccountID
+            WHERE u.UserID = @UserID";
 
             var param = new Dictionary<string, object> { { "@UserID", userId } };
             DataTable dt = dataProcess.ReadData(sql, param);
 
-            if (dt.Rows.Count > 0) return ConvertDataRowToUser(dt.Rows[0]) ;
+            if (dt.Rows.Count > 0) return ConvertDataRowToUser(dt.Rows[0]);
             return null;
         }
         public bool AddUser(Users user, string password)
         {
-            string accId = "ACC" + DateTime.Now.Ticks.ToString().Substring(12);
-            string usrId = "USR" + DateTime.Now.Ticks.ToString().Substring(12);
+            string accId = "ACC" + DateTime.Now.Ticks.ToString().Substring(10);
+            //string usrId = "USR" + DateTime.Now.Ticks.ToString().Substring(10);
 
+            // Thêm Account
             string sqlAcc = "INSERT INTO Accounts (AccountID, Email, PasswordHash, Role, IsActive) VALUES (@ID, @Email, @Pass, @Role, 1)";
             var pAcc = new Dictionary<string, object> {
-                { "@ID", accId }, { "@Email", user.Email }, { "@Pass", password }, { "@Role", user.Role }
+                 { "@ID", accId }, { "@Email", user.Email }, { "@Pass", password }, { "@Role", user.Role }
             };
 
             if (dataProcess.UpdateData(sqlAcc, pAcc))
             {
-                string sqlUsr = "INSERT INTO Users (UserID, AccountID, FullName, PhoneNumber) VALUES (@UserID, @AccID, @Name, @Phone)";
+                // Thêm User (Bổ sung Address, DOB)
+                string sqlUsr = @"INSERT INTO Users (AccountID, FullName, PhoneNumber, Address, DateOfBirth) 
+                          VALUES (@AccID, @Name, @Phone, @Address, @Dob)";
+
                 var pUsr = new Dictionary<string, object> {
-                    { "@UserID", usrId }, { "@AccID", accId }, { "@Name", user.FullName }, { "@Phone", user.PhoneNumber }
-                };
+                    { "@AccID", accId },
+                    { "@Name", user.FullName },
+                    { "@Phone", user.PhoneNumber },
+                    { "@Address", user.Address },
+                    { "@Dob", user.DateOfBirth ?? (object)DBNull.Value }
+                 };
                 return dataProcess.UpdateData(sqlUsr, pUsr);
             }
             return false;
         }
         public bool UpdateUser(Users user)
         {
-            // Lấy User cũ để biết AccountID
             Users oldUser = GetUserById(user.UserID);
             if (oldUser == null) return false;
 
-            // Update Users
-            string sqlUsr = "UPDATE Users SET FullName = @Name, PhoneNumber = @Phone WHERE UserID = @UserID";
+            // Update Users (Bổ sung Address, DOB)
+            string sqlUsr = @"UPDATE Users 
+                      SET FullName = @Name, PhoneNumber = @Phone, Address = @Address, DateOfBirth = @Dob 
+                      WHERE UserID = @UserID";
+
             var pUsr = new Dictionary<string, object> {
-                { "@Name", user.FullName }, { "@Phone", user.PhoneNumber }, { "@UserID", user.UserID }
-            };
+                { "@Name", user.FullName },
+                { "@Phone", user.PhoneNumber },
+                { "@Address", user.Address },
+                { "@Dob", user.DateOfBirth ?? (object)DBNull.Value },
+                { "@UserID", user.UserID }
+             };
             dataProcess.UpdateData(sqlUsr, pUsr);
 
             // Update Accounts
@@ -133,7 +147,9 @@ namespace StudyProcessManagement.Business.Admin
                 Email = row["Email"].ToString(),
                 Role = row["Role"].ToString(),
                 PhoneNumber = row["PhoneNumber"].ToString(),
-                IsActive = Convert.ToBoolean(row["IsActive"])
+                IsActive = Convert.ToBoolean(row["IsActive"]),
+                Address = row["Address"] != DBNull.Value ? row["Address"].ToString() : "",
+                DateOfBirth = row["DateOfBirth"] != DBNull.Value ? Convert.ToDateTime(row["DateOfBirth"]) : (DateTime?)null
             };
         }
         //public bool DeleteUser(string userId)

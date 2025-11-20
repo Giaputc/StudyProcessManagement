@@ -180,11 +180,12 @@ namespace StudyProcessManagement.Views.Admin.User
             // 
             this.lblSearchIcon.AutoSize = true;
             this.lblSearchIcon.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.lblSearchIcon.Location = new System.Drawing.Point(23, 23);
+            this.lblSearchIcon.Location = new System.Drawing.Point(354, 25);
             this.lblSearchIcon.Name = "lblSearchIcon";
             this.lblSearchIcon.Size = new System.Drawing.Size(39, 28);
             this.lblSearchIcon.TabIndex = 0;
             this.lblSearchIcon.Text = "🔍";
+            this.lblSearchIcon.Click += new System.EventHandler(this.lblSearchIcon_Click);
             // 
             // txtSearch
             // 
@@ -195,7 +196,7 @@ namespace StudyProcessManagement.Views.Admin.User
             this.txtSearch.Size = new System.Drawing.Size(300, 30);
             this.txtSearch.TabIndex = 0;
             this.txtSearch.Text = "Tìm kiếm người dùng...";
-            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged_1);
+            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_Enter);
             // 
             // btnExportExcel
             // 
@@ -226,6 +227,7 @@ namespace StudyProcessManagement.Views.Admin.User
             this.btnAddUser.TabIndex = 1;
             this.btnAddUser.Text = "➕ Thêm người dùng";
             this.btnAddUser.UseVisualStyleBackColor = false;
+            this.btnAddUser.Click += new System.EventHandler(this.btnAddUser_Click);
             // 
             // panelTopbar
             // 
