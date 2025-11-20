@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
+using StudyProcessManagement.Business.Teacher; // ✅ Import Service
 
 namespace StudyProcessManagement.Views.Teacher.Controls
 {
     public partial class DashboardControl : UserControl
-    {
-        // ============================================
-        // PRIVATE FIELDS
-        // ============================================
-        private string connectionString = "Data Source=DESKTOP-FO9OMBO;Initial Catalog=StudyProcess;Integrated Security=True";
-        private string currentTeacherID = "USR002";
+    {      
+        private DashboardService dashboardService;
+        private string currentTeacherID = "USR002"; // TODO: Lấy từ session/login
 
         private Label lblTitle;
         private TableLayoutPanel mainLayout;
@@ -30,9 +27,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private Label lblAssignmentsTitle;
         private DataGridView dgvAssignments;
         private Button btnViewAllAssignments;
-
         private Panel topCoursesPanel;
         private Panel topAssignPanel;
+
         private DataGridViewTextBoxColumn colCourseName;
         private DataGridViewTextBoxColumn colCategory;
         private DataGridViewTextBoxColumn colStudents;
@@ -50,6 +47,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             InitializeComponent();
 
+            // ✅ Khởi tạo Service
+            dashboardService = new DashboardService();
+
             if (!this.DesignMode)
             {
                 LoadDashboardData();
@@ -57,7 +57,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         }
 
         // ============================================
-        // LOAD DATA FROM DATABASE
+        // ✅ LOAD DATA - GỌI SERVICE
         // ============================================
         private void LoadDashboardData()
         {
@@ -78,56 +78,27 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service - lấy tất cả thống kê trong 1 query
+                DataTable dt = dashboardService.GetDashboardStatistics(currentTeacherID);
+
+                if (dt.Rows.Count > 0)
                 {
-                    conn.Open();
+                    DataRow row = dt.Rows[0];
 
-                    string query1 = "SELECT COUNT(*) FROM Courses WHERE TeacherID = @TeacherID";
-                    using (SqlCommand cmd = new SqlCommand(query1, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-                        int totalCourses = (int)cmd.ExecuteScalar();
-                        lblCard1Value.Text = totalCourses.ToString();
-                    }
+                    // Card 1: Tổng số khóa học
+                    lblCard1Value.Text = row["TotalCourses"].ToString();
 
-                    string query2 = @"
-                        SELECT COUNT(DISTINCT e.StudentID)
-                        FROM Enrollments e
-                        INNER JOIN Courses c ON e.CourseID = c.CourseID
-                        WHERE c.TeacherID = @TeacherID";
-                    using (SqlCommand cmd = new SqlCommand(query2, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-                        int totalStudents = (int)cmd.ExecuteScalar();
-                        lblCard2Value.Text = totalStudents.ToString();
-                    }
+                    // Card 2: Tổng số học viên
+                    lblCard2Value.Text = row["TotalStudents"].ToString();
 
-                    string query3 = @"
-                        SELECT COUNT(*)
-                        FROM Submissions s
-                        INNER JOIN Assignments a ON s.AssignmentID = a.AssignmentID
-                        INNER JOIN Courses c ON a.CourseID = c.CourseID
-                        WHERE c.TeacherID = @TeacherID AND s.Score IS NULL";
-                    using (SqlCommand cmd = new SqlCommand(query3, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-                        int pendingGrades = (int)cmd.ExecuteScalar();
-                        lblCard3Value.Text = pendingGrades.ToString();
-                    }
+                    // Card 3: Bài tập chưa chấm
+                    lblCard3Value.Text = row["PendingGrades"].ToString();
 
-                    string query4 = @"
-                        SELECT ISNULL(AVG(s.Score), 0)
-                        FROM Submissions s
-                        INNER JOIN Assignments a ON s.AssignmentID = a.AssignmentID
-                        INNER JOIN Courses c ON a.CourseID = c.CourseID
-                        WHERE c.TeacherID = @TeacherID AND s.Score IS NOT NULL";
-                    using (SqlCommand cmd = new SqlCommand(query4, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-                        object result = cmd.ExecuteScalar();
-                        decimal avgScore = result != DBNull.Value ? Convert.ToDecimal(result) : 0;
-                        lblCard4Value.Text = avgScore.ToString("F1");
-                    }
+                    // Card 4: Điểm trung bình
+                    decimal avgScore = row["AverageScore"] != DBNull.Value
+                        ? Convert.ToDecimal(row["AverageScore"])
+                        : 0;
+                    lblCard4Value.Text = avgScore.ToString("F1");
                 }
             }
             catch (Exception ex)
@@ -143,52 +114,30 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             {
                 dgvCourses.Rows.Clear();
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = dashboardService.GetRecentCourses(currentTeacherID);
+
+                foreach (DataRow row in dt.Rows)
                 {
-                    conn.Open();
+                    string courseName = row["CourseName"].ToString();
+                    string category = row["CategoryName"]?.ToString() ?? "N/A";
+                    int students = row["TotalStudents"] != DBNull.Value
+                        ? Convert.ToInt32(row["TotalStudents"])
+                        : 0;
+                    string status = row["Status"]?.ToString() ?? "N/A";
+                    DateTime createdAt = Convert.ToDateTime(row["CreatedAt"]);
 
-                    string query = @"
-                        SELECT TOP 5
-                            c.CourseID,
-                            c.CourseName,
-                            cat.CategoryName,
-                            COUNT(DISTINCT e.EnrollmentID) AS TotalStudents,
-                            c.Status,
-                            c.CreatedAt
-                        FROM Courses c
-                        LEFT JOIN Categories cat ON c.CategoryID = cat.CategoryID
-                        LEFT JOIN Enrollments e ON c.CourseID = e.CourseID
-                        WHERE c.TeacherID = @TeacherID
-                        GROUP BY c.CourseID, c.CourseName, cat.CategoryName, c.Status, c.CreatedAt
-                        ORDER BY c.CreatedAt DESC";
+                    // Format time ago
+                    TimeSpan timeSpan = DateTime.Now - createdAt;
+                    string timeAgo;
+                    if (timeSpan.TotalDays < 1)
+                        timeAgo = $"{(int)timeSpan.TotalHours} giờ trước";
+                    else if (timeSpan.TotalDays < 7)
+                        timeAgo = $"{(int)timeSpan.TotalDays} ngày trước";
+                    else
+                        timeAgo = createdAt.ToString("dd/MM/yyyy");
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                string courseName = reader["CourseName"].ToString();
-                                string category = reader["CategoryName"]?.ToString() ?? "N/A";
-                                int students = reader["TotalStudents"] != DBNull.Value ? Convert.ToInt32(reader["TotalStudents"]) : 0;
-                                string status = reader["Status"]?.ToString() ?? "N/A";
-                                DateTime createdAt = Convert.ToDateTime(reader["CreatedAt"]);
-
-                                TimeSpan timeSpan = DateTime.Now - createdAt;
-                                string timeAgo;
-                                if (timeSpan.TotalDays < 1)
-                                    timeAgo = $"{(int)timeSpan.TotalHours} giờ trước";
-                                else if (timeSpan.TotalDays < 7)
-                                    timeAgo = $"{(int)timeSpan.TotalDays} ngày trước";
-                                else
-                                    timeAgo = createdAt.ToString("dd/MM/yyyy");
-
-                                dgvCourses.Rows.Add(courseName, category, students.ToString(), status, timeAgo);
-                            }
-                        }
-                    }
+                    dgvCourses.Rows.Add(courseName, category, students.ToString(), status, timeAgo);
                 }
             }
             catch (Exception ex)
@@ -204,48 +153,21 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             {
                 dgvAssignments.Rows.Clear();
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = dashboardService.GetPendingSubmissions(currentTeacherID);
+
+                foreach (DataRow row in dt.Rows)
                 {
-                    conn.Open();
+                    string assignmentTitle = row["AssignmentTitle"].ToString();
+                    string courseName = row["CourseName"].ToString();
+                    int totalSubmissions = Convert.ToInt32(row["TotalSubmissions"]);
+                    int totalStudents = Convert.ToInt32(row["TotalStudents"]);
+                    DateTime dueDate = Convert.ToDateTime(row["DueDate"]);
 
-                    string query = @"
-                        SELECT TOP 5
-                            a.AssignmentID,
-                            a.Title AS AssignmentTitle,
-                            c.CourseName,
-                            COUNT(s.SubmissionID) AS TotalSubmissions,
-                            COUNT(DISTINCT e.StudentID) AS TotalStudents,
-                            a.DueDate
-                        FROM Assignments a
-                        INNER JOIN Courses c ON a.CourseID = c.CourseID
-                        LEFT JOIN Submissions s ON a.AssignmentID = s.AssignmentID AND s.Score IS NULL
-                        LEFT JOIN Enrollments e ON c.CourseID = e.CourseID
-                        WHERE c.TeacherID = @TeacherID
-                        GROUP BY a.AssignmentID, a.Title, c.CourseName, a.DueDate
-                        HAVING COUNT(s.SubmissionID) > 0
-                        ORDER BY a.DueDate ASC";
+                    string submissionsText = $"{totalSubmissions}/{totalStudents}";
+                    string dueDateText = dueDate.ToString("dd/MM/yyyy");
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                string assignmentTitle = reader["AssignmentTitle"].ToString();
-                                string courseName = reader["CourseName"].ToString();
-                                int totalSubmissions = Convert.ToInt32(reader["TotalSubmissions"]);
-                                int totalStudents = Convert.ToInt32(reader["TotalStudents"]);
-                                DateTime dueDate = Convert.ToDateTime(reader["DueDate"]);
-
-                                string submissionsText = $"{totalSubmissions}/{totalStudents}";
-                                string dueDateText = dueDate.ToString("dd/MM/yyyy");
-
-                                dgvAssignments.Rows.Add(assignmentTitle, courseName, submissionsText, dueDateText);
-                            }
-                        }
-                    }
+                    dgvAssignments.Rows.Add(assignmentTitle, courseName, submissionsText, dueDateText);
                 }
             }
             catch (Exception ex)
@@ -261,7 +183,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         }
 
         // ============================================
-        // INITIALIZE COMPONENT
+        // INITIALIZE COMPONENT (AUTO-GENERATED UI CODE)
         // ============================================
         private void InitializeComponent()
         {
@@ -299,6 +221,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.topAssignPanel = new System.Windows.Forms.Panel();
             this.btnViewAllAssignments = new System.Windows.Forms.Button();
             this.lblAssignmentsTitle = new System.Windows.Forms.Label();
+
             this.mainLayout.SuspendLayout();
             this.cardsTable.SuspendLayout();
             this.card1.SuspendLayout();
@@ -313,7 +236,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.topAssignPanel.SuspendLayout();
             this.SuspendLayout();
 
+            // 
             // lblTitle
+            // 
             this.lblTitle.AutoSize = true;
             this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.lblTitle.Location = new System.Drawing.Point(20, 20);
@@ -322,7 +247,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Dashboard";
 
-            // mainLayout - ✅ LAYOUT DỌC
+            // 
+            // mainLayout
+            // 
             this.mainLayout.ColumnCount = 1;
             this.mainLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.mainLayout.Controls.Add(this.cardsTable, 0, 0);
@@ -339,7 +266,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.mainLayout.Size = new System.Drawing.Size(1200, 630);
             this.mainLayout.TabIndex = 1;
 
+            // 
             // cardsTable
+            // 
             this.cardsTable.ColumnCount = 4;
             this.cardsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.cardsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
@@ -357,7 +286,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.cardsTable.Size = new System.Drawing.Size(1154, 114);
             this.cardsTable.TabIndex = 0;
 
-            // card1
+            // 
+            // card1 (Blue - Courses)
+            // 
             this.card1.BackColor = System.Drawing.Color.FromArgb(33, 150, 243);
             this.card1.Controls.Add(this.lblCard1Value);
             this.card1.Controls.Add(this.lblCard1Text);
@@ -386,7 +317,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblCard1Text.TabIndex = 1;
             this.lblCard1Text.Text = "Tổng số khóa học";
 
-            // card2
+            // 
+            // card2 (Green - Students)
+            // 
             this.card2.BackColor = System.Drawing.Color.FromArgb(76, 175, 80);
             this.card2.Controls.Add(this.lblCard2Value);
             this.card2.Controls.Add(this.lblCard2Text);
@@ -415,7 +348,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblCard2Text.TabIndex = 1;
             this.lblCard2Text.Text = "Tổng số học viên";
 
-            // card3
+            // 
+            // card3 (Orange - Pending)
+            // 
             this.card3.BackColor = System.Drawing.Color.FromArgb(255, 152, 0);
             this.card3.Controls.Add(this.lblCard3Value);
             this.card3.Controls.Add(this.lblCard3Text);
@@ -444,7 +379,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblCard3Text.TabIndex = 1;
             this.lblCard3Text.Text = "Bài tập chưa chấm";
 
-            // card4
+            // 
+            // card4 (Purple - Average Score)
+            // 
             this.card4.BackColor = System.Drawing.Color.FromArgb(156, 39, 176);
             this.card4.Controls.Add(this.lblCard4Value);
             this.card4.Controls.Add(this.lblCard4Text);
@@ -473,7 +410,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblCard4Text.TabIndex = 1;
             this.lblCard4Text.Text = "Điểm trung bình";
 
-            // panelCourses - ✅ CÓ BORDER
+            // 
+            // panelCourses
+            // 
             this.panelCourses.BackColor = System.Drawing.Color.White;
             this.panelCourses.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelCourses.Controls.Add(this.dgvCourses);
@@ -485,7 +424,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.panelCourses.Size = new System.Drawing.Size(1140, 235);
             this.panelCourses.TabIndex = 1;
 
+            // 
             // dgvCourses
+            // 
             this.dgvCourses.AllowUserToAddRows = false;
             this.dgvCourses.AllowUserToDeleteRows = false;
             this.dgvCourses.AllowUserToResizeRows = false;
@@ -536,7 +477,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.colUpdated.ReadOnly = true;
             this.colUpdated.Width = 150;
 
+            // 
             // topCoursesPanel
+            // 
             this.topCoursesPanel.BackColor = System.Drawing.Color.FromArgb(250, 250, 250);
             this.topCoursesPanel.Controls.Add(this.btnViewAllCourses);
             this.topCoursesPanel.Controls.Add(this.lblCoursesTitle);
@@ -545,8 +488,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.topCoursesPanel.Name = "topCoursesPanel";
             this.topCoursesPanel.Size = new System.Drawing.Size(1138, 60);
             this.topCoursesPanel.TabIndex = 0;
+            this.topCoursesPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.topPanel_Paint);
 
-            // btnViewAllCourses - ✅ NÚT XEM TẤT CẢ
             this.btnViewAllCourses.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnViewAllCourses.BackColor = System.Drawing.Color.FromArgb(33, 150, 243);
             this.btnViewAllCourses.FlatAppearance.BorderSize = 0;
@@ -559,6 +502,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.btnViewAllCourses.TabIndex = 1;
             this.btnViewAllCourses.Text = "Xem tất cả";
             this.btnViewAllCourses.UseVisualStyleBackColor = false;
+            this.btnViewAllCourses.Click += new System.EventHandler(this.btnViewAllCourses_Click);
+            this.btnViewAllCourses.MouseEnter += new System.EventHandler(this.btnViewAll_MouseEnter);
+            this.btnViewAllCourses.MouseLeave += new System.EventHandler(this.btnViewAll_MouseLeave);
 
             this.lblCoursesTitle.AutoSize = true;
             this.lblCoursesTitle.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
@@ -568,7 +514,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblCoursesTitle.TabIndex = 0;
             this.lblCoursesTitle.Text = "Khóa học gần đây";
 
-            // panelAssignments - ✅ CÓ BORDER
+            // 
+            // panelAssignments
+            // 
             this.panelAssignments.BackColor = System.Drawing.Color.White;
             this.panelAssignments.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelAssignments.Controls.Add(this.dgvAssignments);
@@ -580,7 +528,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.panelAssignments.Size = new System.Drawing.Size(1140, 215);
             this.panelAssignments.TabIndex = 2;
 
+            // 
             // dgvAssignments
+            // 
             this.dgvAssignments.AllowUserToAddRows = false;
             this.dgvAssignments.AllowUserToDeleteRows = false;
             this.dgvAssignments.AllowUserToResizeRows = false;
@@ -625,7 +575,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.colDueDate.ReadOnly = true;
             this.colDueDate.Width = 150;
 
+            // 
             // topAssignPanel
+            // 
             this.topAssignPanel.BackColor = System.Drawing.Color.FromArgb(250, 250, 250);
             this.topAssignPanel.Controls.Add(this.btnViewAllAssignments);
             this.topAssignPanel.Controls.Add(this.lblAssignmentsTitle);
@@ -634,8 +586,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.topAssignPanel.Name = "topAssignPanel";
             this.topAssignPanel.Size = new System.Drawing.Size(1138, 60);
             this.topAssignPanel.TabIndex = 0;
+            this.topAssignPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.topPanel_Paint);
 
-            // btnViewAllAssignments - ✅ NÚT XEM TẤT CẢ
             this.btnViewAllAssignments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnViewAllAssignments.BackColor = System.Drawing.Color.FromArgb(33, 150, 243);
             this.btnViewAllAssignments.FlatAppearance.BorderSize = 0;
@@ -648,6 +600,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.btnViewAllAssignments.TabIndex = 1;
             this.btnViewAllAssignments.Text = "Xem tất cả";
             this.btnViewAllAssignments.UseVisualStyleBackColor = false;
+            this.btnViewAllAssignments.Click += new System.EventHandler(this.btnViewAllAssignments_Click);
+            this.btnViewAllAssignments.MouseEnter += new System.EventHandler(this.btnViewAll_MouseEnter);
+            this.btnViewAllAssignments.MouseLeave += new System.EventHandler(this.btnViewAll_MouseLeave);
 
             this.lblAssignmentsTitle.AutoSize = true;
             this.lblAssignmentsTitle.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
@@ -657,11 +612,14 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblAssignmentsTitle.TabIndex = 0;
             this.lblAssignmentsTitle.Text = "Bài tập chưa chấm";
 
+            // 
             // DashboardControl
+            // 
             this.Controls.Add(this.mainLayout);
             this.Controls.Add(this.lblTitle);
             this.Name = "DashboardControl";
             this.Size = new System.Drawing.Size(1200, 700);
+
             this.mainLayout.ResumeLayout(false);
             this.cardsTable.ResumeLayout(false);
             this.card1.ResumeLayout(false);
@@ -682,16 +640,6 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.topAssignPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
-            // Wire up events
-            this.btnViewAllCourses.Click += new System.EventHandler(this.btnViewAllCourses_Click);
-            this.btnViewAllAssignments.Click += new System.EventHandler(this.btnViewAllAssignments_Click);
-            this.btnViewAllCourses.MouseEnter += new System.EventHandler(this.btnViewAll_MouseEnter);
-            this.btnViewAllCourses.MouseLeave += new System.EventHandler(this.btnViewAll_MouseLeave);
-            this.btnViewAllAssignments.MouseEnter += new System.EventHandler(this.btnViewAll_MouseEnter);
-            this.btnViewAllAssignments.MouseLeave += new System.EventHandler(this.btnViewAll_MouseLeave);
-            this.topCoursesPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.topPanel_Paint);
-            this.topAssignPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.topPanel_Paint);
         }
 
         // ============================================

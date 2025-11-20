@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using System.Collections.Generic;
+using StudyProcessManagement.Business.Teacher; // ✅ Import Service
 
 namespace StudyProcessManagement.Views.Teacher.Controls
 {
@@ -28,14 +27,22 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private FlowLayoutPanel flowLayoutCourses;
         private Panel tablePanel;
         private DataGridView dgvCourses;
-
         private bool isCardView = true;
-        private string connectionString = "Server=DESKTOP-FO9OMBO;Database=StudyProcess;Integrated Security=true;";
-        private string currentTeacherID = "USR002";
 
+        // ✅ Thay vì connectionString, dùng Service
+        private CourseService courseService;
+        private string currentTeacherID = "USR002"; // TODO: Lấy từ session/login
+
+        // ============================================
+        // CONSTRUCTOR
+        // ============================================
         public CourseControl()
         {
             InitializeComponent();
+
+            // ✅ Khởi tạo Service
+            courseService = new CourseService();
+
             if (!DesignMode)
             {
                 LoadCategories();
@@ -44,6 +51,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             }
         }
 
+        // ============================================
+        // INITIALIZE COMPONENT (AUTO-GENERATED UI CODE)
+        // ============================================
         private void InitializeComponent()
         {
             this.headerPanel = new Panel();
@@ -89,7 +99,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblBreadcrumb.Font = new Font("Segoe UI", 9F);
             this.lblBreadcrumb.ForeColor = Color.FromArgb(117, 117, 117);
             this.lblBreadcrumb.Location = new Point(33, 60);
-            this.lblBreadcrumb.Text = "Trang chủ  >  Quản lý khóa học  >  Danh sách khóa học";
+            this.lblBreadcrumb.Text = "Trang chủ > Quản lý khóa học > Danh sách khóa học";
 
             // filterPanel
             this.filterPanel.BackColor = Color.White;
@@ -264,36 +274,30 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         }
 
         // ============================================
-        // DATABASE METHODS
+        // ✅ LOAD DATA - GỌI SERVICE
         // ============================================
-
         private void LoadCategories()
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = courseService.GetAllCategories();
+
+                cboCategory.Items.Clear();
+                cboCategory.Items.Add(new CategoryItem { CategoryID = "", CategoryName = "-- Tất cả danh mục --" });
+
+                foreach (DataRow row in dt.Rows)
                 {
-                    conn.Open();
-                    string query = "SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryName";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-
-                    cboCategory.Items.Clear();
-                    cboCategory.Items.Add(new CategoryItem { CategoryID = "", CategoryName = "-- Tất cả danh mục --" });
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    cboCategory.Items.Add(new CategoryItem
                     {
-                        cboCategory.Items.Add(new CategoryItem
-                        {
-                            CategoryID = reader["CategoryID"].ToString(),
-                            CategoryName = reader["CategoryName"].ToString()
-                        });
-                    }
-
-                    cboCategory.DisplayMember = "CategoryName";
-                    cboCategory.ValueMember = "CategoryID";
-                    cboCategory.SelectedIndex = 0;
+                        CategoryID = row["CategoryID"].ToString(),
+                        CategoryName = row["CategoryName"].ToString()
+                    });
                 }
+
+                cboCategory.DisplayMember = "CategoryName";
+                cboCategory.ValueMember = "CategoryID";
+                cboCategory.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
@@ -314,42 +318,16 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     ? ((CategoryItem)cboCategory.SelectedItem).CategoryID
                     : "";
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = courseService.GetTeacherCourses(currentTeacherID, selectedCategoryID, searchKeyword);
+
+                if (isCardView)
                 {
-                    conn.Open();
-
-                    string query = @"
-                        SELECT 
-                            c.CourseID,
-                            c.CourseName,
-                            ISNULL(cat.CategoryName, N'Chưa phân loại') AS CategoryName,
-                            (SELECT COUNT(*) FROM Enrollments WHERE CourseID = c.CourseID) AS StudentCount,
-                            ISNULL(c.TotalLessons, 0) AS LessonCount,
-                            ISNULL(c.Status, N'Active') AS Status
-                        FROM Courses c
-                        LEFT JOIN Categories cat ON c.CategoryID = cat.CategoryID
-                        WHERE c.TeacherID = @TeacherID
-                            AND (@CategoryID = '' OR c.CategoryID = @CategoryID)
-                            AND (@Search = '' OR c.CourseName LIKE '%' + @Search + '%' OR c.Description LIKE '%' + @Search + '%')
-                        ORDER BY c.CreatedAt DESC";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-                    cmd.Parameters.AddWithValue("@CategoryID", selectedCategoryID);
-                    cmd.Parameters.AddWithValue("@Search", searchKeyword);
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    if (isCardView)
-                    {
-                        LoadCardView(dt);
-                    }
-                    else
-                    {
-                        LoadTableView(dt);
-                    }
+                    LoadCardView(dt);
+                }
+                else
+                {
+                    LoadTableView(dt);
                 }
             }
             catch (Exception ex)
@@ -374,7 +352,6 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             };
 
             string[] icons = new string[] { "💻", "🎨", "📱", "⚡", "📊", "🤖", "🎯", "🚀" };
-
             int colorIndex = 0;
 
             foreach (DataRow row in dt.Rows)
@@ -472,7 +449,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             btnEdit.Location = new Point(105, 270);
             btnEdit.Cursor = Cursors.Hand;
             btnEdit.Tag = courseID;
-            btnEdit.Click += (s, e) => EditCourse(courseID);
+            btnEdit.Click += (s, e) => EditCourse(Convert.ToInt32(courseID));
 
             Button btnDelete = new Button();
             btnDelete.Text = "🗑";
@@ -491,8 +468,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             Label lblStatus = new Label();
             lblStatus.Text = status;
             lblStatus.BackColor = status == "Active" ? Color.FromArgb(76, 175, 80) :
-                                 status == "Draft" ? Color.FromArgb(255, 152, 0) :
-                                 Color.FromArgb(158, 158, 158);
+                                  status == "Draft" ? Color.FromArgb(255, 152, 0) :
+                                  Color.FromArgb(158, 158, 158);
             lblStatus.ForeColor = Color.White;
             lblStatus.Font = new Font("Segoe UI", 7F, FontStyle.Bold);
             lblStatus.Size = new Size(50, 18);
@@ -515,7 +492,6 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private void LoadTableView(DataTable dt)
         {
             dgvCourses.Rows.Clear();
-
             foreach (DataRow row in dt.Rows)
             {
                 dgvCourses.Rows.Add(
@@ -534,29 +510,15 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = courseService.GetTeacherSummary(currentTeacherID);
+
+                if (dt.Rows.Count > 0)
                 {
-                    conn.Open();
-
-                    string query = @"
-                        SELECT 
-                            COUNT(DISTINCT c.CourseID) AS TotalCourses,
-                            COUNT(DISTINCT e.EnrollmentID) AS TotalStudents,
-                            SUM(ISNULL(c.TotalLessons, 0)) AS TotalLessons
-                        FROM Courses c
-                        LEFT JOIN Enrollments e ON c.CourseID = e.CourseID
-                        WHERE c.TeacherID = @TeacherID";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        lblTotalCourses.Text = $"📚 Tổng khóa học: {reader["TotalCourses"]}";
-                        lblTotalStudents.Text = $"👥 Tổng học viên: {reader["TotalStudents"]}";
-                        lblTotalLessons.Text = $"📖 Tổng bài học: {reader["TotalLessons"]}";
-                    }
+                    DataRow row = dt.Rows[0];
+                    lblTotalCourses.Text = $"📚 Tổng khóa học: {row["TotalCourses"]}";
+                    lblTotalStudents.Text = $"👥 Tổng học viên: {row["TotalStudents"]}";
+                    lblTotalLessons.Text = $"📖 Tổng bài học: {row["TotalLessons"]}";
                 }
             }
             catch (Exception ex)
@@ -569,11 +531,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         // ============================================
         // EVENT HANDLERS
         // ============================================
-
         private void btnToggleView_Click(object sender, EventArgs e)
         {
             isCardView = !isCardView;
-
             if (isCardView)
             {
                 flowLayoutCourses.Visible = true;
@@ -586,7 +546,6 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                 tablePanel.Visible = true;
                 btnToggleView.Text = "🎴 Thẻ";
             }
-
             LoadCourses();
         }
 
@@ -641,7 +600,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             }
         }
 
-        private void EditCourse(string courseID)
+        private void EditCourse(int courseID)
         {
             using (var form = new Forms.CourseForm(courseID))
             {
@@ -665,27 +624,20 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             {
                 try
                 {
-                    using (SqlConnection conn = new SqlConnection(connectionString))
-                    {
-                        conn.Open();
-                        string query = "DELETE FROM Courses WHERE CourseID = @CourseID AND TeacherID = @TeacherID";
-                        SqlCommand cmd = new SqlCommand(query, conn);
-                        cmd.Parameters.AddWithValue("@CourseID", courseID);
-                        cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
+                    // ✅ Gọi Service
+                    bool success = courseService.DeleteCourse(courseID, currentTeacherID);
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show("Xóa khóa học thành công!", "Thành công",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            LoadCourses();
-                            LoadSummary();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Không thể xóa khóa học!", "Lỗi",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                    if (success)
+                    {
+                        MessageBox.Show("Xóa khóa học thành công!", "Thành công",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadCourses();
+                        LoadSummary();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không thể xóa khóa học!", "Lỗi",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 catch (Exception ex)
@@ -715,7 +667,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                 }
                 else if (relativeX >= 65 && relativeX <= 115)
                 {
-                    EditCourse(courseID);
+                    EditCourse(Convert.ToInt32(courseID));
                 }
                 else if (relativeX >= 120 && relativeX <= 165)
                 {
@@ -770,7 +722,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     e.Graphics.FillPath(brush, path);
                 using (Font font = new Font("Segoe UI", 7F, FontStyle.Bold))
                 using (SolidBrush textBrush = new SolidBrush(Color.White))
-                    e.Graphics.DrawString("📊 Chi tiết", font, textBrush, detailRect, new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+                    e.Graphics.DrawString("📊 Chi tiết", font, textBrush, detailRect,
+                        new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
 
                 // Button Sửa
                 Rectangle editRect = new Rectangle(e.CellBounds.X + 65, e.CellBounds.Y + (e.CellBounds.Height - 28) / 2, 50, 28);
@@ -779,7 +732,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     e.Graphics.FillPath(brush, path);
                 using (Font font = new Font("Segoe UI", 7F, FontStyle.Bold))
                 using (SolidBrush textBrush = new SolidBrush(Color.White))
-                    e.Graphics.DrawString("✏ Sửa", font, textBrush, editRect, new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+                    e.Graphics.DrawString("✏ Sửa", font, textBrush, editRect,
+                        new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
 
                 // Button Xóa
                 Rectangle deleteRect = new Rectangle(e.CellBounds.X + 120, e.CellBounds.Y + (e.CellBounds.Height - 28) / 2, 45, 28);
@@ -788,7 +742,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     e.Graphics.FillPath(brush, path);
                 using (Font font = new Font("Segoe UI", 10F, FontStyle.Bold))
                 using (SolidBrush textBrush = new SolidBrush(Color.White))
-                    e.Graphics.DrawString("🗑", font, textBrush, deleteRect, new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+                    e.Graphics.DrawString("🗑", font, textBrush, deleteRect,
+                        new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
             }
         }
 
@@ -803,6 +758,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             return path;
         }
 
+        // ============================================
+        // HELPER CLASS
+        // ============================================
         private class CategoryItem
         {
             public string CategoryID { get; set; }

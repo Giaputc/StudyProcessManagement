@@ -1,30 +1,26 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
+using StudyProcessManagement.Business.Teacher;
 
 namespace StudyProcessManagement.Views.Teacher.Forms
 {
     public partial class GradeSubmissionForm : Form
     {
-        // ============================================
-        // PRIVATE FIELDS
-        // ============================================
-        private string connectionString = "Data Source=DESKTOP-FO9OMBO;Initial Catalog=StudyProcess;Integrated Security=True";
         private string submissionID;
         private bool isViewOnly;
         private string attachmentPath = "";
+        private GradeSubmissionFormService service;
 
-        // ============================================
-        // CONSTRUCTORS
-        // ============================================
         public GradeSubmissionForm(string submissionID, bool isViewOnly = false)
         {
             InitializeComponent();
             this.submissionID = submissionID;
             this.isViewOnly = isViewOnly;
+            this.service = new GradeSubmissionFormService();
+
             LoadSubmissionData();
 
             if (isViewOnly)
@@ -33,144 +29,110 @@ namespace StudyProcessManagement.Views.Teacher.Forms
             }
         }
 
-        // ============================================
-        // EVENT HANDLERS
-        // ============================================
-        private void btnOpenFile_Click(object sender, EventArgs e)
+        private void LoadSubmissionData()
         {
-            if (!string.IsNullOrEmpty(attachmentPath))
+            try
             {
-                try
+                DataTable dt = service.GetSubmissionDetails(submissionID);
+
+                if (dt.Rows.Count > 0)
                 {
-                    Process.Start(new ProcessStartInfo
+                    DataRow row = dt.Rows[0];
+
+                    // ✅ Load thông tin - Đọc đúng tên cột trong DB
+                    lblStudentValue.Text = row["StudentName"].ToString();
+                    lblAssignmentValue.Text = row["AssignmentTitle"].ToString();
+                    lblCourseValue.Text = row["CourseName"].ToString();
+
+                    // Load thông tin bài nộp
+                    lblSubmitDateValue.Text = Convert.ToDateTime(row["SubmissionDate"]).ToString("dd/MM/yyyy HH:mm");
+                    lblDueDateValue.Text = Convert.ToDateTime(row["DueDate"]).ToString("dd/MM/yyyy");
+
+                    // ✅ Đọc StudentNote (không phải SubmissionText)
+                    txtSubmissionText.Text = row["StudentNote"]?.ToString() ?? "";
+
+                    // Load mô tả bài tập
+                    txtAssignmentDescription.Text = row["AssignmentDescription"]?.ToString() ?? "";
+
+                    // ✅ Load file đính kèm - Đọc FileUrl (không phải AttachmentUrl)
+                    attachmentPath = row["FileUrl"]?.ToString() ?? "";
+                    lblAttachmentValue.Text = string.IsNullOrEmpty(attachmentPath)
+                        ? "Không có file đính kèm"
+                        : Path.GetFileName(attachmentPath);
+
+                    // Load điểm và phản hồi (nếu đã chấm)
+                    if (row["Score"] != DBNull.Value)
                     {
-                        FileName = attachmentPath,
-                        UseShellExecute = true
-                    });
+                        numScore.Value = Convert.ToDecimal(row["Score"]);
+                    }
+
+                    // ✅ Đọc TeacherFeedback (không phải Feedback)
+                    if (row["TeacherFeedback"] != DBNull.Value)
+                    {
+                        txtFeedback.Text = row["TeacherFeedback"].ToString();
+                    }
+
+                    // Hiển thị điểm tối đa
+                    lblMaxScoreValue.Text = "/ " + row["MaxScore"].ToString();
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show("Không thể mở file: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Không tìm thấy thông tin bài nộp!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Close();
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Không có file đính kèm.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Lỗi khi tải dữ liệu: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
             }
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            // 1. Validate điểm
+            // Validate điểm
             if (numScore.Value < 0 || numScore.Value > 10)
             {
-                MessageBox.Show("Điểm số phải từ 0 đến 10!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Điểm số phải từ 0 đến 10!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 numScore.Focus();
                 return;
             }
 
-            // 2. Validate ID
+            // Validate ID
             if (string.IsNullOrEmpty(submissionID))
             {
-                MessageBox.Show("Lỗi: Không tìm thấy ID bài nộp!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi: Không tìm thấy ID bài nộp!", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // 3. Validate phản hồi (optional warning)
-            if (string.IsNullOrWhiteSpace(txtFeedback.Text))
-            {
-                if (MessageBox.Show("Bạn chưa nhập phản hồi. Tiếp tục lưu?", "Xác nhận",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-                {
-                    txtFeedback.Focus();
-                    return;
-                }
-            }
-
-            // 4. DEBUG: Hiển thị thông tin trước khi lưu
-            string debugInfo = $"SubmissionID: {submissionID}\n" +
-                               $"Score: {numScore.Value}\n" +
-                               $"Feedback length: {txtFeedback.Text.Length}";
-
-            System.Diagnostics.Debug.WriteLine(debugInfo);
-
-            // 5. Kiểm tra xem bài nộp có tồn tại không TRƯỚC KHI UPDATE
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Gọi service để lưu
+                bool success = service.GradeSubmission(submissionID, numScore.Value, txtFeedback.Text.Trim());
+
+                if (success)
                 {
-                    conn.Open();
-
-                    // Kiểm tra bài nộp có tồn tại không
-                    string checkQuery = "SELECT COUNT(*) FROM Submissions WHERE SubmissionID = @SubmissionID";
-                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
-                    {
-                        checkCmd.Parameters.Add("@SubmissionID", SqlDbType.Int).Value = Convert.ToInt32(submissionID);
-                        int count = (int)checkCmd.ExecuteScalar();
-
-                        if (count == 0)
-                        {
-                            MessageBox.Show($"Không tìm thấy bài nộp với ID: {submissionID}\n\n" +
-                                            "Vui lòng kiểm tra lại dữ liệu!",
-                                            "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-                    }
-
-                    // Thực hiện UPDATE
-                    using (SqlCommand cmd = new SqlCommand("spGradeSubmission", conn))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-
-                        cmd.Parameters.Add("@SubmissionID", SqlDbType.Int).Value = Convert.ToInt32(submissionID);
-                        cmd.Parameters.Add("@Score", SqlDbType.Decimal).Value = numScore.Value;
-                        cmd.Parameters.Add("@TeacherFeedback", SqlDbType.NVarChar).Value = txtFeedback.Text.Trim();
-
-                        // Debug: In ra các parameters
-                        System.Diagnostics.Debug.WriteLine("=== PARAMETERS ===");
-                        foreach (SqlParameter param in cmd.Parameters)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"{param.ParameterName} = {param.Value} ({param.SqlDbType})");
-                        }
-
-                        int rows = cmd.ExecuteNonQuery();
-
-                        System.Diagnostics.Debug.WriteLine($"Rows affected: {rows}");
-
-                        if (rows > 0)
-                        {
-                            MessageBox.Show("Chấm điểm thành công!", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            this.DialogResult = DialogResult.OK;
-                            this.Close();
-                        }
-                        else
-                        {
-                            MessageBox.Show($"Không thể cập nhật bài nộp!\n\n" +
-                                            $"SubmissionID: {submissionID}\n" +
-                                            $"Rows affected: {rows}\n\n" +
-                                            "Vui lòng kiểm tra stored procedure hoặc dữ liệu!",
-                                            "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-                    }
+                    MessageBox.Show("Chấm điểm thành công!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
                 }
-            }
-            catch (SqlException sqlEx)
-            {
-                MessageBox.Show($"Lỗi database: {sqlEx.Message}\n\n" +
-                                $"Error Number: {sqlEx.Number}\n" +
-                                $"Line Number: {sqlEx.LineNumber}\n\n" +
-                                $"Chi tiết: {sqlEx.ToString()}",
-                                "Lỗi SQL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else
+                {
+                    MessageBox.Show("Không thể cập nhật bài nộp!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi lưu: {ex.Message}\n\n" +
-                                $"Chi tiết: {ex.ToString()}",
-                                "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi lưu: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
@@ -178,105 +140,36 @@ namespace StudyProcessManagement.Views.Teacher.Forms
             this.Close();
         }
 
-        // ============================================
-        // PRIVATE METHODS
-        // ============================================
-        private void LoadSubmissionData()
+        private void btnOpenFile_Click(object sender, EventArgs e)
         {
-            try
+            if (!string.IsNullOrEmpty(attachmentPath))
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                try
                 {
-                    conn.Open();
-
-                    string query = @"
-                        SELECT 
-                            s.SubmissionID,
-                            s.SubmissionDate,
-                            s.StudentNote,
-                            s.FileUrl,
-                            s.Score,
-                            s.TeacherFeedback,
-                            u.FullName AS StudentName,
-                            a.Title AS AssignmentTitle,
-                            a.Description AS AssignmentDescription,
-                            a.MaxScore,
-                            a.DueDate,
-                            c.CourseName
-                        FROM Submissions s
-                        INNER JOIN Users u ON s.StudentID = u.UserID
-                        INNER JOIN Assignments a ON s.AssignmentID = a.AssignmentID
-                        INNER JOIN Courses c ON a.CourseID = c.CourseID
-                        WHERE s.SubmissionID = @SubmissionID";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    if (File.Exists(attachmentPath))
                     {
-                        // ✅ SỬA: Đổi kiểu parameter từ VarChar sang Int
-                        cmd.Parameters.Add("@SubmissionID", SqlDbType.Int).Value = Convert.ToInt32(submissionID);
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        Process.Start(new ProcessStartInfo
                         {
-                            if (reader.Read())
-                            {
-                                // ✅ SỬA: Đổi tên controls theo Designer
-                                // Load thông tin sinh viên và bài tập
-                                lblStudentValue.Text = reader["StudentName"].ToString();
-                                lblAssignmentValue.Text = reader["AssignmentTitle"].ToString();
-                                lblCourseValue.Text = reader["CourseName"].ToString();
-
-                                // Load thông tin bài nộp
-                                lblSubmitDateValue.Text = Convert.ToDateTime(reader["SubmissionDate"]).ToString("dd/MM/yyyy HH:mm");
-                                lblDueDateValue.Text = Convert.ToDateTime(reader["DueDate"]).ToString("dd/MM/yyyy");
-
-                                // ✅ SỬA: Đổi tên từ txtStudentNote sang txtSubmissionText
-                                txtSubmissionText.Text = reader["StudentNote"]?.ToString() ?? "";
-
-                                // ✅ SỬA: Mô tả bài tập
-                                txtAssignmentDescription.Text = reader["AssignmentDescription"]?.ToString() ?? "";
-
-                                // Load file đính kèm
-                                attachmentPath = reader["FileUrl"]?.ToString() ?? "";
-                                // ✅ SỬA: Đổi tên từ lblFileName sang lblAttachmentValue
-                                lblAttachmentValue.Text = string.IsNullOrEmpty(attachmentPath)
-                                    ? "Không có file đính kèm"
-                                    : Path.GetFileName(attachmentPath);
-
-                                // Load điểm và phản hồi (nếu đã chấm)
-                                if (!reader.IsDBNull(reader.GetOrdinal("Score")))
-                                {
-                                    numScore.Value = Convert.ToDecimal(reader["Score"]);
-                                }
-
-                                if (!reader.IsDBNull(reader.GetOrdinal("TeacherFeedback")))
-                                {
-                                    txtFeedback.Text = reader["TeacherFeedback"].ToString();
-                                }
-
-                                // Hiển thị điểm tối đa
-                                // ✅ SỬA: Đổi tên từ lblMaxScore sang lblMaxScoreValue
-                                lblMaxScoreValue.Text = "/ " + reader["MaxScore"].ToString();
-                            }
-                            else
-                            {
-                                MessageBox.Show("Không tìm thấy thông tin bài nộp!", "Lỗi",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                this.Close();
-                            }
-                        }
+                            FileName = attachmentPath,
+                            UseShellExecute = true
+                        });
+                    }
+                    else
+                    {
+                        MessageBox.Show("File không tồn tại: " + attachmentPath, "Lỗi",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Không thể mở file: " + ex.Message, "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (SqlException sqlEx)
+            else
             {
-                MessageBox.Show("Lỗi khi tải dữ liệu: " + sqlEx.Message, "Lỗi SQL",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.Close();
+                MessageBox.Show("Không có file đính kèm.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

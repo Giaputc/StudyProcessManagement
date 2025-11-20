@@ -2,12 +2,15 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Data;
-using System.Data.SqlClient;
+using StudyProcessManagement.Business.Teacher; // ✅ Import Service
 
 namespace StudyProcessManagement.Views.Teacher.Controls
 {
     public class ContentControl : UserControl
     {
+        // =============================================
+        // FIELDS
+        // =============================================
         private Panel headerPanel;
         private Label lblTitle;
         private Label lblBreadcrumb;
@@ -31,50 +34,52 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private Button btnAddLesson;
         private Button btnDelete;
 
-        // Database connection (Thay đổi connection string của bạn)
-        private string connectionString = "Server=DESKTOP-FO9OMBO;Database=StudyProcess;Integrated Security=true;";
-        private string currentTeacherID = "USR002"; // ID giảng viên hiện tại (lấy từ session/login)
+        // ✅ Thay vì connectionString, dùng Service
+        private CourseContentService courseContentService;
+        private string currentTeacherID = "USR002"; // TODO: Lấy từ session/login
         private string selectedCourseID = "";
         private string selectedSectionID = "";
         private string selectedLessonID = "";
         private bool isEditingLesson = false;
 
+        // =============================================
+        // CONSTRUCTOR
+        // =============================================
         public ContentControl()
         {
             InitializeComponent();
+
+            // ✅ Khởi tạo Service
+            courseContentService = new CourseContentService();
 
             // ✅ GÁN CÁC EVENT HANDLERS
             if (!DesignMode)
             {
                 this.Load += ContentControl_Load;
                 this.Resize += ContentControl_Resize;
-
                 cboCourse.SelectedIndexChanged += CboCourse_SelectedIndexChanged;
                 btnAddSection.Click += BtnAddSection_Click;
                 btnAddSection.MouseEnter += BtnAddSection_MouseEnter;
                 btnAddSection.MouseLeave += BtnAddSection_MouseLeave;
-
                 tvContent.AfterSelect += TvContent_AfterSelect;
-
                 btnSave.Click += BtnSave_Click;
                 btnSave.MouseEnter += BtnSave_MouseEnter;
                 btnSave.MouseLeave += BtnSave_MouseLeave;
-
                 btnAddLesson.Click += BtnAddLesson_Click;
                 btnAddLesson.MouseEnter += BtnAddLesson_MouseEnter;
                 btnAddLesson.MouseLeave += BtnAddLesson_MouseLeave;
-
                 btnDelete.Click += BtnDelete_Click;
                 btnDelete.MouseEnter += BtnDelete_MouseEnter;
                 btnDelete.MouseLeave += BtnDelete_MouseLeave;
-
                 txtMaterials.Click += TxtMaterials_Click;
-
                 treeContainerPanel.Paint += TreeContainerPanel_Paint;
                 detailPanel.Paint += DetailPanel_Paint;
             }
         }
 
+        // =============================================
+        // INITIALIZE COMPONENT (AUTO-GENERATED UI CODE)
+        // =============================================
         private void InitializeComponent()
         {
             this.headerPanel = new System.Windows.Forms.Panel();
@@ -105,6 +110,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.buttonPanel.SuspendLayout();
             this.treeContainerPanel.SuspendLayout();
             this.SuspendLayout();
+
             // 
             // headerPanel
             // 
@@ -118,6 +124,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.headerPanel.Name = "headerPanel";
             this.headerPanel.Size = new System.Drawing.Size(1005, 130);
             this.headerPanel.TabIndex = 1;
+
             // 
             // lblTitle
             // 
@@ -129,6 +136,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblTitle.Size = new System.Drawing.Size(240, 37);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Quản lý Nội dung";
+
             // 
             // lblBreadcrumb
             // 
@@ -140,6 +148,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblBreadcrumb.Size = new System.Drawing.Size(215, 15);
             this.lblBreadcrumb.TabIndex = 1;
             this.lblBreadcrumb.Text = "Trang chủ / Nội dung / Quản lý bài học";
+
             // 
             // cboCourse
             // 
@@ -149,6 +158,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.cboCourse.Name = "cboCourse";
             this.cboCourse.Size = new System.Drawing.Size(280, 25);
             this.cboCourse.TabIndex = 2;
+
             // 
             // btnAddSection
             // 
@@ -164,6 +174,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.btnAddSection.TabIndex = 3;
             this.btnAddSection.Text = "➕ Thêm chương";
             this.btnAddSection.UseVisualStyleBackColor = false;
+
             // 
             // mainContentPanel
             // 
@@ -175,8 +186,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.mainContentPanel.Name = "mainContentPanel";
             this.mainContentPanel.Size = new System.Drawing.Size(1005, 556);
             this.mainContentPanel.TabIndex = 0;
+
             // 
-            // detailPanel - ✅ FIX LAYOUT: Dock Fill để chiếm 50% space
+            // detailPanel
             // 
             this.detailPanel.BackColor = System.Drawing.Color.White;
             this.detailPanel.Controls.Add(this.lblDetailTitle);
@@ -189,11 +201,13 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.detailPanel.Controls.Add(this.lblMaterials);
             this.detailPanel.Controls.Add(this.txtMaterials);
             this.detailPanel.Controls.Add(this.buttonPanel);
-            this.detailPanel.Dock = System.Windows.Forms.DockStyle.Fill;  // ✅ Fill remaining space (50%)
+            this.detailPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.detailPanel.Location = new System.Drawing.Point(510, 0);
             this.detailPanel.Name = "detailPanel";
+            this.detailPanel.Padding = new System.Windows.Forms.Padding(15);
             this.detailPanel.Size = new System.Drawing.Size(495, 556);
             this.detailPanel.TabIndex = 1;
+
             // 
             // lblDetailTitle
             // 
@@ -205,6 +219,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblDetailTitle.Size = new System.Drawing.Size(207, 32);
             this.lblDetailTitle.TabIndex = 0;
             this.lblDetailTitle.Text = "Chi tiết bài học";
+
             // 
             // lblLessonName
             // 
@@ -216,6 +231,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblLessonName.Size = new System.Drawing.Size(83, 19);
             this.lblLessonName.TabIndex = 1;
             this.lblLessonName.Text = "Tên bài học";
+
             // 
             // txtLessonName
             // 
@@ -226,6 +242,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.txtLessonName.Name = "txtLessonName";
             this.txtLessonName.Size = new System.Drawing.Size(445, 25);
             this.txtLessonName.TabIndex = 2;
+
             // 
             // lblLessonDesc
             // 
@@ -237,6 +254,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblLessonDesc.Size = new System.Drawing.Size(47, 19);
             this.lblLessonDesc.TabIndex = 3;
             this.lblLessonDesc.Text = "Mô tả";
+
             // 
             // txtLessonDescription
             // 
@@ -248,6 +266,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.txtLessonDescription.Size = new System.Drawing.Size(445, 100);
             this.txtLessonDescription.TabIndex = 4;
             this.txtLessonDescription.Text = "";
+
             // 
             // lblVideoUrl
             // 
@@ -259,6 +278,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblVideoUrl.Size = new System.Drawing.Size(101, 19);
             this.lblVideoUrl.TabIndex = 5;
             this.lblVideoUrl.Text = "Link video bài";
+
             // 
             // txtVideoUrl
             // 
@@ -269,6 +289,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.txtVideoUrl.Name = "txtVideoUrl";
             this.txtVideoUrl.Size = new System.Drawing.Size(445, 25);
             this.txtVideoUrl.TabIndex = 6;
+
             // 
             // lblMaterials
             // 
@@ -280,6 +301,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblMaterials.Size = new System.Drawing.Size(96, 19);
             this.lblMaterials.TabIndex = 7;
             this.lblMaterials.Text = "Tài liệu đính";
+
             // 
             // txtMaterials
             // 
@@ -293,6 +315,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.txtMaterials.Size = new System.Drawing.Size(445, 25);
             this.txtMaterials.TabIndex = 8;
             this.txtMaterials.Text = "Chọn file...";
+
             // 
             // buttonPanel
             // 
@@ -305,6 +328,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.buttonPanel.Name = "buttonPanel";
             this.buttonPanel.Size = new System.Drawing.Size(445, 50);
             this.buttonPanel.TabIndex = 9;
+
             // 
             // btnSave
             // 
@@ -320,6 +344,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.btnSave.TabIndex = 0;
             this.btnSave.Text = "💾 Lưu";
             this.btnSave.UseVisualStyleBackColor = false;
+
             // 
             // btnAddLesson
             // 
@@ -335,6 +360,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.btnAddLesson.TabIndex = 1;
             this.btnAddLesson.Text = "➕ Thêm bài";
             this.btnAddLesson.UseVisualStyleBackColor = false;
+
             // 
             // btnDelete
             // 
@@ -350,28 +376,31 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.btnDelete.TabIndex = 2;
             this.btnDelete.Text = "🗑️ Xóa";
             this.btnDelete.UseVisualStyleBackColor = false;
+
             // 
-            // treeContainerPanel - ✅ FIX LAYOUT: Dock Left với Width 50%
+            // treeContainerPanel
             // 
             this.treeContainerPanel.BackColor = System.Drawing.Color.White;
             this.treeContainerPanel.Controls.Add(this.tvContent);
-            this.treeContainerPanel.Dock = System.Windows.Forms.DockStyle.Left;  // ✅ Dock Left
+            this.treeContainerPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.treeContainerPanel.Location = new System.Drawing.Point(0, 0);
             this.treeContainerPanel.Margin = new System.Windows.Forms.Padding(0, 0, 15, 0);
             this.treeContainerPanel.Name = "treeContainerPanel";
-            this.treeContainerPanel.Padding = new System.Windows.Forms.Padding(15, 15, 8, 15);  // ✅ Padding for spacing
-            this.treeContainerPanel.Size = new System.Drawing.Size(495, 556);  // ✅ Fixed width 50%
+            this.treeContainerPanel.Padding = new System.Windows.Forms.Padding(15, 15, 8, 15);
+            this.treeContainerPanel.Size = new System.Drawing.Size(495, 556);
             this.treeContainerPanel.TabIndex = 0;
+
             // 
             // tvContent
             // 
             this.tvContent.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tvContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvContent.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.tvContent.Location = new System.Drawing.Point(0, 0);
+            this.tvContent.Location = new System.Drawing.Point(15, 15);
             this.tvContent.Name = "tvContent";
-            this.tvContent.Size = new System.Drawing.Size(495, 556);
+            this.tvContent.Size = new System.Drawing.Size(472, 526);
             this.tvContent.TabIndex = 0;
+
             // 
             // ContentControl
             // 
@@ -392,7 +421,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         }
 
         // =============================================
-        // ✅ LOAD DATA KHI FORM MỞ
+        // ✅ LOAD DATA - GỌI SERVICE
         // =============================================
         private void ContentControl_Load(object sender, EventArgs e)
         {
@@ -403,36 +432,30 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = courseContentService.GetTeacherCourses(currentTeacherID);
+
+                cboCourse.Items.Clear();
+                foreach (DataRow row in dt.Rows)
                 {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("sp_GetTeacherCourses", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    cboCourse.Items.Clear();
-
-                    while (reader.Read())
+                    cboCourse.Items.Add(new ComboBoxItem
                     {
-                        cboCourse.Items.Add(new ComboBoxItem
-                        {
-                            Text = reader["CourseName"].ToString(),
-                            Value = reader["CourseID"].ToString()
-                        });
-                    }
+                        Text = row["CourseName"].ToString(),
+                        Value = row["CourseID"].ToString()
+                    });
+                }
 
-                    if (cboCourse.Items.Count > 0)
-                    {
-                        cboCourse.DisplayMember = "Text";
-                        cboCourse.ValueMember = "Value";
-                        cboCourse.SelectedIndex = 0;
-                    }
+                if (cboCourse.Items.Count > 0)
+                {
+                    cboCourse.DisplayMember = "Text";
+                    cboCourse.ValueMember = "Value";
+                    cboCourse.SelectedIndex = 0;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải danh sách khóa học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi tải danh sách khóa học: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -453,57 +476,39 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             {
                 tvContent.Nodes.Clear();
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Load Sections từ Service
+                DataTable dtSections = courseContentService.GetCourseSections(courseID);
+
+                foreach (DataRow sectionRow in dtSections.Rows)
                 {
-                    conn.Open();
+                    TreeNode sectionNode = new TreeNode(sectionRow["SectionTitle"].ToString());
+                    sectionNode.Tag = new { Type = "Section", ID = sectionRow["SectionID"].ToString() };
+                    tvContent.Nodes.Add(sectionNode);
 
-                    // Load Sections
-                    SqlCommand cmdSections = new SqlCommand(
-                        "SELECT SectionID, SectionTitle, SectionOrder FROM Sections WHERE CourseID = @CourseID ORDER BY SectionOrder", conn);
-                    cmdSections.Parameters.AddWithValue("@CourseID", courseID);
-                    SqlDataReader readerSections = cmdSections.ExecuteReader();
+                    // ✅ Load Lessons cho Section này
+                    string sectionID = sectionRow["SectionID"].ToString();
+                    DataTable dtLessons = courseContentService.GetSectionLessons(sectionID);
 
-                    while (readerSections.Read())
+                    foreach (DataRow lessonRow in dtLessons.Rows)
                     {
-                        TreeNode sectionNode = new TreeNode(readerSections["SectionTitle"].ToString());
-                        sectionNode.Tag = new { Type = "Section", ID = readerSections["SectionID"].ToString() };
-                        tvContent.Nodes.Add(sectionNode);
+                        TreeNode lessonNode = new TreeNode(lessonRow["LessonTitle"].ToString());
+                        lessonNode.Tag = new { Type = "Lesson", ID = lessonRow["LessonID"].ToString() };
+                        sectionNode.Nodes.Add(lessonNode);
                     }
-                    readerSections.Close();
-
-                    // Load Lessons for each Section
-                    foreach (TreeNode sectionNode in tvContent.Nodes)
-                    {
-                        dynamic sectionData = sectionNode.Tag;
-                        string sectionID = sectionData.ID;
-
-                        SqlCommand cmdLessons = new SqlCommand(
-                            "SELECT LessonID, LessonTitle, LessonOrder FROM Lessons WHERE SectionID = @SectionID ORDER BY LessonOrder", conn);
-                        cmdLessons.Parameters.AddWithValue("@SectionID", sectionID);
-                        SqlDataReader readerLessons = cmdLessons.ExecuteReader();
-
-                        while (readerLessons.Read())
-                        {
-                            TreeNode lessonNode = new TreeNode(readerLessons["LessonTitle"].ToString());
-                            lessonNode.Tag = new { Type = "Lesson", ID = readerLessons["LessonID"].ToString() };
-                            sectionNode.Nodes.Add(lessonNode);
-                        }
-                        readerLessons.Close();
-                    }
-
-                    tvContent.ExpandAll();
                 }
+
+                tvContent.ExpandAll();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải cấu trúc khóa học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi tải cấu trúc khóa học: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         // =============================================
         // EVENT HANDLERS
         // =============================================
-
         private void TvContent_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (e.Node.Tag == null) return;
@@ -528,30 +533,25 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = courseContentService.GetLessonDetails(lessonID);
+
+                if (dt.Rows.Count > 0)
                 {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand(
-                        "SELECT * FROM Lessons WHERE LessonID = @LessonID", conn);
-                    cmd.Parameters.AddWithValue("@LessonID", lessonID);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        txtLessonName.Text = reader["LessonTitle"].ToString();
-                        txtLessonDescription.Text = reader["Content"].ToString();
-                        txtVideoUrl.Text = reader["VideoUrl"].ToString();
-                        txtMaterials.Text = reader["AttachmentUrl"].ToString();
-
-                        selectedLessonID = lessonID;
-                        selectedSectionID = reader["SectionID"].ToString();
-                        isEditingLesson = true;
-                    }
+                    DataRow row = dt.Rows[0];
+                    txtLessonName.Text = row["LessonTitle"].ToString();
+                    txtLessonDescription.Text = row["Content"].ToString();
+                    txtVideoUrl.Text = row["VideoUrl"].ToString();
+                    txtMaterials.Text = row["AttachmentUrl"].ToString();
+                    selectedLessonID = lessonID;
+                    selectedSectionID = row["SectionID"].ToString();
+                    isEditingLesson = true;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải chi tiết bài học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi tải chi tiết bài học: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -559,7 +559,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             if (string.IsNullOrEmpty(selectedCourseID))
             {
-                MessageBox.Show("Vui lòng chọn khóa học trước!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn khóa học trước!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -570,33 +571,16 @@ namespace StudyProcessManagement.Views.Teacher.Controls
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    // Get next section order
-                    SqlCommand cmdOrder = new SqlCommand(
-                        "SELECT ISNULL(MAX(SectionOrder), 0) + 1 FROM Sections WHERE CourseID = @CourseID", conn);
-                    cmdOrder.Parameters.AddWithValue("@CourseID", selectedCourseID);
-                    int nextOrder = (int)cmdOrder.ExecuteScalar();
-
-                    // Insert new section
-                    string newSectionID = "SEC" + Guid.NewGuid().ToString().Substring(0, 8);
-                    SqlCommand cmdInsert = new SqlCommand(
-                        "INSERT INTO Sections (SectionID, CourseID, SectionTitle, SectionOrder) VALUES (@SectionID, @CourseID, @SectionTitle, @SectionOrder)", conn);
-                    cmdInsert.Parameters.AddWithValue("@SectionID", newSectionID);
-                    cmdInsert.Parameters.AddWithValue("@CourseID", selectedCourseID);
-                    cmdInsert.Parameters.AddWithValue("@SectionTitle", sectionTitle);
-                    cmdInsert.Parameters.AddWithValue("@SectionOrder", nextOrder);
-                    cmdInsert.ExecuteNonQuery();
-
-                    MessageBox.Show("Thêm chương thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadCourseStructure(selectedCourseID);
-                }
+                // ✅ Gọi Service
+                courseContentService.AddSection(selectedCourseID, sectionTitle);
+                MessageBox.Show("Thêm chương thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadCourseStructure(selectedCourseID);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi thêm chương: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi thêm chương: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -604,7 +588,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             if (string.IsNullOrEmpty(selectedSectionID))
             {
-                MessageBox.Show("Vui lòng chọn chương trước!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn chương trước!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -617,68 +602,55 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             if (string.IsNullOrWhiteSpace(txtLessonName.Text))
             {
-                MessageBox.Show("Vui lòng nhập tên bài học!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng nhập tên bài học!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (string.IsNullOrEmpty(selectedSectionID))
             {
-                MessageBox.Show("Vui lòng chọn chương!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn chương!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                if (isEditingLesson && !string.IsNullOrEmpty(selectedLessonID))
                 {
-                    conn.Open();
-
-                    if (isEditingLesson && !string.IsNullOrEmpty(selectedLessonID))
-                    {
-                        // Update existing lesson
-                        SqlCommand cmd = new SqlCommand(
-                            "UPDATE Lessons SET LessonTitle = @Title, Content = @Content, VideoUrl = @VideoUrl, AttachmentUrl = @Attachment WHERE LessonID = @LessonID", conn);
-                        cmd.Parameters.AddWithValue("@LessonID", selectedLessonID);
-                        cmd.Parameters.AddWithValue("@Title", txtLessonName.Text);
-                        cmd.Parameters.AddWithValue("@Content", txtLessonDescription.Text);
-                        cmd.Parameters.AddWithValue("@VideoUrl", txtVideoUrl.Text);
-                        cmd.Parameters.AddWithValue("@Attachment", txtMaterials.Text);
-                        cmd.ExecuteNonQuery();
-
-                        MessageBox.Show("Cập nhật bài học thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        // Insert new lesson
-                        SqlCommand cmdOrder = new SqlCommand(
-                            "SELECT ISNULL(MAX(LessonOrder), 0) + 1 FROM Lessons WHERE SectionID = @SectionID", conn);
-                        cmdOrder.Parameters.AddWithValue("@SectionID", selectedSectionID);
-                        int nextOrder = (int)cmdOrder.ExecuteScalar();
-
-                        string newLessonID = "LES" + Guid.NewGuid().ToString().Substring(0, 8);
-                        SqlCommand cmd = new SqlCommand(
-                            "INSERT INTO Lessons (LessonID, CourseID, SectionID, LessonTitle, LessonOrder, Content, VideoUrl, AttachmentUrl) " +
-                            "VALUES (@LessonID, @CourseID, @SectionID, @Title, @Order, @Content, @VideoUrl, @Attachment)", conn);
-                        cmd.Parameters.AddWithValue("@LessonID", newLessonID);
-                        cmd.Parameters.AddWithValue("@CourseID", selectedCourseID);
-                        cmd.Parameters.AddWithValue("@SectionID", selectedSectionID);
-                        cmd.Parameters.AddWithValue("@Title", txtLessonName.Text);
-                        cmd.Parameters.AddWithValue("@Order", nextOrder);
-                        cmd.Parameters.AddWithValue("@Content", txtLessonDescription.Text);
-                        cmd.Parameters.AddWithValue("@VideoUrl", txtVideoUrl.Text);
-                        cmd.Parameters.AddWithValue("@Attachment", txtMaterials.Text);
-                        cmd.ExecuteNonQuery();
-
-                        MessageBox.Show("Thêm bài học thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-
-                    LoadCourseStructure(selectedCourseID);
-                    ClearLessonForm();
+                    // ✅ Update existing lesson
+                    courseContentService.UpdateLesson(
+                        selectedLessonID,
+                        txtLessonName.Text,
+                        txtLessonDescription.Text,
+                        txtVideoUrl.Text,
+                        txtMaterials.Text
+                    );
+                    MessageBox.Show("Cập nhật bài học thành công!", "Thành công",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                else
+                {
+                    // ✅ Insert new lesson
+                    courseContentService.AddLesson(
+                        selectedCourseID,
+                        selectedSectionID,
+                        txtLessonName.Text,
+                        txtLessonDescription.Text,
+                        txtVideoUrl.Text,
+                        txtMaterials.Text
+                    );
+                    MessageBox.Show("Thêm bài học thành công!", "Thành công",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                LoadCourseStructure(selectedCourseID);
+                ClearLessonForm();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi lưu bài học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi lưu bài học: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -686,7 +658,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             if (tvContent.SelectedNode == null || tvContent.SelectedNode.Tag == null)
             {
-                MessageBox.Show("Vui lòng chọn mục cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn mục cần xóa!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -704,31 +677,26 @@ namespace StudyProcessManagement.Views.Teacher.Controls
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                if (type == "Section")
                 {
-                    conn.Open();
-
-                    if (type == "Section")
-                    {
-                        SqlCommand cmd = new SqlCommand("DELETE FROM Sections WHERE SectionID = @SectionID", conn);
-                        cmd.Parameters.AddWithValue("@SectionID", id);
-                        cmd.ExecuteNonQuery();
-                    }
-                    else if (type == "Lesson")
-                    {
-                        SqlCommand cmd = new SqlCommand("DELETE FROM Lessons WHERE LessonID = @LessonID", conn);
-                        cmd.Parameters.AddWithValue("@LessonID", id);
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    MessageBox.Show("Xóa thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadCourseStructure(selectedCourseID);
-                    ClearLessonForm();
+                    // ✅ Gọi Service xóa Section
+                    courseContentService.DeleteSection(id);
                 }
+                else if (type == "Lesson")
+                {
+                    // ✅ Gọi Service xóa Lesson
+                    courseContentService.DeleteLesson(id);
+                }
+
+                MessageBox.Show("Xóa thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadCourseStructure(selectedCourseID);
+                ClearLessonForm();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi xóa: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi xóa: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -755,26 +723,22 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         }
 
         // =============================================
-        // ✅ RESIZE EVENT - Maintain 50-50 split
+        // RESIZE EVENT - Maintain 50-50 split
         // =============================================
         private void ContentControl_Resize(object sender, EventArgs e)
         {
-            // ✅ Calculate 50% width for both panels with spacing
             if (mainContentPanel != null && mainContentPanel.Width > 30)
             {
-                int spacing = 15; // Space between two panels
+                int spacing = 15;
                 int availableWidth = mainContentPanel.Width - spacing;
                 int halfWidth = availableWidth / 2;
-
                 treeContainerPanel.Width = halfWidth;
-                // detailPanel will auto-fill the remaining space with Dock.Fill
             }
         }
 
         // =============================================
         // UI PAINT EVENTS
         // =============================================
-
         private void TreeContainerPanel_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -818,7 +782,6 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         // =============================================
         // HOVER EFFECTS
         // =============================================
-
         private void BtnAddSection_MouseEnter(object sender, EventArgs e)
         {
             this.btnAddSection.BackColor = Color.FromArgb(56, 142, 60);

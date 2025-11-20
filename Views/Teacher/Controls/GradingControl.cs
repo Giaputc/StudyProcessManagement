@@ -1,9 +1,10 @@
 using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using StudyProcessManagement.Business.Teacher;   // THÊM
+
 
 namespace StudyProcessManagement.Views.Teacher.Controls
 {
@@ -35,19 +36,23 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private int hoverRow = -1;
 
         // Database connection
-        private string connectionString = "Server=DESKTOP-FO9OMBO;Database=StudyProcess;Integrated Security=true;";
+        private GradingService gradingService = new GradingService();
+        private readonly StudentService studentService;
         private string currentTeacherID = "USR002";
 
         public GradingControl()
         {
             InitializeComponent();
+
+            gradingService = new GradingService();
+            studentService = new StudentService();
+
             if (!DesignMode)
             {
                 LoadCourseFilter();
                 LoadSubmissions();
             }
         }
-
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -242,6 +247,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.dgvSubmissions.RowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dgvSubmissions.RowTemplate.Height = 50;
             this.dgvSubmissions.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvSubmissions.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvSubmissions.Size = new System.Drawing.Size(940, 410);
             this.dgvSubmissions.TabIndex = 0;
             this.dgvSubmissions.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvSubmissions_CellClick);
@@ -338,42 +344,35 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         // DATABASE METHODS
         // ============================================
 
-        private void LoadCourseFilter()
+        void LoadCourseFilter()
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                cboCourse.Items.Clear();
+                cboCourse.Items.Add(new CourseItem { CourseID = "", CourseName = "-- Tất cả khóa học --" });
+
+                DataTable dt = studentService.GetTeacherCourses(currentTeacherID);
+
+                foreach (DataRow row in dt.Rows)
                 {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("sp_GetTeacherCourses", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-
-                    cboCourse.Items.Clear();
-                    cboCourse.Items.Add(new CourseItem { CourseID = "", CourseName = "-- Tất cả khóa học --" });
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    cboCourse.Items.Add(new CourseItem
                     {
-                        cboCourse.Items.Add(new CourseItem
-                        {
-                            CourseID = reader["CourseID"].ToString(),
-                            CourseName = reader["CourseName"].ToString()
-                        });
-                    }
-
-                    cboCourse.DisplayMember = "CourseName";
-                    cboCourse.ValueMember = "CourseID";
-                    cboCourse.SelectedIndex = 0;
+                        CourseID = row["CourseID"].ToString(),
+                        CourseName = row["CourseName"].ToString()
+                    });
                 }
 
-                // Load status filter
+                cboCourse.DisplayMember = "CourseName";
+                cboCourse.ValueMember = "CourseID";
+                cboCourse.SelectedIndex = 0;
+
+                // Status filter
                 cboStatus.Items.Clear();
                 cboStatus.Items.Add("Tất cả");
                 cboStatus.Items.Add("Chưa chấm");
                 cboStatus.Items.Add("Đã chấm");
                 cboStatus.Items.Add("Nộp trễ");
-                cboStatus.SelectedIndex = 1; // Default: Chưa chấm
+                cboStatus.SelectedIndex = 1;
             }
             catch (Exception ex)
             {
@@ -382,55 +381,50 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             }
         }
 
-        private void LoadSubmissions()
+
+        void LoadSubmissions()
         {
             try
             {
-                string selectedCourseID = cboCourse.SelectedItem != null
-                    ? ((CourseItem)cboCourse.SelectedItem).CourseID
-                    : "";
+                string courseFilter = null;
 
-                string selectedStatus = cboStatus.SelectedItem?.ToString() ?? "Tất cả";
-
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                if (cboCourse.SelectedItem is CourseItem item && !string.IsNullOrEmpty(item.CourseID))
                 {
-                    conn.Open();
-
-                    SqlCommand cmd = new SqlCommand("sp_GetAllSubmissions", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-                    cmd.Parameters.AddWithValue("@CourseID", string.IsNullOrEmpty(selectedCourseID) ? (object)DBNull.Value : selectedCourseID);
-
-                    // THAY ĐỔI CHÍNH: @Status → @StatusFilter
-                    cmd.Parameters.AddWithValue("@StatusFilter", selectedStatus == "Tất cả" ? (object)DBNull.Value : selectedStatus);
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    dgvSubmissions.Rows.Clear();
-
-                    int pendingCount = 0;
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        string status = row["Status"].ToString();
-                        if (status == "Chưa chấm") pendingCount++;
-
-                        dgvSubmissions.Rows.Add(
-                            row["StudentName"],
-                            row["AssignmentTitle"],
-                            row["CourseName"],
-                            Convert.ToDateTime(row["SubmissionDate"]).ToString("dd/MM/yyyy"),
-                            Convert.ToDateTime(row["DueDate"]).ToString("dd/MM/yyyy"),
-                            status,
-                            row["Score"] != DBNull.Value ? row["Score"].ToString() : "-",
-                            "", // Action column
-                            row["SubmissionID"]
-                        );
-                    }
-
-                    lblSummaryCount.Text = pendingCount.ToString();
+                    // GradingService filter theo CourseName
+                    courseFilter = item.CourseName;
                 }
+
+                string selectedStatus = cboStatus.SelectedItem?.ToString();
+                string statusFilter = selectedStatus == "Tất cả" ? null : selectedStatus;
+
+                DataTable dt = gradingService.GetAllSubmissions(
+                    currentTeacherID,
+                    courseFilter,
+                    statusFilter
+                );
+
+                dgvSubmissions.Rows.Clear();
+
+                int pendingCount = 0;
+                foreach (DataRow row in dt.Rows)
+                {
+                    string status = row["Status"].ToString();
+                    if (status == "Chưa chấm") pendingCount++;
+
+                    dgvSubmissions.Rows.Add(
+                        row["StudentName"],
+                        row["AssignmentTitle"],
+                        row["CourseName"],
+                        Convert.ToDateTime(row["SubmissionDate"]).ToString("dd/MM/yyyy"),
+                        Convert.ToDateTime(row["DueDate"]).ToString("dd/MM/yyyy"),
+                        status,
+                        row["Score"] != DBNull.Value ? row["Score"].ToString() : "-",
+                        "", // Thao tác
+                        row["SubmissionID"]
+                    );
+                }
+
+                lblSummaryCount.Text = pendingCount.ToString();
             }
             catch (Exception ex)
             {
@@ -438,6 +432,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
 
         // ============================================

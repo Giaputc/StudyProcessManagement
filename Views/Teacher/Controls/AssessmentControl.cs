@@ -1,13 +1,18 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using StudyProcessManagement.Business.Teacher;
+using StudyProcessManagement.Views.Teacher.Forms;
+using System;
 using System.Data;
 using System.Data.SqlClient;
-using StudyProcessManagement.Views.Teacher.Forms;
+using System.Drawing;
+using System.Windows.Forms;
+
 namespace StudyProcessManagement.Views.Teacher.Controls
 {
     public class AssessmentControl : UserControl
     {
+        // =============================================
+        // FIELDS
+        // =============================================
         private TableLayoutPanel mainLayout;
         private Panel headerPanel;
         private Label lblTitle;
@@ -18,8 +23,6 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private int hoverRow = -1;
         private string hoverButton = "";
 
-        // Database connection
-        private string connectionString = "Server=DESKTOP-FO9OMBO;Database=StudyProcess;Integrated Security=true;";
         private FlowLayoutPanel rightPanel;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
@@ -28,11 +31,20 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private DataGridViewTextBoxColumn colStatus;
         private DataGridViewTextBoxColumn colAction;
         private DataGridViewTextBoxColumn colID;
-        private string currentTeacherID = "USR002";
 
+        // ✅ Thay vì connectionString, dùng Service
+        private AssignmentService assignmentService;
+        private string currentTeacherID = "USR002"; // TODO: Lấy từ session/login
+
+        // =============================================
+        // CONSTRUCTOR
+        // =============================================
         public AssessmentControl()
         {
             InitializeComponent();
+
+            // ✅ Khởi tạo Service
+            assignmentService = new AssignmentService();
 
             // ✅ GÁN CÁC EVENT HANDLERS
             if (!DesignMode)
@@ -55,6 +67,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             }
         }
 
+        // =============================================
+        // INITIALIZE COMPONENT (AUTO-GENERATED UI CODE)
+        // =============================================
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -80,6 +95,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.contentPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvAssignments)).BeginInit();
             this.SuspendLayout();
+
             // 
             // mainLayout
             // 
@@ -96,6 +112,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.mainLayout.Size = new System.Drawing.Size(1065, 726);
             this.mainLayout.TabIndex = 0;
+
             // 
             // headerPanel
             // 
@@ -107,6 +124,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.headerPanel.Padding = new System.Windows.Forms.Padding(8);
             this.headerPanel.Size = new System.Drawing.Size(1043, 64);
             this.headerPanel.TabIndex = 0;
+
             // 
             // lblTitle
             // 
@@ -118,6 +136,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Quản lý Bài tập";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+
             // 
             // rightPanel
             // 
@@ -131,6 +150,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.rightPanel.Size = new System.Drawing.Size(360, 48);
             this.rightPanel.TabIndex = 1;
             this.rightPanel.WrapContents = false;
+
             // 
             // cboCourse
             // 
@@ -141,6 +161,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.cboCourse.Name = "cboCourse";
             this.cboCourse.Size = new System.Drawing.Size(200, 25);
             this.cboCourse.TabIndex = 0;
+
             // 
             // btnCreate
             // 
@@ -157,6 +178,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.btnCreate.TabIndex = 1;
             this.btnCreate.Text = "➕ Tạo mới";
             this.btnCreate.UseVisualStyleBackColor = false;
+
             // 
             // contentPanel
             // 
@@ -169,6 +191,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.contentPanel.Padding = new System.Windows.Forms.Padding(1);
             this.contentPanel.Size = new System.Drawing.Size(1041, 632);
             this.contentPanel.TabIndex = 1;
+
             // 
             // dgvAssignments
             // 
@@ -216,6 +239,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.dgvAssignments.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvAssignments.Size = new System.Drawing.Size(1039, 630);
             this.dgvAssignments.TabIndex = 0;
+            this.dgvAssignments.AutoGenerateColumns = false;
+
             // 
             // colID
             // 
@@ -224,6 +249,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.colID.Name = "colID";
             this.colID.ReadOnly = true;
             this.colID.Visible = false;
+
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -232,6 +258,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.dataGridViewTextBoxColumn1.HeaderText = "Tên bài tập";
             this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             this.dataGridViewTextBoxColumn1.ReadOnly = true;
+
             // 
             // dataGridViewTextBoxColumn2
             // 
@@ -239,6 +266,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.dataGridViewTextBoxColumn2.HeaderText = "Khóa học";
             this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
             this.dataGridViewTextBoxColumn2.ReadOnly = true;
+
             // 
             // colDueDate
             // 
@@ -247,6 +275,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.colDueDate.HeaderText = "Hạn nộp";
             this.colDueDate.Name = "colDueDate";
             this.colDueDate.ReadOnly = true;
+
             // 
             // colSubmitted
             // 
@@ -255,6 +284,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.colSubmitted.HeaderText = "Đã nộp";
             this.colSubmitted.Name = "colSubmitted";
             this.colSubmitted.ReadOnly = true;
+
             // 
             // colStatus
             // 
@@ -263,6 +293,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.colStatus.HeaderText = "Trạng thái";
             this.colStatus.Name = "colStatus";
             this.colStatus.ReadOnly = true;
+
             // 
             // colAction
             // 
@@ -270,6 +301,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.colAction.HeaderText = "Thao tác";
             this.colAction.Name = "colAction";
             this.colAction.ReadOnly = true;
+
             // 
             // AssessmentControl
             // 
@@ -287,7 +319,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         }
 
         // =============================================
-        // ✅ LOAD DATA KHI FORM MỞ
+        // ✅ LOAD DATA - GỌI SERVICE
         // =============================================
         private void AssessmentControl_Load(object sender, EventArgs e)
         {
@@ -298,37 +330,32 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service thay vì viết SQL trực tiếp
+                DataTable dt = assignmentService.GetTeacherCourses(currentTeacherID);
+
+                cboCourse.Items.Clear();
+                cboCourse.Items.Add(new ComboBoxItem { Text = "-- Tất cả khóa học --", Value = "" });
+
+                foreach (DataRow row in dt.Rows)
                 {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("sp_GetTeacherCourses", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    cboCourse.Items.Clear();
-                    cboCourse.Items.Add(new ComboBoxItem { Text = "-- Tất cả khóa học --", Value = "" });
-
-                    while (reader.Read())
+                    cboCourse.Items.Add(new ComboBoxItem
                     {
-                        cboCourse.Items.Add(new ComboBoxItem
-                        {
-                            Text = reader["CourseName"].ToString(),
-                            Value = reader["CourseID"].ToString()
-                        });
-                    }
+                        Text = row["CourseName"].ToString(),
+                        Value = row["CourseID"].ToString()
+                    });
+                }
 
-                    if (cboCourse.Items.Count > 0)
-                    {
-                        cboCourse.DisplayMember = "Text";
-                        cboCourse.ValueMember = "Value";
-                        cboCourse.SelectedIndex = 0;
-                    }
+                if (cboCourse.Items.Count > 0)
+                {
+                    cboCourse.DisplayMember = "Text";
+                    cboCourse.ValueMember = "Value";
+                    cboCourse.SelectedIndex = 0;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải danh sách khóa học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi tải danh sách khóa học: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -348,64 +375,30 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     selectedCourseID = selected.Value;
                 }
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = assignmentService.GetAssignments(currentTeacherID, selectedCourseID);
+                dgvAssignments.DataSource = dt;
+
+                // Format DueDate column
+                if (dgvAssignments.Columns["DueDate"] != null)
                 {
-                    conn.Open();
-
-                    string query = @"
-                        SELECT 
-                            a.AssignmentID,
-                            a.Title,
-                            c.CourseName,
-                            a.DueDate,
-                            COUNT(s.SubmissionID) AS TotalSubmissions,
-                            CASE 
-                                WHEN GETDATE() > a.DueDate THEN N'Đã đóng'
-                                WHEN GETDATE() < a.AssignedDate THEN N'Chưa mở'
-                                ELSE N'Đang mở'
-                            END AS Status
-                        FROM Assignments a
-                        INNER JOIN Courses c ON a.CourseID = c.CourseID
-                        LEFT JOIN Submissions s ON a.AssignmentID = s.AssignmentID
-                        WHERE c.TeacherID = @TeacherID
-                        " + (string.IsNullOrEmpty(selectedCourseID) ? "" : "AND c.CourseID = @CourseID") + @"
-                        GROUP BY a.AssignmentID, a.Title, c.CourseName, a.DueDate, a.AssignedDate
-                        ORDER BY a.AssignedDate DESC";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-                    if (!string.IsNullOrEmpty(selectedCourseID))
-                    {
-                        cmd.Parameters.AddWithValue("@CourseID", selectedCourseID);
-                    }
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    dgvAssignments.DataSource = dt;
-
-                    // Format DueDate column
-                    if (dgvAssignments.Columns["DueDate"] != null)
-                    {
-                        dgvAssignments.Columns["DueDate"].DefaultCellStyle.Format = "dd/MM/yyyy";
-                    }
+                    dgvAssignments.Columns["DueDate"].DefaultCellStyle.Format = "dd/MM/yyyy";
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải danh sách bài tập: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi tải danh sách bài tập: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         // =============================================
         // EVENT HANDLERS
         // =============================================
-
         private void BtnCreate_Click(object sender, EventArgs e)
         {
             // Mở form tạo bài tập mới
-            using (var form = new Forms.AssignmentForm())
+            using (var form = new AssignmentForm())
             {
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -414,10 +407,89 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             }
         }
 
-        // =============================================
-        // DATAGRIDVIEW EVENTS
-        // =============================================
+        private void DgvAssignments_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == dgvAssignments.Columns["colAction"].Index && e.RowIndex >= 0)
+            {
+                string assignmentIDStr = dgvAssignments.Rows[e.RowIndex].Cells["colID"].Value?.ToString();
+                string assignmentTitle = dgvAssignments.Rows[e.RowIndex].Cells["dataGridViewTextBoxColumn1"].Value?.ToString();
 
+                if (string.IsNullOrEmpty(assignmentIDStr))
+                {
+                    MessageBox.Show("Không tìm thấy ID bài tập!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // ✅ Parse về INT vì AssignmentID là INT IDENTITY
+                if (!int.TryParse(assignmentIDStr, out int assignmentID))
+                {
+                    MessageBox.Show("ID bài tập không hợp lệ!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var cellRect = dgvAssignments.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                var mousePos = dgvAssignments.PointToClient(Cursor.Position);
+                var relativeX = mousePos.X - cellRect.X;
+
+                if (relativeX < cellRect.Width / 2)
+                {
+                    // Sửa - Edit button
+                    using (var form = new AssignmentForm(assignmentID))
+                    {
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            LoadAssignments(); // reload grid
+                        }
+                    }
+                }
+                else
+                {
+                    // Xóa - Delete button
+                    DialogResult result = MessageBox.Show(
+                        $"Bạn có chắc chắn muốn xóa bài tập '{assignmentTitle}'?",
+                        "Xác nhận xóa",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        DeleteAssignment(assignmentID);
+                    }
+                }
+            }
+        }
+
+        // Gọi Service để xóa Assignment
+        private void DeleteAssignment(int assignmentID)
+        {
+            try
+            {
+                bool success = assignmentService.DeleteAssignment(assignmentID);
+                if (success)
+                {
+                    MessageBox.Show("Xóa bài tập thành công!", "Thành công",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadAssignments();
+                }
+                else
+                {
+                    MessageBox.Show("Không thể xóa bài tập!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa bài tập: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        // =============================================
+        // DATAGRIDVIEW CUSTOM PAINTING
+        // =============================================
         private void DgvAssignments_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             if (e.ColumnIndex == dgvAssignments.Columns["colAction"].Index && e.RowIndex >= 0)
@@ -470,12 +542,12 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                 {
                     g.FillPath(brush, path);
                 }
+            }
 
-                using (var textBrush = new SolidBrush(textColor))
-                using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
-                {
-                    g.DrawString(text, new Font("Segoe UI", 9F), textBrush, rect, sf);
-                }
+            using (var textBrush = new SolidBrush(textColor))
+            using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+            {
+                g.DrawString(text, new Font("Segoe UI", 9F), textBrush, rect, sf);
             }
         }
 
@@ -511,70 +583,9 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             }
         }
 
-        private void DgvAssignments_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == dgvAssignments.Columns["colAction"].Index && e.RowIndex >= 0)
-            {
-                string assignmentID = dgvAssignments.Rows[e.RowIndex].Cells["colID"].Value?.ToString();
-                string assignmentTitle = dgvAssignments.Rows[e.RowIndex].Cells["dataGridViewTextBoxColumn1"].Value?.ToString();
-
-                var cellRect = dgvAssignments.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
-                var mousePos = dgvAssignments.PointToClient(Cursor.Position);
-                var relativeX = mousePos.X - cellRect.X;
-
-                if (relativeX < cellRect.Width / 2)
-                {
-                    // Edit button clicked
-                    using (var form = new Forms.AssignmentForm(assignmentID))
-                    {
-                        if (form.ShowDialog() == DialogResult.OK)
-                        {
-                            LoadAssignments(); // Reload danh sách
-                        }
-                    }
-                }
-                else
-                {
-                    // Delete button clicked
-                    DialogResult result = MessageBox.Show(
-                        $"Bạn có chắc chắn muốn xóa bài tập '{assignmentTitle}'?",
-                        "Xác nhận xóa",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        DeleteAssignment(assignmentID);
-                    }
-                }
-            }
-        }
-
-        private void DeleteAssignment(string assignmentID)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("DELETE FROM Assignments WHERE AssignmentID = @ID", conn);
-                    cmd.Parameters.AddWithValue("@ID", assignmentID);
-                    cmd.ExecuteNonQuery();
-
-                    MessageBox.Show("Xóa bài tập thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadAssignments();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi xóa bài tập: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         // =============================================
         // HOVER EFFECTS
         // =============================================
-
         private void BtnCreate_MouseEnter(object sender, EventArgs e)
         {
             btnCreate.BackColor = Color.FromArgb(56, 142, 60);

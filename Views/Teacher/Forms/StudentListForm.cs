@@ -1,79 +1,77 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using StudyProcessManagement.Business.Teacher;
 
 namespace StudyProcessManagement.Views.Teacher.Forms
 {
     public partial class StudentListForm : Form
     {
-        private string connectionString = "Server=DESKTOP-FO9OMBO;Database=StudyProcess;Integrated Security=true;";
+        // ============================================
+        // PRIVATE FIELDS
+        // ============================================
+
+        // ✅ Dùng Service riêng cho Form
+        private StudentListFormService studentListFormService;
         private string courseID;
         private string courseName;
+
+        // ============================================
+        // CONSTRUCTOR
+        // ============================================
 
         public StudentListForm(string courseID, string courseName)
         {
             this.courseID = courseID;
             this.courseName = courseName;
+
             InitializeComponent();
+
+            // ✅ Khởi tạo Service
+            studentListFormService = new StudentListFormService();
+
+            // Set course info
+            lblCourseInfo.Text = $"Khóa học: {courseName}";
+
             LoadStudents();
         }
+
+        // ============================================
+        // ✅ LOAD DATA - GỌI SERVICE
+        // ============================================
 
         private void LoadStudents()
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // ✅ Gọi Service
+                DataTable dt = studentListFormService.GetEnrolledStudents(courseID);
+
+                dgvStudents.Rows.Clear();
+
+                if (dt.Rows.Count == 0)
                 {
-                    conn.Open();
+                    lblTitle.Text = "📊 Danh sách học viên (Chưa có học viên)";
+                }
+                else
+                {
+                    lblTitle.Text = $"📊 Danh sách học viên ({dt.Rows.Count} học viên)";
 
-                    string query = @"
-                        SELECT 
-                            ROW_NUMBER() OVER (ORDER BY e.EnrollmentDate DESC) AS STT,
-                            e.StudentID,
-                            u.FullName,
-                            a.Email,
-                            e.EnrollmentDate,
-                            ISNULL(e.ProgressPercent, 0) AS ProgressPercent,
-                            ISNULL(e.Status, N'Learning') AS Status
-                        FROM Enrollments e
-                        INNER JOIN Users u ON e.StudentID = u.UserID
-                        INNER JOIN Accounts a ON u.AccountID = a.AccountID
-                        WHERE e.CourseID = @CourseID
-                        ORDER BY e.EnrollmentDate DESC";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@CourseID", courseID);
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    dgvStudents.Rows.Clear();
-
-                    if (dt.Rows.Count == 0)
+                    foreach (DataRow row in dt.Rows)
                     {
-                        lblTitle.Text = "📊 Danh sách học viên (Chưa có học viên)";
-                    }
-                    else
-                    {
-                        lblTitle.Text = $"📊 Danh sách học viên ({dt.Rows.Count} học viên)";
+                        int progress = Convert.ToInt32(row["ProgressPercent"]);
 
-                        foreach (DataRow row in dt.Rows)
-                        {
-                            int progress = Convert.ToInt32(row["ProgressPercent"]);
-
-                            dgvStudents.Rows.Add(
-                                row["STT"],
-                                row["StudentID"],
-                                row["FullName"],
-                                row["Email"],
-                                Convert.ToDateTime(row["EnrollmentDate"]).ToString("dd/MM/yyyy"),
-                                progress + "%",
-                                row["Status"]
-                            );
-                        }
+                        dgvStudents.Rows.Add(
+                            row["STT"],
+                            row["StudentID"],
+                            row["FullName"],
+                            row["Email"],
+                            Convert.ToDateTime(row["EnrollmentDate"]).ToString("dd/MM/yyyy"),
+                            progress + "%",
+                            row["Status"]
+                        );
                     }
                 }
             }
@@ -84,11 +82,15 @@ namespace StudyProcessManagement.Views.Teacher.Forms
             }
         }
 
+        // ============================================
+        // DATAGRIDVIEW CUSTOM PAINTING
+        // ============================================
+
         private void dgvStudents_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             if (e.RowIndex < 0) return;
 
-            // Progress column
+            // Paint Progress column with progress bar
             if (e.ColumnIndex == dgvStudents.Columns["colProgress"].Index)
             {
                 e.Handled = true;
@@ -99,6 +101,7 @@ namespace StudyProcessManagement.Views.Teacher.Forms
                 {
                     int progress = int.Parse(progressText.Replace("%", ""));
 
+                    // Color based on progress
                     Color progressColor = progress >= 80 ? Color.FromArgb(76, 175, 80) :
                                          progress >= 50 ? Color.FromArgb(255, 193, 7) :
                                          Color.FromArgb(244, 67, 54);
@@ -108,13 +111,16 @@ namespace StudyProcessManagement.Views.Teacher.Forms
                         e.CellBounds.Y + (e.CellBounds.Height - 18) / 2,
                         e.CellBounds.Width - 10, 18);
 
+                    // Background
                     using (SolidBrush bgBrush = new SolidBrush(Color.FromArgb(230, 230, 230)))
                         e.Graphics.FillRectangle(bgBrush, barRect);
 
+                    // Fill
                     int fillWidth = (int)(barRect.Width * progress / 100.0);
                     using (SolidBrush fillBrush = new SolidBrush(progressColor))
                         e.Graphics.FillRectangle(fillBrush, new Rectangle(barRect.X, barRect.Y, fillWidth, barRect.Height));
 
+                    // Text
                     using (Font font = new Font("Segoe UI", 7F, FontStyle.Bold))
                     using (SolidBrush textBrush = new SolidBrush(Color.White))
                     {
@@ -124,7 +130,7 @@ namespace StudyProcessManagement.Views.Teacher.Forms
                 }
             }
 
-            // Status column
+            // Paint Status column with badge
             if (e.ColumnIndex == dgvStudents.Columns["colStatus"].Index)
             {
                 e.Handled = true;
@@ -142,7 +148,7 @@ namespace StudyProcessManagement.Views.Teacher.Forms
                         e.CellBounds.Y + (e.CellBounds.Height - 24) / 2,
                         e.CellBounds.Width - 10, 24);
 
-                    using (System.Drawing.Drawing2D.GraphicsPath path = GetRoundedRectPath(badgeRect, 12))
+                    using (GraphicsPath path = GetRoundedRectPath(badgeRect, 12))
                     using (SolidBrush brush = new SolidBrush(badgeColor))
                         e.Graphics.FillPath(brush, path);
 
@@ -156,9 +162,13 @@ namespace StudyProcessManagement.Views.Teacher.Forms
             }
         }
 
-        private System.Drawing.Drawing2D.GraphicsPath GetRoundedRectPath(Rectangle rect, int radius)
+        // ============================================
+        // HELPER METHODS
+        // ============================================
+
+        private GraphicsPath GetRoundedRectPath(Rectangle rect, int radius)
         {
-            System.Drawing.Drawing2D.GraphicsPath path = new System.Drawing.Drawing2D.GraphicsPath();
+            GraphicsPath path = new GraphicsPath();
             path.AddArc(rect.X, rect.Y, radius, radius, 180, 90);
             path.AddArc(rect.Right - radius, rect.Y, radius, radius, 270, 90);
             path.AddArc(rect.Right - radius, rect.Bottom - radius, radius, radius, 0, 90);

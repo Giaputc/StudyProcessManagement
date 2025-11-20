@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using StudyProcessManagement.Business.Teacher;   // THÊM
+
 
 namespace StudyProcessManagement.Views.Teacher.Controls
 {
@@ -28,12 +29,24 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private DataGridView dgvStudents;
 
         // Database
-        private string connectionString = "Server=DESKTOP-FO9OMBO;Database=StudyProcess;Integrated Security=true;";
         private string currentTeacherID = "USR002";
+        private readonly StudentService studentService;
 
         public StudentsControl()
         {
             InitializeComponent();
+            studentService = new StudentService();
+            InitStatusCombo();
+            dgvStudents.Columns[0].FillWeight = 60;  // Mã SV
+            dgvStudents.Columns[1].FillWeight = 150; // Họ tên
+            dgvStudents.Columns[2].FillWeight = 180; // Email
+            dgvStudents.Columns[3].FillWeight = 160; // Khóa học
+            dgvStudents.Columns[4].FillWeight = 90;  // Ngày đăng ký
+            dgvStudents.Columns[5].FillWeight = 90;  // Tiến độ
+            dgvStudents.Columns[6].FillWeight = 90;
+
+            studentService = new StudentService();   // THÊM
+
             if (!DesignMode)
             {
                 LoadCourseFilter();
@@ -204,6 +217,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.dgvStudents.RowHeadersVisible = false;
             this.dgvStudents.RowTemplate.Height = 50;
             this.dgvStudents.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            this.dgvStudents.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
             DataGridViewCellStyle headerStyle = new DataGridViewCellStyle();
             headerStyle.BackColor = Color.FromArgb(250, 250, 250);
@@ -230,13 +244,13 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.dgvStudents.Columns.Add("colProgress", "Tiến độ");
             this.dgvStudents.Columns.Add("colStatus", "Trạng thái");
 
-            this.dgvStudents.Columns[0].Width = 100;
-            this.dgvStudents.Columns[1].Width = 150;
-            this.dgvStudents.Columns[2].Width = 200;
-            this.dgvStudents.Columns[3].Width = 180;
-            this.dgvStudents.Columns[4].Width = 120;
-            this.dgvStudents.Columns[5].Width = 120;
-            this.dgvStudents.Columns[6].Width = 110;
+            //this.dgvStudents.Columns[0].Width = 100;
+            //this.dgvStudents.Columns[1].Width = 150;
+            //this.dgvStudents.Columns[2].Width = 200;
+            //this.dgvStudents.Columns[3].Width = 180;
+            //this.dgvStudents.Columns[4].Width = 120;
+            //this.dgvStudents.Columns[5].Width = 120;
+            //this.dgvStudents.Columns[6].Width = 110;
 
             this.dgvStudents.CellPainting += new DataGridViewCellPaintingEventHandler(this.dgvStudents_CellPainting);
 
@@ -262,34 +276,27 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         // DATABASE METHODS
         // ============================================
 
-        private void LoadCourseFilter()
+        void LoadCourseFilter()
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                cboCourse.Items.Clear();
+                cboCourse.Items.Add(new CourseItem { CourseID = "", CourseName = "-- Tất cả khóa học --" });
+
+                DataTable dt = studentService.GetTeacherCourses(currentTeacherID);
+
+                foreach (DataRow row in dt.Rows)
                 {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("sp_GetTeacherCourses", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-
-                    cboCourse.Items.Clear();
-                    cboCourse.Items.Add(new CourseItem { CourseID = "", CourseName = "-- Tất cả khóa học --" });
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    cboCourse.Items.Add(new CourseItem
                     {
-                        cboCourse.Items.Add(new CourseItem
-                        {
-                            CourseID = reader["CourseID"].ToString(),
-                            CourseName = reader["CourseName"].ToString()
-                        });
-                    }
-
-                    cboCourse.DisplayMember = "CourseName";
-                    cboCourse.ValueMember = "CourseID";
-                    cboCourse.SelectedIndex = 0;
+                        CourseID = row["CourseID"].ToString(),
+                        CourseName = row["CourseName"].ToString()
+                    });
                 }
+
+                cboCourse.DisplayMember = "CourseName";
+                cboCourse.ValueMember = "CourseID";
+                cboCourse.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
@@ -297,6 +304,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void LoadStudents()
         {
@@ -306,61 +314,38 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                 if (searchKeyword == "🔍 Tìm kiếm theo tên hoặc email...")
                     searchKeyword = "";
 
-                string selectedCourseID = cboCourse.SelectedItem != null
-                    ? ((CourseItem)cboCourse.SelectedItem).CourseID
-                    : "";
+                // Lấy CourseID được chọn (có thể rỗng = tất cả)
+                string selectedCourseID = "";
+                if (cboCourse.SelectedItem is CourseItem cItem && !string.IsNullOrEmpty(cItem.CourseID))
+                    selectedCourseID = cItem.CourseID;
 
-                string statusFilter = cboStatus.SelectedItem?.ToString() ?? "Tất cả trạng thái";
+                // Lấy trạng thái filter
+                string statusFilter = "Tất cả trạng thái";
+                if (cboStatus.SelectedItem is StatusItem sItem && !string.IsNullOrEmpty(sItem.Value))
+                    statusFilter = sItem.Value;               // Learning / Completed / Suspended
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                DataTable dt = studentService.GetStudents(
+                    currentTeacherID,
+                    selectedCourseID,
+                    statusFilter,
+                    searchKeyword
+                );
+
+                dgvStudents.Rows.Clear();
+
+                foreach (DataRow row in dt.Rows)
                 {
-                    conn.Open();
+                    int progress = Convert.ToInt32(row["ProgressPercent"]);
 
-                    string query = @"
-                        SELECT 
-                            e.StudentID AS UserID,
-                            u.FullName,
-                            a.Email,
-                            c.CourseName,
-                            e.EnrollmentDate,
-                            ISNULL(e.ProgressPercent, 0) AS ProgressPercent,
-                            ISNULL(e.Status, N'Learning') AS Status
-                        FROM Enrollments e
-                        INNER JOIN Users u ON e.StudentID = u.UserID
-                        INNER JOIN Accounts a ON u.AccountID = a.AccountID
-                        INNER JOIN Courses c ON e.CourseID = c.CourseID
-                        WHERE c.TeacherID = @TeacherID
-                            AND (@CourseID = '' OR e.CourseID = @CourseID)
-                            AND (@Search = '' OR u.FullName LIKE '%' + @Search + '%' OR a.Email LIKE '%' + @Search + '%')
-                            AND (@Status = N'Tất cả trạng thái' OR e.Status = @Status)
-                        ORDER BY e.EnrollmentDate DESC";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-                    cmd.Parameters.AddWithValue("@CourseID", selectedCourseID);
-                    cmd.Parameters.AddWithValue("@Search", searchKeyword);
-                    cmd.Parameters.AddWithValue("@Status", statusFilter);
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    dgvStudents.Rows.Clear();
-
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        int progress = Convert.ToInt32(row["ProgressPercent"]);
-
-                        dgvStudents.Rows.Add(
-                            row["UserID"],
-                            row["FullName"],
-                            row["Email"],
-                            row["CourseName"],
-                            Convert.ToDateTime(row["EnrollmentDate"]).ToString("dd/MM/yyyy"),
-                            progress + "%",
-                            row["Status"]
-                        );
-                    }
+                    dgvStudents.Rows.Add(
+                        row["UserID"],
+                        row["FullName"],
+                        row["Email"],
+                        row["CourseName"],
+                        Convert.ToDateTime(row["EnrollmentDate"]).ToString("dd/MM/yyyy"),
+                        progress + "%",
+                        row["Status"]      // tí nữa CellPainting sẽ đổi sang tiếng Việt
+                    );
                 }
             }
             catch (Exception ex)
@@ -370,33 +355,24 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             }
         }
 
+
+
         private void LoadSummary()
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                string selectedCourseID = "";
+                if (cboCourse.SelectedItem is CourseItem cItem && !string.IsNullOrEmpty(cItem.CourseID))
+                    selectedCourseID = cItem.CourseID;
+
+                DataTable dt = studentService.GetStudentSummary(currentTeacherID, selectedCourseID);
+
+                if (dt.Rows.Count > 0)
                 {
-                    conn.Open();
-
-                    string query = @"
-                        SELECT 
-                            COUNT(*) AS Total,
-                            SUM(CASE WHEN e.Status = 'Learning' THEN 1 ELSE 0 END) AS Active,
-                            SUM(CASE WHEN e.Status = 'Completed' THEN 1 ELSE 0 END) AS Completed
-                        FROM Enrollments e
-                        INNER JOIN Courses c ON e.CourseID = c.CourseID
-                        WHERE c.TeacherID = @TeacherID";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        lblTotalStudents.Text = $"📊 Tổng số học viên: {reader["Total"]}";
-                        lblActiveStudents.Text = $"✅ Đang học: {reader["Active"]}";
-                        lblCompletedStudents.Text = $"🎓 Hoàn thành: {reader["Completed"]}";
-                    }
+                    DataRow row = dt.Rows[0];
+                    lblTotalStudents.Text = $"📊 Tổng số học viên: {row["Total"]}";
+                    lblActiveStudents.Text = $"✅ Đang học: {row["Active"]}";
+                    lblCompletedStudents.Text = $"🎓 Hoàn thành: {row["Completed"]}";
                 }
             }
             catch (Exception ex)
@@ -405,6 +381,8 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
 
         // ============================================
         // EVENT HANDLERS
@@ -443,7 +421,16 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             LoadStudents();
         }
-
+        private string GetStatusDisplay(string status)
+        {
+            switch (status)
+            {
+                case "Learning": return "Đang học";
+                case "Completed": return "Hoàn thành";
+                case "Suspended": return "Tạm dừng";
+                default: return status; // fallback
+            }
+        }
         private void dgvStudents_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             if (e.RowIndex < 0) return;
@@ -491,6 +478,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                 e.PaintBackground(e.CellBounds, true);
 
                 string status = dgvStudents.Rows[e.RowIndex].Cells["colStatus"].Value?.ToString();
+                string displayText = GetStatusDisplay(status);
                 if (!string.IsNullOrEmpty(status))
                 {
                     Color badgeColor = status == "Learning" ? Color.FromArgb(33, 150, 243) :
@@ -510,7 +498,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     using (SolidBrush textBrush = new SolidBrush(Color.White))
                     {
                         StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-                        e.Graphics.DrawString(status, font, textBrush, badgeRect, sf);
+                        e.Graphics.DrawString(GetStatusDisplay(status), font, textBrush, badgeRect, sf);
                     }
                 }
             }
@@ -539,6 +527,26 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         {
             public string CourseID { get; set; }
             public string CourseName { get; set; }
+        }
+        private class StatusItem
+        {
+            public string Value { get; set; } // Giá trị lưu trong DB (Learning/Completed/Suspended)
+            public string Text { get; set; }  // Text hiển thị trên Combobox
+
+            public override string ToString() => Text;
+        }
+        private void InitStatusCombo()
+        {
+            cboStatus.Items.Clear();
+            cboStatus.DisplayMember = "Text";
+            cboStatus.ValueMember = "Value";
+
+            cboStatus.Items.Add(new StatusItem { Value = "", Text = "Tất cả trạng thái" });
+            cboStatus.Items.Add(new StatusItem { Value = "Learning", Text = "Đang học" });
+            cboStatus.Items.Add(new StatusItem { Value = "Completed", Text = "Hoàn thành" });
+            cboStatus.Items.Add(new StatusItem { Value = "Suspended", Text = "Tạm dừng" });
+
+            cboStatus.SelectedIndex = 0;
         }
     }
 }

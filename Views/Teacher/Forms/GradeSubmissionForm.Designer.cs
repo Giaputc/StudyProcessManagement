@@ -68,7 +68,7 @@
             this.panelHeader.Location = new System.Drawing.Point(0, 0);
             this.panelHeader.Name = "panelHeader";
             this.panelHeader.Padding = new System.Windows.Forms.Padding(20);
-            this.panelHeader.Size = new System.Drawing.Size(937, 70);
+            this.panelHeader.Size = new System.Drawing.Size(954, 70);
             this.panelHeader.TabIndex = 0;
             // 
             // lblFormTitle
@@ -78,7 +78,7 @@
             this.lblFormTitle.ForeColor = System.Drawing.Color.White;
             this.lblFormTitle.Location = new System.Drawing.Point(20, 20);
             this.lblFormTitle.Name = "lblFormTitle";
-            this.lblFormTitle.Size = new System.Drawing.Size(897, 30);
+            this.lblFormTitle.Size = new System.Drawing.Size(914, 30);
             this.lblFormTitle.TabIndex = 0;
             this.lblFormTitle.Text = "CHẤM ĐIỂM BÀI NỘP";
             this.lblFormTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -447,7 +447,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(954, 700);
+            this.ClientSize = new System.Drawing.Size(971, 700);
             this.Controls.Add(this.panelButtons);
             this.Controls.Add(this.panelGrading);
             this.Controls.Add(this.panelSubmission);
