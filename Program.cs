@@ -20,9 +20,8 @@ namespace StudyProcessManagement
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Ông đang chạy MainForm (Giao diện Admin) để test đúng không?
-            // Nếu muốn chạy từ màn hình Đăng nhập thì sửa thành: new Login()
-            Application.Run(new MainForm());
+        
+            Application.Run(new Login());
         }
     }
 }
