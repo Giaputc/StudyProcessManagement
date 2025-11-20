@@ -51,7 +51,7 @@ namespace StudyProcessManagement.Views.Admin
         {
             if (currentChildForm != null)
             {
-                currentChildForm.Close(); // Đóng form cũ
+                currentChildForm.Close();
             }
             currentChildForm = childForm;
 
@@ -59,7 +59,7 @@ namespace StudyProcessManagement.Views.Admin
             childForm.FormBorderStyle = FormBorderStyle.None; // Bỏ viền
             childForm.Dock = DockStyle.Fill; // Lấp đầy panel
 
-            panelContent.Controls.Add(childForm); // Thêm vào panelContent
+            panelContent.Controls.Add(childForm); 
             panelContent.Tag = childForm;
             childForm.BringToFront();
             childForm.Show();
@@ -89,6 +89,11 @@ namespace StudyProcessManagement.Views.Admin
         private void btnMenuCourses_Click(object sender, EventArgs e)
         {
             OpenChildForm(new CourseManagement());
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

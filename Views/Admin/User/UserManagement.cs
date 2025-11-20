@@ -8,12 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using StudyProcessManagement.Business.Admin;
+using StudyProcessManagement.Models;
 using StudyProcessManagement.Views.Admin.Student.StudentManagement;
 using StudyProcessManagement.Views.Admin.Teacher.TeacherMangement;
 namespace StudyProcessManagement.Views.Admin.User
 {
     public partial class UserManagement : Form
-    {
+    { 
+        private UserService userService = new UserService();
         public UserManagement()
         {
             InitializeComponent();
@@ -23,64 +26,48 @@ namespace StudyProcessManagement.Views.Admin.User
         // Tải form: Nơi ông sẽ load dữ liệu từ database vào DataGridView
         private void UserManagement_Load(object sender, EventArgs e)
         {
-            // Gán sự kiện cho các nút
+
             this.btnAddUser.Click += new System.EventHandler(this.btnAddUser_Click);
             this.btnExportExcel.Click += new System.EventHandler(this.btnExportExcel_Click);
             this.Size = new System.Drawing.Size(1324, 673);
-            // Tải dữ liệu
             LoadUserData();
         }
 
         // Hàm giả lập tải dữ liệu (thay bằng logic database của ông)
         private void LoadUserData()
         {
-            // Xóa dữ liệu cũ (nếu có)
-            dataGridViewUsers.Rows.Clear();
-
-            // Thêm dữ liệu mẫu giống như file HTML
-            dataGridViewUsers.Rows.Add("001", "Nguyễn Văn A", "nguyenvana@email.com", "Giảng viên", "Hoạt động");
-            dataGridViewUsers.Rows.Add("002", "Trần Thị B", "tranthib@email.com", "Học viên", "Hoạt động");
-            dataGridViewUsers.Rows.Add("003", "Lê Văn C", "levanc@email.com", "Giảng viên", "Đã khóa");
-            dataGridViewUsers.Rows.Add("004", "Phạm Thị D", "phamthid@email.com", "Học viên", "Hoạt động");
-
-            // Ông nên dùng DataTable hoặc List<User> gán vào DataSource
-            // ví dụ: dataGridViewUsers.DataSource = GetUsersFromDatabase();
-        }
-
-        // Xử lý sự kiện khi click vào các nút "Xem", "Sửa", "Xóa" trong bảng
-        private void dataGridViewUsers_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            // Bỏ qua nếu click vào header
-            if (e.RowIndex < 0) return;
-
-            // Lấy ID của user ở hàng được click
-            string userId = dataGridViewUsers.Rows[e.RowIndex].Cells["colId"].Value.ToString();
-
-            // Kiểm tra xem đã click vào cột nút nào
-            if (e.ColumnIndex == dataGridViewUsers.Columns["colView"].Index)
+            try
             {
-                // Logic nút "Xem"
-                MessageBox.Show($"Xem chi tiết người dùng ID: {userId}");
-            }
-            else if (e.ColumnIndex == dataGridViewUsers.Columns["colEdit"].Index)
-            {
-                // Logic nút "Sửa"
-                // Đây là lúc gọi "Modal" (Form mới)
-                OpenAddEditUserForm(userId);
-            }
-            else if (e.ColumnIndex == dataGridViewUsers.Columns["colDelete"].Index)
-            {
-                // Logic nút "Xóa"
-                var result = MessageBox.Show($"Bạn có chắc muốn xóa người dùng ID: {userId}?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (result == DialogResult.Yes)
+                dataGridViewUsers.Rows.Clear();
+                string keyword = txtSearch.Text.Trim();
+
+                List<Users> list = userService.GetAllUsers(keyword);
+
+                foreach (var u in list)
                 {
-                    // Thực hiện logic xóa...
-                    MessageBox.Show($"Đã xóa người dùng ID: {userId}");
-                    // Tải lại dữ liệu
-                    LoadUserData();
+                    // Dùng thuộc tính của Model (u.FullName, u.StatusText...)
+                    // Cực kỳ an toàn, gõ sai là báo lỗi ngay
+                    int index = dataGridViewUsers.Rows.Add(
+                        u.UserID,
+                        u.FullName,
+                        u.Email,
+                        u.Role,
+                        u.StatusText // Model tự xử lý logic "Hoạt động"/"Đã khóa"
+                    );
+
+                    // Tô màu
+                    if (u.IsActive)
+                        dataGridViewUsers.Rows[index].Cells["colStatus"].Style.ForeColor = Color.Green;
+                    else
+                        dataGridViewUsers.Rows[index].Cells["colStatus"].Style.ForeColor = Color.Red;
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message);
+            }
         }
+   
 
         // Sự kiện cho nút "Thêm người dùng"
         private void btnAddUser_Click(object sender, EventArgs e)
@@ -242,6 +229,34 @@ namespace StudyProcessManagement.Views.Admin.User
         private void lblBreadcrumb_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void txtSearch_TextChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridViewUsers_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            string userId = dataGridViewUsers.Rows[e.RowIndex].Cells["colId"].Value.ToString();
+            string userName = dataGridViewUsers.Rows[e.RowIndex].Cells["colName"].Value.ToString();
+            if (e.ColumnIndex == dataGridViewUsers.Columns["colDelete"].Index)
+            {
+                if (MessageBox.Show($"Xóa user {userId}?", "Xác nhận", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    if (userService.DeleteUser(userId))
+                    {
+                        MessageBox.Show("Xóa thành công!");
+                        LoadUserData();
+                    }
+                }
+            }
+            else if (e.ColumnIndex == dataGridViewUsers.Columns["colEdit"].Index)
+            {
+              
+                MessageBox.Show("Sửa user: " + userId);
+            }
         }
     }
 }
