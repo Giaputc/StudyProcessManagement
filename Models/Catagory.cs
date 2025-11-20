@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace StudyProcessManagement.Models
 {
-    internal class Catagory
+    public class Catagory
     {
+        public string CategoryID { get; set; }
+        public string CategoryName { get; set; }
+        public string Description { get; set; }
     }
 }

@@ -8,12 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using StudyProcessManagement.Business.Admin;
 using StudyProcessManagement.Views.Admin.Student.StudentManagement;
 using StudyProcessManagement.Views.Admin.Teacher.TeacherMangement;
 namespace StudyProcessManagement.Views.Admin.User
 {
     public partial class UserManagement : Form
-    {
+    { 
+        private UserService userService = new UserService();
         public UserManagement()
         {
             InitializeComponent();
