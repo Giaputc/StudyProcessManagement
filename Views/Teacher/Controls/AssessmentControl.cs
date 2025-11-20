@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-
+using System.Data;
+using System.Data.SqlClient;
+using StudyProcessManagement.Views.Teacher.Forms;
 namespace StudyProcessManagement.Views.Teacher.Controls
 {
     public class AssessmentControl : UserControl
@@ -10,341 +12,586 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private Panel headerPanel;
         private Label lblTitle;
         private ComboBox cboCourse;
-        private ComboBox cboType;
         private Button btnCreate;
         private Panel contentPanel;
-        private DataGridView dgvAssessments;
+        private DataGridView dgvAssignments;
+        private int hoverRow = -1;
+        private string hoverButton = "";
+
+        // Database connection
+        private string connectionString = "Server=DESKTOP-FO9OMBO;Database=StudyProcess;Integrated Security=true;";
+        private FlowLayoutPanel rightPanel;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private DataGridViewTextBoxColumn colDueDate;
+        private DataGridViewTextBoxColumn colSubmitted;
+        private DataGridViewTextBoxColumn colStatus;
+        private DataGridViewTextBoxColumn colAction;
+        private DataGridViewTextBoxColumn colID;
+        private string currentTeacherID = "USR002";
 
         public AssessmentControl()
         {
             InitializeComponent();
+
+            // ✅ GÁN CÁC EVENT HANDLERS
+            if (!DesignMode)
+            {
+                this.Load += AssessmentControl_Load;
+
+                // ComboBox events
+                cboCourse.SelectedIndexChanged += CboCourse_SelectedIndexChanged;
+
+                // Button events
+                btnCreate.Click += BtnCreate_Click;
+                btnCreate.MouseEnter += BtnCreate_MouseEnter;
+                btnCreate.MouseLeave += BtnCreate_MouseLeave;
+
+                // DataGridView events
+                dgvAssignments.CellPainting += DgvAssignments_CellPainting;
+                dgvAssignments.CellMouseEnter += DgvAssignments_CellMouseEnter;
+                dgvAssignments.CellMouseLeave += DgvAssignments_CellMouseLeave;
+                dgvAssignments.CellClick += DgvAssignments_CellClick;
+            }
         }
 
         private void InitializeComponent()
         {
-            this.mainLayout = new TableLayoutPanel();
-            this.headerPanel = new Panel();
-            this.lblTitle = new Label();
-            this.cboCourse = new ComboBox();
-            this.cboType = new ComboBox();
-            this.btnCreate = new Button();
-            this.contentPanel = new Panel();
-            this.dgvAssessments = new DataGridView();
-
-            ((System.ComponentModel.ISupportInitialize)(this.dgvAssessments)).BeginInit();
-
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.mainLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.headerPanel = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.rightPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.cboCourse = new System.Windows.Forms.ComboBox();
+            this.btnCreate = new System.Windows.Forms.Button();
+            this.contentPanel = new System.Windows.Forms.Panel();
+            this.dgvAssignments = new System.Windows.Forms.DataGridView();
+            this.colID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDueDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colSubmitted = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAction = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.mainLayout.SuspendLayout();
+            this.headerPanel.SuspendLayout();
+            this.rightPanel.SuspendLayout();
+            this.contentPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvAssignments)).BeginInit();
+            this.SuspendLayout();
+            // 
             // mainLayout
-            this.mainLayout.Dock = DockStyle.Fill;
+            // 
             this.mainLayout.ColumnCount = 1;
-            this.mainLayout.RowCount = 2;
-            this.mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            this.mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
-            this.mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            this.mainLayout.Padding = new Padding(8);
-
-            // headerPanel
-            this.headerPanel.Dock = DockStyle.Fill;
-            this.headerPanel.Padding = new Padding(8);
-
-            // lblTitle
-            this.lblTitle.AutoSize = false;
-            this.lblTitle.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
-            this.lblTitle.Text = "Quản lý Bài tập & Kiểm tra";
-            this.lblTitle.Dock = DockStyle.Left;
-            this.lblTitle.Width = 380;
-            this.lblTitle.TextAlign = ContentAlignment.MiddleLeft;
-
-            // cboType
-            this.cboType.Size = new Size(150, 30);
-            this.cboType.Font = new Font("Segoe UI", 9.5F);
-            this.cboType.Location = new Point(this.headerPanel.Width - 475, 18);
-            this.cboType.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.cboType.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.cboType.Items.AddRange(new object[] { "Tất cả", "Quiz", "Bài tập", "Đồ án" });
-            this.cboType.SelectedIndex = 0;
-
-            // cboCourse
-            this.cboCourse.Size = new Size(150, 30);
-            this.cboCourse.Font = new Font("Segoe UI", 9.5F);
-            this.cboCourse.Location = new Point(this.headerPanel.Width - 315, 18);
-            this.cboCourse.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.cboCourse.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.cboCourse.Items.AddRange(new object[] {
-                "Tất cả khóa học",
-                "Lập trình Web với React",
-                "Python cơ bản",
-                "JavaScript nâng cao"
-            });
-            this.cboCourse.SelectedIndex = 0;
-
-            // btnCreate
-            this.btnCreate.Text = "+ Tạo mới";
-            this.btnCreate.Size = new Size(140, 38);
-            this.btnCreate.Location = new Point(this.headerPanel.Width - 148, 13);
-            this.btnCreate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.btnCreate.BackColor = Color.FromArgb(76, 175, 80);
-            this.btnCreate.ForeColor = Color.White;
-            this.btnCreate.FlatStyle = FlatStyle.Flat;
-            this.btnCreate.FlatAppearance.BorderSize = 0;
-            this.btnCreate.Font = new Font("Segoe UI", 9.5F);
-            this.btnCreate.Cursor = Cursors.Hand;
-
-            this.btnCreate.MouseEnter += (s, e) =>
-            {
-                this.btnCreate.BackColor = Color.FromArgb(56, 142, 60);
-            };
-            this.btnCreate.MouseLeave += (s, e) =>
-            {
-                this.btnCreate.BackColor = Color.FromArgb(76, 175, 80);
-            };
-
-            this.headerPanel.Controls.Add(this.lblTitle);
-            this.headerPanel.Controls.Add(this.cboType);
-            this.headerPanel.Controls.Add(this.cboCourse);
-            this.headerPanel.Controls.Add(this.btnCreate);
-
-            // contentPanel
-            this.contentPanel.Dock = DockStyle.Fill;
-            this.contentPanel.Margin = new Padding(4);
-            this.contentPanel.BorderStyle = BorderStyle.FixedSingle;
-
-            // dgvAssessments
-            this.dgvAssessments.Dock = DockStyle.Fill;
-            this.dgvAssessments.AllowUserToAddRows = false;
-            this.dgvAssessments.AllowUserToDeleteRows = false;
-            this.dgvAssessments.RowHeadersVisible = false;
-            this.dgvAssessments.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            this.dgvAssessments.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvAssessments.BackgroundColor = Color.White;
-            this.dgvAssessments.BorderStyle = BorderStyle.None;
-            this.dgvAssessments.RowTemplate.Height = 55;
-            this.dgvAssessments.ColumnHeadersHeight = 45;
-            this.dgvAssessments.Margin = new Padding(0);
-            this.dgvAssessments.GridColor = Color.FromArgb(230, 230, 230);
-            this.dgvAssessments.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            this.dgvAssessments.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            this.dgvAssessments.EnableHeadersVisualStyles = false;
-            this.dgvAssessments.DefaultCellStyle.SelectionBackColor = Color.FromArgb(240, 248, 255);
-            this.dgvAssessments.DefaultCellStyle.SelectionForeColor = Color.Black;
-            this.dgvAssessments.DefaultCellStyle.Padding = new Padding(8, 5, 8, 5);
-            this.dgvAssessments.ColumnHeadersDefaultCellStyle.BackColor = Color.White;
-            this.dgvAssessments.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(70, 70, 70);
-            this.dgvAssessments.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular);
-            this.dgvAssessments.ColumnHeadersDefaultCellStyle.Padding = new Padding(8, 5, 8, 5);
-            this.dgvAssessments.DefaultCellStyle.Font = new Font("Segoe UI", 9F);
-
-            // Columns
-            this.dgvAssessments.Columns.Clear();
-            this.dgvAssessments.Columns.Add("colName", "Tên bài");
-            this.dgvAssessments.Columns.Add("colType", "Loại");
-            this.dgvAssessments.Columns["colType"].Width = 100;
-            this.dgvAssessments.Columns.Add("colCourse", "Khóa học");
-            this.dgvAssessments.Columns.Add("colDueDate", "Hạn nộp");
-            this.dgvAssessments.Columns["colDueDate"].Width = 130;
-            this.dgvAssessments.Columns.Add("colSubmitted", "Đã nộp");
-            this.dgvAssessments.Columns["colSubmitted"].Width = 100;
-            this.dgvAssessments.Columns.Add("colStatus", "Trạng thái");
-            this.dgvAssessments.Columns["colStatus"].Width = 120;
-
-            var colAction = new DataGridViewTextBoxColumn();
-            colAction.Name = "colAction";
-            colAction.HeaderText = "Thao tác";
-            colAction.ReadOnly = true;
-            colAction.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colAction.Width = 200;
-            this.dgvAssessments.Columns.Add(colAction);
-
-            // Sample data
-            this.dgvAssessments.Rows.Add("Quiz 1: Giới thiệu React", "Quiz", "Lập trình Web với React", "20/11/2025", "35/45", "Đang mở", "");
-            this.dgvAssessments.Rows.Add("Bài tập 1: Component", "Bài tập", "Lập trình Web với React", "25/11/2025", "40/45", "Đang mở", "");
-            this.dgvAssessments.Rows.Add("Quiz 2: State và Props", "Quiz", "Lập trình Web với React", "15/11/2025", "45/45", "Đã đóng", "");
-            this.dgvAssessments.Rows.Add("Đồ án cuối khóa", "Đồ án", "Python cơ bản", "30/11/2025", "25/78", "Đang mở", "");
-            this.dgvAssessments.Rows.Add("Quiz 1: Biến và Kiểu dữ liệu", "Quiz", "Python cơ bản", "18/11/2025", "78/78", "Đang mở", "");
-
-            // Tracking hover state
-            int hoverRow = -1;
-            string hoverButton = "";
-
-            // Custom paint for action buttons
-            this.dgvAssessments.CellPainting += (sender, e) =>
-            {
-                if (e.ColumnIndex == this.dgvAssessments.Columns["colAction"].Index && e.RowIndex >= 0)
-                {
-                    e.Paint(e.CellBounds, DataGridViewPaintParts.Background | DataGridViewPaintParts.Border);
-
-                    // Button "Sửa"
-                    var btnEditRect = new Rectangle(
-                        e.CellBounds.X + (e.CellBounds.Width - 170) / 2,
-                        e.CellBounds.Y + (e.CellBounds.Height - 30) / 2,
-                        80, 30);
-
-                    // Button "Chấm"
-                    var btnGradeRect = new Rectangle(
-                        btnEditRect.Right + 10,
-                        e.CellBounds.Y + (e.CellBounds.Height - 30) / 2,
-                        80, 30);
-
-                    var isHoverEdit = e.RowIndex == hoverRow && hoverButton == "edit";
-                    var isHoverGrade = e.RowIndex == hoverRow && hoverButton == "grade";
-
-                    var editColor = isHoverEdit ? Color.FromArgb(25, 118, 210) : Color.FromArgb(33, 150, 243);
-                    var gradeColor = isHoverGrade ? Color.FromArgb(56, 142, 60) : Color.FromArgb(76, 175, 80);
-
-                    e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-                    // Draw Edit button
-                    using (var path = new System.Drawing.Drawing2D.GraphicsPath())
-                    {
-                        int radius = 5;
-                        path.AddArc(btnEditRect.X, btnEditRect.Y, radius * 2, radius * 2, 180, 90);
-                        path.AddArc(btnEditRect.Right - radius * 2, btnEditRect.Y, radius * 2, radius * 2, 270, 90);
-                        path.AddArc(btnEditRect.Right - radius * 2, btnEditRect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
-                        path.AddArc(btnEditRect.X, btnEditRect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
-                        path.CloseFigure();
-
-                        using (var brush = new SolidBrush(editColor))
-                        {
-                            e.Graphics.FillPath(brush, path);
-                        }
-
-                        using (var textBrush = new SolidBrush(Color.White))
-                        using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
-                        {
-                            e.Graphics.DrawString("Sửa", new Font("Segoe UI", 9F), textBrush, btnEditRect, sf);
-                        }
-                    }
-
-                    // Draw Grade button
-                    using (var path = new System.Drawing.Drawing2D.GraphicsPath())
-                    {
-                        int radius = 5;
-                        path.AddArc(btnGradeRect.X, btnGradeRect.Y, radius * 2, radius * 2, 180, 90);
-                        path.AddArc(btnGradeRect.Right - radius * 2, btnGradeRect.Y, radius * 2, radius * 2, 270, 90);
-                        path.AddArc(btnGradeRect.Right - radius * 2, btnGradeRect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
-                        path.AddArc(btnGradeRect.X, btnGradeRect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
-                        path.CloseFigure();
-
-                        using (var brush = new SolidBrush(gradeColor))
-                        {
-                            e.Graphics.FillPath(brush, path);
-                        }
-
-                        using (var textBrush = new SolidBrush(Color.White))
-                        using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
-                        {
-                            e.Graphics.DrawString("Chấm", new Font("Segoe UI", 9F), textBrush, btnGradeRect, sf);
-                        }
-                    }
-
-                    e.Handled = true;
-                }
-            };
-
-            this.dgvAssessments.CellMouseMove += (sender, e) =>
-            {
-                if (e.ColumnIndex == this.dgvAssessments.Columns["colAction"].Index && e.RowIndex >= 0)
-                {
-                    var cellRect = this.dgvAssessments.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
-                    var btnEditRect = new Rectangle(
-                        cellRect.X + (cellRect.Width - 170) / 2,
-                        cellRect.Y + (cellRect.Height - 30) / 2,
-                        80, 30);
-                    var btnGradeRect = new Rectangle(
-                        btnEditRect.Right + 10,
-                        cellRect.Y + (cellRect.Height - 30) / 2,
-                        80, 30);
-
-                    var mousePos = this.dgvAssessments.PointToClient(Cursor.Position);
-                    var relativePos = new Point(mousePos.X - cellRect.X, mousePos.Y - cellRect.Y);
-
-                    if (btnEditRect.Contains(relativePos))
-                    {
-                        if (hoverRow != e.RowIndex || hoverButton != "edit")
-                        {
-                            hoverRow = e.RowIndex;
-                            hoverButton = "edit";
-                            this.dgvAssessments.Cursor = Cursors.Hand;
-                            this.dgvAssessments.InvalidateCell(e.ColumnIndex, e.RowIndex);
-                        }
-                    }
-                    else if (btnGradeRect.Contains(relativePos))
-                    {
-                        if (hoverRow != e.RowIndex || hoverButton != "grade")
-                        {
-                            hoverRow = e.RowIndex;
-                            hoverButton = "grade";
-                            this.dgvAssessments.Cursor = Cursors.Hand;
-                            this.dgvAssessments.InvalidateCell(e.ColumnIndex, e.RowIndex);
-                        }
-                    }
-                    else
-                    {
-                        if (hoverRow != -1)
-                        {
-                            int oldRow = hoverRow;
-                            hoverRow = -1;
-                            hoverButton = "";
-                            this.dgvAssessments.Cursor = Cursors.Default;
-                            this.dgvAssessments.InvalidateCell(e.ColumnIndex, oldRow);
-                        }
-                    }
-                }
-            };
-
-            this.dgvAssessments.CellMouseLeave += (sender, e) =>
-            {
-                if (hoverRow != -1)
-                {
-                    int oldRow = hoverRow;
-                    hoverRow = -1;
-                    hoverButton = "";
-                    this.dgvAssessments.Cursor = Cursors.Default;
-                    if (oldRow >= 0 && oldRow < this.dgvAssessments.Rows.Count)
-                    {
-                        this.dgvAssessments.InvalidateCell(this.dgvAssessments.Columns["colAction"].Index, oldRow);
-                    }
-                }
-            };
-
-            this.dgvAssessments.CellClick += (sender, e) =>
-            {
-                if (e.ColumnIndex == this.dgvAssessments.Columns["colAction"].Index && e.RowIndex >= 0)
-                {
-                    var cellRect = this.dgvAssessments.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
-                    var btnEditRect = new Rectangle(
-                        cellRect.X + (cellRect.Width - 170) / 2,
-                        cellRect.Y + (cellRect.Height - 30) / 2,
-                        80, 30);
-                    var btnGradeRect = new Rectangle(
-                        btnEditRect.Right + 10,
-                        cellRect.Y + (cellRect.Height - 30) / 2,
-                        80, 30);
-
-                    var mousePos = this.dgvAssessments.PointToClient(Cursor.Position);
-                    var relativePos = new Point(mousePos.X - cellRect.X, mousePos.Y - cellRect.Y);
-
-                    if (btnEditRect.Contains(relativePos))
-                    {
-                        MessageBox.Show($"Sửa bài: {this.dgvAssessments.Rows[e.RowIndex].Cells["colName"].Value}");
-                    }
-                    else if (btnGradeRect.Contains(relativePos))
-                    {
-                        MessageBox.Show($"Chấm bài: {this.dgvAssessments.Rows[e.RowIndex].Cells["colName"].Value}\n" +
-                            $"Đã nộp: {this.dgvAssessments.Rows[e.RowIndex].Cells["colSubmitted"].Value}");
-                    }
-                }
-            };
-
-            this.contentPanel.Controls.Add(this.dgvAssessments);
-
+            this.mainLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.mainLayout.Controls.Add(this.headerPanel, 0, 0);
             this.mainLayout.Controls.Add(this.contentPanel, 0, 1);
-
+            this.mainLayout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainLayout.Location = new System.Drawing.Point(0, 0);
+            this.mainLayout.Name = "mainLayout";
+            this.mainLayout.Padding = new System.Windows.Forms.Padding(8);
+            this.mainLayout.RowCount = 2;
+            this.mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 70F));
+            this.mainLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.mainLayout.Size = new System.Drawing.Size(1065, 726);
+            this.mainLayout.TabIndex = 0;
+            // 
+            // headerPanel
+            // 
+            this.headerPanel.Controls.Add(this.lblTitle);
+            this.headerPanel.Controls.Add(this.rightPanel);
+            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.headerPanel.Location = new System.Drawing.Point(11, 11);
+            this.headerPanel.Name = "headerPanel";
+            this.headerPanel.Padding = new System.Windows.Forms.Padding(8);
+            this.headerPanel.Size = new System.Drawing.Size(1043, 64);
+            this.headerPanel.TabIndex = 0;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Location = new System.Drawing.Point(8, 8);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(300, 48);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Quản lý Bài tập";
+            this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // rightPanel
+            // 
+            this.rightPanel.AutoSize = true;
+            this.rightPanel.Controls.Add(this.cboCourse);
+            this.rightPanel.Controls.Add(this.btnCreate);
+            this.rightPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.rightPanel.Location = new System.Drawing.Point(675, 8);
+            this.rightPanel.Name = "rightPanel";
+            this.rightPanel.Padding = new System.Windows.Forms.Padding(0, 10, 0, 0);
+            this.rightPanel.Size = new System.Drawing.Size(360, 48);
+            this.rightPanel.TabIndex = 1;
+            this.rightPanel.WrapContents = false;
+            // 
+            // cboCourse
+            // 
+            this.cboCourse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboCourse.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.cboCourse.Location = new System.Drawing.Point(5, 13);
+            this.cboCourse.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.cboCourse.Name = "cboCourse";
+            this.cboCourse.Size = new System.Drawing.Size(200, 25);
+            this.cboCourse.TabIndex = 0;
+            // 
+            // btnCreate
+            // 
+            this.btnCreate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.btnCreate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCreate.FlatAppearance.BorderSize = 0;
+            this.btnCreate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCreate.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.btnCreate.ForeColor = System.Drawing.Color.White;
+            this.btnCreate.Location = new System.Drawing.Point(215, 10);
+            this.btnCreate.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.btnCreate.Name = "btnCreate";
+            this.btnCreate.Size = new System.Drawing.Size(140, 38);
+            this.btnCreate.TabIndex = 1;
+            this.btnCreate.Text = "➕ Tạo mới";
+            this.btnCreate.UseVisualStyleBackColor = false;
+            // 
+            // contentPanel
+            // 
+            this.contentPanel.BackColor = System.Drawing.Color.White;
+            this.contentPanel.Controls.Add(this.dgvAssignments);
+            this.contentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.contentPanel.Location = new System.Drawing.Point(12, 82);
+            this.contentPanel.Margin = new System.Windows.Forms.Padding(4);
+            this.contentPanel.Name = "contentPanel";
+            this.contentPanel.Padding = new System.Windows.Forms.Padding(1);
+            this.contentPanel.Size = new System.Drawing.Size(1041, 632);
+            this.contentPanel.TabIndex = 1;
+            // 
+            // dgvAssignments
+            // 
+            this.dgvAssignments.AllowUserToAddRows = false;
+            this.dgvAssignments.AllowUserToDeleteRows = false;
+            this.dgvAssignments.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvAssignments.BackgroundColor = System.Drawing.Color.White;
+            this.dgvAssignments.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dgvAssignments.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
+            this.dgvAssignments.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(245)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(80)))), ((int)(((byte)(80)))));
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(245)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(80)))), ((int)(((byte)(80)))));
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvAssignments.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvAssignments.ColumnHeadersHeight = 45;
+            this.dgvAssignments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.dgvAssignments.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colID,
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2,
+            this.colDueDate,
+            this.colSubmitted,
+            this.colStatus,
+            this.colAction});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(247)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvAssignments.DefaultCellStyle = dataGridViewCellStyle2;
+            this.dgvAssignments.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvAssignments.EnableHeadersVisualStyles = false;
+            this.dgvAssignments.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.dgvAssignments.Location = new System.Drawing.Point(1, 1);
+            this.dgvAssignments.Name = "dgvAssignments";
+            this.dgvAssignments.ReadOnly = true;
+            this.dgvAssignments.RowHeadersVisible = false;
+            this.dgvAssignments.RowTemplate.Height = 50;
+            this.dgvAssignments.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvAssignments.Size = new System.Drawing.Size(1039, 630);
+            this.dgvAssignments.TabIndex = 0;
+            // 
+            // colID
+            // 
+            this.colID.DataPropertyName = "AssignmentID";
+            this.colID.HeaderText = "ID";
+            this.colID.Name = "colID";
+            this.colID.ReadOnly = true;
+            this.colID.Visible = false;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.DataPropertyName = "Title";
+            this.dataGridViewTextBoxColumn1.FillWeight = 120F;
+            this.dataGridViewTextBoxColumn1.HeaderText = "Tên bài tập";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.DataPropertyName = "CourseName";
+            this.dataGridViewTextBoxColumn2.HeaderText = "Khóa học";
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            this.dataGridViewTextBoxColumn2.ReadOnly = true;
+            // 
+            // colDueDate
+            // 
+            this.colDueDate.DataPropertyName = "DueDate";
+            this.colDueDate.FillWeight = 80F;
+            this.colDueDate.HeaderText = "Hạn nộp";
+            this.colDueDate.Name = "colDueDate";
+            this.colDueDate.ReadOnly = true;
+            // 
+            // colSubmitted
+            // 
+            this.colSubmitted.DataPropertyName = "TotalSubmissions";
+            this.colSubmitted.FillWeight = 60F;
+            this.colSubmitted.HeaderText = "Đã nộp";
+            this.colSubmitted.Name = "colSubmitted";
+            this.colSubmitted.ReadOnly = true;
+            // 
+            // colStatus
+            // 
+            this.colStatus.DataPropertyName = "Status";
+            this.colStatus.FillWeight = 70F;
+            this.colStatus.HeaderText = "Trạng thái";
+            this.colStatus.Name = "colStatus";
+            this.colStatus.ReadOnly = true;
+            // 
+            // colAction
+            // 
+            this.colAction.FillWeight = 80F;
+            this.colAction.HeaderText = "Thao tác";
+            this.colAction.Name = "colAction";
+            this.colAction.ReadOnly = true;
+            // 
+            // AssessmentControl
+            // 
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(250)))), ((int)(((byte)(250)))));
             this.Controls.Add(this.mainLayout);
-            this.BackColor = Color.White;
-            this.Dock = DockStyle.Fill;
+            this.Name = "AssessmentControl";
+            this.Size = new System.Drawing.Size(1065, 726);
+            this.mainLayout.ResumeLayout(false);
+            this.headerPanel.ResumeLayout(false);
+            this.headerPanel.PerformLayout();
+            this.rightPanel.ResumeLayout(false);
+            this.contentPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvAssignments)).EndInit();
+            this.ResumeLayout(false);
+        }
 
-            ((System.ComponentModel.ISupportInitialize)(this.dgvAssessments)).EndInit();
+        // =============================================
+        // ✅ LOAD DATA KHI FORM MỞ
+        // =============================================
+        private void AssessmentControl_Load(object sender, EventArgs e)
+        {
+            LoadCourses();
+        }
+
+        private void LoadCourses()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("sp_GetTeacherCourses", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    cboCourse.Items.Clear();
+                    cboCourse.Items.Add(new ComboBoxItem { Text = "-- Tất cả khóa học --", Value = "" });
+
+                    while (reader.Read())
+                    {
+                        cboCourse.Items.Add(new ComboBoxItem
+                        {
+                            Text = reader["CourseName"].ToString(),
+                            Value = reader["CourseID"].ToString()
+                        });
+                    }
+
+                    if (cboCourse.Items.Count > 0)
+                    {
+                        cboCourse.DisplayMember = "Text";
+                        cboCourse.ValueMember = "Value";
+                        cboCourse.SelectedIndex = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải danh sách khóa học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CboCourse_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadAssignments();
+        }
+
+        private void LoadAssignments()
+        {
+            try
+            {
+                string selectedCourseID = "";
+                if (cboCourse.SelectedItem != null)
+                {
+                    ComboBoxItem selected = (ComboBoxItem)cboCourse.SelectedItem;
+                    selectedCourseID = selected.Value;
+                }
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string query = @"
+                        SELECT 
+                            a.AssignmentID,
+                            a.Title,
+                            c.CourseName,
+                            a.DueDate,
+                            COUNT(s.SubmissionID) AS TotalSubmissions,
+                            CASE 
+                                WHEN GETDATE() > a.DueDate THEN N'Đã đóng'
+                                WHEN GETDATE() < a.AssignedDate THEN N'Chưa mở'
+                                ELSE N'Đang mở'
+                            END AS Status
+                        FROM Assignments a
+                        INNER JOIN Courses c ON a.CourseID = c.CourseID
+                        LEFT JOIN Submissions s ON a.AssignmentID = s.AssignmentID
+                        WHERE c.TeacherID = @TeacherID
+                        " + (string.IsNullOrEmpty(selectedCourseID) ? "" : "AND c.CourseID = @CourseID") + @"
+                        GROUP BY a.AssignmentID, a.Title, c.CourseName, a.DueDate, a.AssignedDate
+                        ORDER BY a.AssignedDate DESC";
+
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
+                    if (!string.IsNullOrEmpty(selectedCourseID))
+                    {
+                        cmd.Parameters.AddWithValue("@CourseID", selectedCourseID);
+                    }
+
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+
+                    dgvAssignments.DataSource = dt;
+
+                    // Format DueDate column
+                    if (dgvAssignments.Columns["DueDate"] != null)
+                    {
+                        dgvAssignments.Columns["DueDate"].DefaultCellStyle.Format = "dd/MM/yyyy";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải danh sách bài tập: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // =============================================
+        // EVENT HANDLERS
+        // =============================================
+
+        private void BtnCreate_Click(object sender, EventArgs e)
+        {
+            // Mở form tạo bài tập mới
+            using (var form = new Forms.AssignmentForm())
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadAssignments(); // Reload danh sách
+                }
+            }
+        }
+
+        // =============================================
+        // DATAGRIDVIEW EVENTS
+        // =============================================
+
+        private void DgvAssignments_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.ColumnIndex == dgvAssignments.Columns["colAction"].Index && e.RowIndex >= 0)
+            {
+                e.Paint(e.CellBounds, DataGridViewPaintParts.Background | DataGridViewPaintParts.Border);
+
+                // Define button areas
+                int buttonWidth = 70;
+                int buttonHeight = 30;
+                int spacing = 5;
+                int totalWidth = (buttonWidth * 2) + spacing;
+                int startX = e.CellBounds.X + (e.CellBounds.Width - totalWidth) / 2;
+                int startY = e.CellBounds.Y + (e.CellBounds.Height - buttonHeight) / 2;
+
+                var editRect = new Rectangle(startX, startY, buttonWidth, buttonHeight);
+                var deleteRect = new Rectangle(startX + buttonWidth + spacing, startY, buttonWidth, buttonHeight);
+
+                // Determine hover state
+                bool isEditHover = (e.RowIndex == hoverRow && hoverButton == "edit");
+                bool isDeleteHover = (e.RowIndex == hoverRow && hoverButton == "delete");
+
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+                // Draw Edit button
+                DrawRoundedButton(e.Graphics, editRect,
+                    isEditHover ? Color.FromArgb(25, 118, 210) : Color.FromArgb(33, 150, 243),
+                    "Sửa", Color.White);
+
+                // Draw Delete button
+                DrawRoundedButton(e.Graphics, deleteRect,
+                    isDeleteHover ? Color.FromArgb(229, 57, 53) : Color.FromArgb(244, 67, 54),
+                    "Xóa", Color.White);
+
+                e.Handled = true;
+            }
+        }
+
+        private void DrawRoundedButton(Graphics g, Rectangle rect, Color bgColor, string text, Color textColor)
+        {
+            using (var path = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                int radius = 5;
+                path.AddArc(rect.X, rect.Y, radius * 2, radius * 2, 180, 90);
+                path.AddArc(rect.Right - radius * 2, rect.Y, radius * 2, radius * 2, 270, 90);
+                path.AddArc(rect.Right - radius * 2, rect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
+                path.AddArc(rect.X, rect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
+                path.CloseFigure();
+
+                using (var brush = new SolidBrush(bgColor))
+                {
+                    g.FillPath(brush, path);
+                }
+
+                using (var textBrush = new SolidBrush(textColor))
+                using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+                {
+                    g.DrawString(text, new Font("Segoe UI", 9F), textBrush, rect, sf);
+                }
+            }
+        }
+
+        private void DgvAssignments_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == dgvAssignments.Columns["colAction"].Index && e.RowIndex >= 0)
+            {
+                dgvAssignments.Cursor = Cursors.Hand;
+                hoverRow = e.RowIndex;
+
+                // Determine which button is hovered
+                var cellRect = dgvAssignments.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                var mousePos = dgvAssignments.PointToClient(Cursor.Position);
+                var relativeX = mousePos.X - cellRect.X;
+
+                if (relativeX < cellRect.Width / 2)
+                    hoverButton = "edit";
+                else
+                    hoverButton = "delete";
+
+                dgvAssignments.InvalidateCell(e.ColumnIndex, e.RowIndex);
+            }
+        }
+
+        private void DgvAssignments_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == dgvAssignments.Columns["colAction"].Index && e.RowIndex >= 0)
+            {
+                dgvAssignments.Cursor = Cursors.Default;
+                hoverRow = -1;
+                hoverButton = "";
+                dgvAssignments.InvalidateCell(e.ColumnIndex, e.RowIndex);
+            }
+        }
+
+        private void DgvAssignments_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == dgvAssignments.Columns["colAction"].Index && e.RowIndex >= 0)
+            {
+                string assignmentID = dgvAssignments.Rows[e.RowIndex].Cells["colID"].Value?.ToString();
+                string assignmentTitle = dgvAssignments.Rows[e.RowIndex].Cells["dataGridViewTextBoxColumn1"].Value?.ToString();
+
+                var cellRect = dgvAssignments.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                var mousePos = dgvAssignments.PointToClient(Cursor.Position);
+                var relativeX = mousePos.X - cellRect.X;
+
+                if (relativeX < cellRect.Width / 2)
+                {
+                    // Edit button clicked
+                    using (var form = new Forms.AssignmentForm(assignmentID))
+                    {
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            LoadAssignments(); // Reload danh sách
+                        }
+                    }
+                }
+                else
+                {
+                    // Delete button clicked
+                    DialogResult result = MessageBox.Show(
+                        $"Bạn có chắc chắn muốn xóa bài tập '{assignmentTitle}'?",
+                        "Xác nhận xóa",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        DeleteAssignment(assignmentID);
+                    }
+                }
+            }
+        }
+
+        private void DeleteAssignment(string assignmentID)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("DELETE FROM Assignments WHERE AssignmentID = @ID", conn);
+                    cmd.Parameters.AddWithValue("@ID", assignmentID);
+                    cmd.ExecuteNonQuery();
+
+                    MessageBox.Show("Xóa bài tập thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadAssignments();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa bài tập: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // =============================================
+        // HOVER EFFECTS
+        // =============================================
+
+        private void BtnCreate_MouseEnter(object sender, EventArgs e)
+        {
+            btnCreate.BackColor = Color.FromArgb(56, 142, 60);
+        }
+
+        private void BtnCreate_MouseLeave(object sender, EventArgs e)
+        {
+            btnCreate.BackColor = Color.FromArgb(76, 175, 80);
+        }
+
+        // =============================================
+        // HELPER CLASS
+        // =============================================
+        private class ComboBoxItem
+        {
+            public string Text { get; set; }
+            public string Value { get; set; }
         }
     }
 }

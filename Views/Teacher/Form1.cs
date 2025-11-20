@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using StudyProcessManagement.Views.Teacher.Controls;
 
@@ -16,8 +10,15 @@ namespace StudyProcessManagement.Views.Teacher
         public Form1()
         {
             InitializeComponent();
+            if (!DesignMode)
+            {
+                ShowDashboard();
+            }
         }
 
+        // =============================================
+        // EVENT HANDLERS CHO CÁC BUTTONS
+        // =============================================
         private void btnDashboard_Click(object sender, EventArgs e)
         {
             ShowDashboard();
@@ -28,9 +29,14 @@ namespace StudyProcessManagement.Views.Teacher
             ShowCourses();
         }
 
-        private void btnAssignments_Click(object sender, EventArgs e)
+        private void btnContent_Click(object sender, EventArgs e)
         {
             ShowContent();
+        }
+
+        private void btnAssignments_Click(object sender, EventArgs e)
+        {
+            ShowAssessments();
         }
 
         private void btnGrading_Click(object sender, EventArgs e)
@@ -45,10 +51,20 @@ namespace StudyProcessManagement.Views.Teacher
 
         private void btnLogout_Click(object sender, EventArgs e)
         {
-            // Simple placeholder: close form to simulate logout
-            this.Close();
+            DialogResult result = MessageBox.Show(
+                "Bạn có chắc chắn muốn đăng xuất?",
+                "Xác nhận đăng xuất",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                this.Close();
+            }
         }
 
+        // =============================================
+        // METHODS HIỂN THỊ CÁC CONTROLS
+        // =============================================
         private void ShowDashboard()
         {
             panelContent.Controls.Clear();
@@ -73,6 +89,14 @@ namespace StudyProcessManagement.Views.Teacher
             panelContent.Controls.Add(ctrl);
         }
 
+        private void ShowAssessments()
+        {
+            panelContent.Controls.Clear();
+            var ctrl = new AssessmentControl();
+            ctrl.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(ctrl);
+        }
+
         private void ShowGrading()
         {
             panelContent.Controls.Clear();
@@ -87,6 +111,62 @@ namespace StudyProcessManagement.Views.Teacher
             var ctrl = new StudentsControl();
             ctrl.Dock = DockStyle.Fill;
             panelContent.Controls.Add(ctrl);
+        }
+
+        // =============================================
+        // PUBLIC METHODS ĐỂ DASHBOARD GỌI - ✅ THÊM MỚI
+        // =============================================
+        public void NavigateToCourseManagement()
+        {
+            ShowCourses();
+        }
+
+        public void NavigateToGradingWithFilter(string filter)
+        {
+            ShowGrading();
+            // TODO: Có thể set filter cho GradingControl nếu cần
+        }
+
+        // =============================================
+        // PAINT EVENT
+        // =============================================
+        private void panelLogout_Paint(object sender, PaintEventArgs e)
+        {
+            var avatarRect = new Rectangle(20, 8, 40, 40);
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            using (var brush = new SolidBrush(Color.FromArgb(76, 175, 80)))
+            {
+                e.Graphics.FillEllipse(brush, avatarRect);
+            }
+
+            using (var font = new Font("Segoe UI", 16F, FontStyle.Bold))
+            using (var textBrush = new SolidBrush(Color.White))
+            using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+            {
+                e.Graphics.DrawString("T", font, textBrush, new Rectangle(avatarRect.X, avatarRect.Y, avatarRect.Width, avatarRect.Height), sf);
+            }
+
+            using (var font = new Font("Segoe UI", 10.5F, FontStyle.Bold))
+            using (var textBrush = new SolidBrush(Color.White))
+            {
+                e.Graphics.DrawString("Teacher", font, textBrush, 68, 11);
+            }
+
+            using (var font = new Font("Segoe UI", 8.5F))
+            using (var textBrush = new SolidBrush(Color.FromArgb(180, 180, 180)))
+            {
+                e.Graphics.DrawString("Giảng viên", font, textBrush, 68, 30);
+            }
+        }
+
+        private void btnLogout_MouseEnter(object sender, EventArgs e)
+        {
+            this.btnLogout.BackColor = Color.FromArgb(192, 57, 43);
+        }
+
+        private void btnLogout_MouseLeave(object sender, EventArgs e)
+        {
+            this.btnLogout.BackColor = Color.FromArgb(201, 69, 57);
         }
     }
 }

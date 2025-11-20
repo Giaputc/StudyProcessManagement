@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace StudyProcessManagement.Views.Teacher
+﻿namespace StudyProcessManagement.Views.Teacher
 {
     partial class Form1
     {
@@ -35,6 +33,7 @@ namespace StudyProcessManagement.Views.Teacher
             this.lblAppName = new System.Windows.Forms.Label();
             this.btnDashboard = new System.Windows.Forms.Button();
             this.btnCourses = new System.Windows.Forms.Button();
+            this.btnContent = new System.Windows.Forms.Button();
             this.btnAssignments = new System.Windows.Forms.Button();
             this.btnGrading = new System.Windows.Forms.Button();
             this.btnStudents = new System.Windows.Forms.Button();
@@ -52,6 +51,7 @@ namespace StudyProcessManagement.Views.Teacher
             this.panelSidebar.Controls.Add(this.btnStudents);
             this.panelSidebar.Controls.Add(this.btnGrading);
             this.panelSidebar.Controls.Add(this.btnAssignments);
+            this.panelSidebar.Controls.Add(this.btnContent);
             this.panelSidebar.Controls.Add(this.btnCourses);
             this.panelSidebar.Controls.Add(this.btnDashboard);
             this.panelSidebar.Controls.Add(this.panelSidebarTop);
@@ -123,7 +123,27 @@ namespace StudyProcessManagement.Views.Teacher
             this.btnCourses.UseVisualStyleBackColor = true;
             this.btnCourses.Click += new System.EventHandler(this.btnCourses_Click);
             // 
-            // btnAssignments
+            // btnContent (ĐỔI TÊN TỪ btnAssignments)
+            // 
+            this.btnContent.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnContent.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnContent.FlatAppearance.BorderSize = 0;
+            this.btnContent.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
+            this.btnContent.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnContent.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnContent.ForeColor = System.Drawing.Color.White;
+            this.btnContent.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnContent.Location = new System.Drawing.Point(0, 180);
+            this.btnContent.Name = "btnContent";
+            this.btnContent.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
+            this.btnContent.Size = new System.Drawing.Size(260, 50);
+            this.btnContent.TabIndex = 3;
+            this.btnContent.Text = "Quản lý nội dung";
+            this.btnContent.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnContent.UseVisualStyleBackColor = true;
+            this.btnContent.Click += new System.EventHandler(this.btnContent_Click);
+            // 
+            // btnAssignments (BUTTON MỚI - Quản lý bài tập)
             // 
             this.btnAssignments.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAssignments.Dock = System.Windows.Forms.DockStyle.Top;
@@ -133,12 +153,12 @@ namespace StudyProcessManagement.Views.Teacher
             this.btnAssignments.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnAssignments.ForeColor = System.Drawing.Color.White;
             this.btnAssignments.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAssignments.Location = new System.Drawing.Point(0, 180);
+            this.btnAssignments.Location = new System.Drawing.Point(0, 230);
             this.btnAssignments.Name = "btnAssignments";
             this.btnAssignments.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
             this.btnAssignments.Size = new System.Drawing.Size(260, 50);
-            this.btnAssignments.TabIndex = 3;
-            this.btnAssignments.Text = "Quản lý nội dung";
+            this.btnAssignments.TabIndex = 4;
+            this.btnAssignments.Text = "Quản lý bài tập";
             this.btnAssignments.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnAssignments.UseVisualStyleBackColor = true;
             this.btnAssignments.Click += new System.EventHandler(this.btnAssignments_Click);
@@ -153,11 +173,11 @@ namespace StudyProcessManagement.Views.Teacher
             this.btnGrading.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnGrading.ForeColor = System.Drawing.Color.White;
             this.btnGrading.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnGrading.Location = new System.Drawing.Point(0, 230);
+            this.btnGrading.Location = new System.Drawing.Point(0, 280);
             this.btnGrading.Name = "btnGrading";
             this.btnGrading.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
             this.btnGrading.Size = new System.Drawing.Size(260, 50);
-            this.btnGrading.TabIndex = 4;
+            this.btnGrading.TabIndex = 5;
             this.btnGrading.Text = "Chấm điểm & Phản hồi";
             this.btnGrading.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnGrading.UseVisualStyleBackColor = true;
@@ -173,11 +193,11 @@ namespace StudyProcessManagement.Views.Teacher
             this.btnStudents.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnStudents.ForeColor = System.Drawing.Color.White;
             this.btnStudents.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnStudents.Location = new System.Drawing.Point(0, 280);
+            this.btnStudents.Location = new System.Drawing.Point(0, 330);
             this.btnStudents.Name = "btnStudents";
             this.btnStudents.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
             this.btnStudents.Size = new System.Drawing.Size(260, 50);
-            this.btnStudents.TabIndex = 5;
+            this.btnStudents.TabIndex = 6;
             this.btnStudents.Text = "Quản lý học viên";
             this.btnStudents.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnStudents.UseVisualStyleBackColor = true;
@@ -191,43 +211,9 @@ namespace StudyProcessManagement.Views.Teacher
             this.panelLogout.Location = new System.Drawing.Point(0, 516);
             this.panelLogout.Name = "panelLogout";
             this.panelLogout.Size = new System.Drawing.Size(260, 110);
-            this.panelLogout.TabIndex = 6;
+            this.panelLogout.TabIndex = 7;
             this.panelLogout.Padding = new System.Windows.Forms.Padding(0);
-            // 
-            // Custom paint for avatar and user info
-            this.panelLogout.Paint += (s, e) =>
-            {
-                // Draw avatar circle
-                var avatarRect = new Rectangle(20, 8, 40, 40);
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-                using (var brush = new SolidBrush(Color.FromArgb(76, 175, 80)))
-                {
-                    e.Graphics.FillEllipse(brush, avatarRect);
-                }
-
-                // Draw initial "T"
-                using (var font = new Font("Segoe UI", 16F, FontStyle.Bold))
-                using (var textBrush = new SolidBrush(Color.White))
-                using (var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
-                {
-                    e.Graphics.DrawString("T", font, textBrush, new Rectangle(avatarRect.X, avatarRect.Y, avatarRect.Width, avatarRect.Height), sf);
-                }
-
-                // Draw "Teacher" text
-                using (var font = new Font("Segoe UI", 10.5F, FontStyle.Bold))
-                using (var textBrush = new SolidBrush(Color.White))
-                {
-                    e.Graphics.DrawString("Teacher", font, textBrush, 68, 11);
-                }
-
-                // Draw "Giảng viên" text
-                using (var font = new Font("Segoe UI", 8.5F))
-                using (var textBrush = new SolidBrush(Color.FromArgb(180, 180, 180)))
-                {
-                    e.Graphics.DrawString("Giảng viên", font, textBrush, 68, 30);
-                }
-            };
+            this.panelLogout.Paint += new System.Windows.Forms.PaintEventHandler(this.panelLogout_Paint);
             // 
             // btnLogout
             // 
@@ -245,14 +231,8 @@ namespace StudyProcessManagement.Views.Teacher
             this.btnLogout.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.btnLogout.UseVisualStyleBackColor = false;
             this.btnLogout.Click += new System.EventHandler(this.btnLogout_Click);
-            this.btnLogout.MouseEnter += (s, e) =>
-            {
-                this.btnLogout.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(57)))), ((int)(((byte)(43)))));
-            };
-            this.btnLogout.MouseLeave += (s, e) =>
-            {
-                this.btnLogout.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(201)))), ((int)(((byte)(69)))), ((int)(((byte)(57)))));
-            };
+            this.btnLogout.MouseEnter += new System.EventHandler(this.btnLogout_MouseEnter);
+            this.btnLogout.MouseLeave += new System.EventHandler(this.btnLogout_MouseLeave);
             // 
             // panelContent
             // 
@@ -287,6 +267,7 @@ namespace StudyProcessManagement.Views.Teacher
         private System.Windows.Forms.Label lblAppName;
         private System.Windows.Forms.Button btnDashboard;
         private System.Windows.Forms.Button btnCourses;
+        private System.Windows.Forms.Button btnContent;
         private System.Windows.Forms.Button btnAssignments;
         private System.Windows.Forms.Button btnGrading;
         private System.Windows.Forms.Button btnStudents;

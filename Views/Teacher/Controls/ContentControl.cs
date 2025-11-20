@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace StudyProcessManagement.Views.Teacher.Controls
 {
@@ -29,387 +31,154 @@ namespace StudyProcessManagement.Views.Teacher.Controls
         private Button btnAddLesson;
         private Button btnDelete;
 
+        // Database connection (Thay đổi connection string của bạn)
+        private string connectionString = "Server=DESKTOP-FO9OMBO;Database=StudyProcess;Integrated Security=true;";
+        private string currentTeacherID = "USR002"; // ID giảng viên hiện tại (lấy từ session/login)
+        private string selectedCourseID = "";
+        private string selectedSectionID = "";
+        private string selectedLessonID = "";
+        private bool isEditingLesson = false;
+
         public ContentControl()
         {
             InitializeComponent();
+
+            // ✅ GÁN CÁC EVENT HANDLERS
+            if (!DesignMode)
+            {
+                this.Load += ContentControl_Load;
+                this.Resize += ContentControl_Resize;
+
+                cboCourse.SelectedIndexChanged += CboCourse_SelectedIndexChanged;
+                btnAddSection.Click += BtnAddSection_Click;
+                btnAddSection.MouseEnter += BtnAddSection_MouseEnter;
+                btnAddSection.MouseLeave += BtnAddSection_MouseLeave;
+
+                tvContent.AfterSelect += TvContent_AfterSelect;
+
+                btnSave.Click += BtnSave_Click;
+                btnSave.MouseEnter += BtnSave_MouseEnter;
+                btnSave.MouseLeave += BtnSave_MouseLeave;
+
+                btnAddLesson.Click += BtnAddLesson_Click;
+                btnAddLesson.MouseEnter += BtnAddLesson_MouseEnter;
+                btnAddLesson.MouseLeave += BtnAddLesson_MouseLeave;
+
+                btnDelete.Click += BtnDelete_Click;
+                btnDelete.MouseEnter += BtnDelete_MouseEnter;
+                btnDelete.MouseLeave += BtnDelete_MouseLeave;
+
+                txtMaterials.Click += TxtMaterials_Click;
+
+                treeContainerPanel.Paint += TreeContainerPanel_Paint;
+                detailPanel.Paint += DetailPanel_Paint;
+            }
         }
 
         private void InitializeComponent()
         {
-            this.headerPanel = new Panel();
-            this.lblTitle = new Label();
-            this.lblBreadcrumb = new Label();
-            this.cboCourse = new ComboBox();
-            this.btnAddSection = new Button();
-            this.mainContentPanel = new Panel();
-            this.treeContainerPanel = new Panel();
-            this.tvContent = new TreeView();
-            this.detailPanel = new Panel();
-            this.lblDetailTitle = new Label();
-            this.lblLessonName = new Label();
-            this.txtLessonName = new TextBox();
-            this.lblLessonDesc = new Label();
-            this.txtLessonDescription = new RichTextBox();
-            this.lblVideoUrl = new Label();
-            this.txtVideoUrl = new TextBox();
-            this.lblMaterials = new Label();
-            this.txtMaterials = new TextBox();
-            this.buttonPanel = new Panel();
-            this.btnSave = new Button();
-            this.btnAddLesson = new Button();
-            this.btnDelete = new Button();
-
+            this.headerPanel = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.lblBreadcrumb = new System.Windows.Forms.Label();
+            this.cboCourse = new System.Windows.Forms.ComboBox();
+            this.btnAddSection = new System.Windows.Forms.Button();
+            this.mainContentPanel = new System.Windows.Forms.Panel();
+            this.detailPanel = new System.Windows.Forms.Panel();
+            this.lblDetailTitle = new System.Windows.Forms.Label();
+            this.lblLessonName = new System.Windows.Forms.Label();
+            this.txtLessonName = new System.Windows.Forms.TextBox();
+            this.lblLessonDesc = new System.Windows.Forms.Label();
+            this.txtLessonDescription = new System.Windows.Forms.RichTextBox();
+            this.lblVideoUrl = new System.Windows.Forms.Label();
+            this.txtVideoUrl = new System.Windows.Forms.TextBox();
+            this.lblMaterials = new System.Windows.Forms.Label();
+            this.txtMaterials = new System.Windows.Forms.TextBox();
+            this.buttonPanel = new System.Windows.Forms.Panel();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnAddLesson = new System.Windows.Forms.Button();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.treeContainerPanel = new System.Windows.Forms.Panel();
+            this.tvContent = new System.Windows.Forms.TreeView();
+            this.headerPanel.SuspendLayout();
+            this.mainContentPanel.SuspendLayout();
+            this.detailPanel.SuspendLayout();
+            this.buttonPanel.SuspendLayout();
+            this.treeContainerPanel.SuspendLayout();
             this.SuspendLayout();
-
-            // Main Control
-            this.BackColor = Color.FromArgb(248, 248, 248);
-            this.Dock = DockStyle.Fill;
-            this.Padding = new Padding(30, 20, 30, 20);
-
+            // 
             // headerPanel
-            this.headerPanel.Dock = DockStyle.Top;
-            this.headerPanel.Height = 130;
-            this.headerPanel.BackColor = Color.Transparent;
-
-            // lblTitle
-            this.lblTitle.Text = "Quản lý Nội dung";
-            this.lblTitle.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
-            this.lblTitle.ForeColor = Color.FromArgb(40, 40, 40);
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Location = new Point(0, 5);
-
-            // lblBreadcrumb
-            this.lblBreadcrumb.Text = "Trang chủ / Nội dung / Quản lý bài học";
-            this.lblBreadcrumb.Font = new Font("Segoe UI", 9F);
-            this.lblBreadcrumb.ForeColor = Color.FromArgb(120, 120, 120);
-            this.lblBreadcrumb.AutoSize = true;
-            this.lblBreadcrumb.Location = new Point(0, 40);
-
-            // cboCourse
-            this.cboCourse.Size = new Size(280, 38);
-            this.cboCourse.Font = new Font("Segoe UI", 10F);
-            this.cboCourse.Location = new Point(0, 75);
-            this.cboCourse.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.cboCourse.Items.AddRange(new object[] {
-                "Lập trình Web với React",
-                "Python cơ bản",
-                "JavaScript nâng cao",
-                "Data Science với Python"
-            });
-            this.cboCourse.SelectedIndex = 0;
-
-            // btnAddSection
-            this.btnAddSection.Text = "➕ Thêm chương";
-            this.btnAddSection.Size = new Size(160, 40);
-            this.btnAddSection.Location = new Point(300, 75);
-            this.btnAddSection.BackColor = Color.FromArgb(76, 175, 80);
-            this.btnAddSection.ForeColor = Color.White;
-            this.btnAddSection.FlatStyle = FlatStyle.Flat;
-            this.btnAddSection.FlatAppearance.BorderSize = 0;
-            this.btnAddSection.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            this.btnAddSection.Cursor = Cursors.Hand;
-
-            this.btnAddSection.MouseEnter += (s, e) => this.btnAddSection.BackColor = Color.FromArgb(56, 142, 60);
-            this.btnAddSection.MouseLeave += (s, e) => this.btnAddSection.BackColor = Color.FromArgb(76, 175, 80);
-            this.btnAddSection.Click += (s, e) => MessageBox.Show("Thêm chương mới");
-
+            // 
+            this.headerPanel.BackColor = System.Drawing.Color.Transparent;
             this.headerPanel.Controls.Add(this.lblTitle);
             this.headerPanel.Controls.Add(this.lblBreadcrumb);
             this.headerPanel.Controls.Add(this.cboCourse);
             this.headerPanel.Controls.Add(this.btnAddSection);
-
+            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.headerPanel.Location = new System.Drawing.Point(30, 20);
+            this.headerPanel.Name = "headerPanel";
+            this.headerPanel.Size = new System.Drawing.Size(1005, 130);
+            this.headerPanel.TabIndex = 1;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.lblTitle.Location = new System.Drawing.Point(0, 5);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(240, 37);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Quản lý Nội dung";
+            // 
+            // lblBreadcrumb
+            // 
+            this.lblBreadcrumb.AutoSize = true;
+            this.lblBreadcrumb.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.lblBreadcrumb.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(120)))), ((int)(((byte)(120)))));
+            this.lblBreadcrumb.Location = new System.Drawing.Point(0, 40);
+            this.lblBreadcrumb.Name = "lblBreadcrumb";
+            this.lblBreadcrumb.Size = new System.Drawing.Size(215, 15);
+            this.lblBreadcrumb.TabIndex = 1;
+            this.lblBreadcrumb.Text = "Trang chủ / Nội dung / Quản lý bài học";
+            // 
+            // cboCourse
+            // 
+            this.cboCourse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboCourse.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cboCourse.Location = new System.Drawing.Point(0, 75);
+            this.cboCourse.Name = "cboCourse";
+            this.cboCourse.Size = new System.Drawing.Size(280, 25);
+            this.cboCourse.TabIndex = 2;
+            // 
+            // btnAddSection
+            // 
+            this.btnAddSection.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.btnAddSection.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddSection.FlatAppearance.BorderSize = 0;
+            this.btnAddSection.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddSection.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnAddSection.ForeColor = System.Drawing.Color.White;
+            this.btnAddSection.Location = new System.Drawing.Point(300, 75);
+            this.btnAddSection.Name = "btnAddSection";
+            this.btnAddSection.Size = new System.Drawing.Size(160, 40);
+            this.btnAddSection.TabIndex = 3;
+            this.btnAddSection.Text = "➕ Thêm chương";
+            this.btnAddSection.UseVisualStyleBackColor = false;
+            // 
             // mainContentPanel
-            this.mainContentPanel.Dock = DockStyle.Fill;
-            this.mainContentPanel.BackColor = Color.Transparent;
-
-            // treeContainerPanel - Dùng Dock Left chiếm 50%
-            this.treeContainerPanel.Dock = DockStyle.Left;
-            this.treeContainerPanel.Width = (this.Width - 60) / 2; // 50% minus padding
-            this.treeContainerPanel.BackColor = Color.White;
-            this.treeContainerPanel.Padding = new Padding(15);
-            this.treeContainerPanel.Margin = new Padding(0, 0, 8, 0);
-
-            // Resize handler để treePanel luôn chiếm 50%
-            this.Resize += (s, e) =>
-            {
-                this.treeContainerPanel.Width = (this.Width - 60) / 2;
-            };
-
-            this.treeContainerPanel.Paint += (s, e) =>
-            {
-                // Draw rounded rectangle border
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                using (var path = new System.Drawing.Drawing2D.GraphicsPath())
-                {
-                    int radius = 8;
-                    var rect = new Rectangle(0, 0, this.treeContainerPanel.Width - 1, this.treeContainerPanel.Height - 1);
-                    path.AddArc(rect.X, rect.Y, radius * 2, radius * 2, 180, 90);
-                    path.AddArc(rect.Right - radius * 2, rect.Y, radius * 2, radius * 2, 270, 90);
-                    path.AddArc(rect.Right - radius * 2, rect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
-                    path.AddArc(rect.X, rect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
-                    path.CloseFigure();
-
-                    using (var pen = new Pen(Color.FromArgb(230, 230, 230), 1))
-                    {
-                        e.Graphics.DrawPath(pen, path);
-                    }
-                }
-            };
-
-            // tvContent - TreeView với styling đẹp hơn
-            this.tvContent.Dock = DockStyle.Fill;
-            this.tvContent.Font = new Font("Segoe UI", 11F);
-            this.tvContent.BackColor = Color.White;
-            this.tvContent.BorderStyle = BorderStyle.None;
-            this.tvContent.ItemHeight = 38;
-            this.tvContent.Indent = 25;
-            this.tvContent.ShowLines = true;
-            this.tvContent.ShowPlusMinus = true;
-            this.tvContent.ShowRootLines = true;
-            this.tvContent.FullRowSelect = true;
-            this.tvContent.HideSelection = false;
-
-            // Custom colors for TreeView
-            this.tvContent.DrawMode = TreeViewDrawMode.OwnerDrawText;
-            this.tvContent.DrawNode += (sender, e) =>
-            {
-                // Background color
-                Color bgColor = Color.White;
-                if ((e.State & TreeNodeStates.Selected) != 0)
-                {
-                    bgColor = Color.FromArgb(227, 242, 253);
-                }
-                else if ((e.State & TreeNodeStates.Hot) != 0)
-                {
-                    bgColor = Color.FromArgb(245, 245, 245);
-                }
-
-                using (var brush = new SolidBrush(bgColor))
-                {
-                    e.Graphics.FillRectangle(brush, e.Bounds);
-                }
-
-                // Text color based on level
-                Color textColor;
-                Font textFont;
-
-                if (e.Node.Level == 0) // Course node
-                {
-                    textColor = Color.FromArgb(33, 150, 243);
-                    textFont = new Font("Segoe UI", 12F, FontStyle.Bold);
-                }
-                else if (e.Node.Level == 1) // Section node
-                {
-                    textColor = Color.FromArgb(76, 175, 80);
-                    textFont = new Font("Segoe UI", 11F, FontStyle.Bold);
-                }
-                else // Lesson node
-                {
-                    textColor = Color.FromArgb(100, 100, 100);
-                    textFont = new Font("Segoe UI", 10.5F);
-                }
-
-                // Draw text
-                TextRenderer.DrawText(e.Graphics, e.Node.Text, textFont, e.Bounds, textColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
-            };
-
-            // Add sample data with better structure
-            var courseNode = new TreeNode("📚 Lập trình Web với React");
-
-            var section1 = new TreeNode("📖 Chương 1: Giới thiệu React");
-            section1.Nodes.Add(new TreeNode("📄 Bài 1: Tổng quan về React"));
-            section1.Nodes.Add(new TreeNode("📄 Bài 2: Cài đặt môi trường"));
-            section1.Nodes.Add(new TreeNode("📄 Bài 3: Component đầu tiên"));
-            section1.Nodes.Add(new TreeNode("📄 Bài 4: JSX và Virtual DOM"));
-
-            var section2 = new TreeNode("📖 Chương 2: State và Props");
-            section2.Nodes.Add(new TreeNode("📄 Bài 5: Hiểu về State"));
-            section2.Nodes.Add(new TreeNode("📄 Bài 6: Props là gì?"));
-            section2.Nodes.Add(new TreeNode("📄 Bài 7: Props validation"));
-            section2.Nodes.Add(new TreeNode("📄 Bài 8: State vs Props"));
-
-            var section3 = new TreeNode("📖 Chương 3: Lifecycle và Hooks");
-            section3.Nodes.Add(new TreeNode("📄 Bài 9: Component Lifecycle"));
-            section3.Nodes.Add(new TreeNode("📄 Bài 10: useState Hook"));
-            section3.Nodes.Add(new TreeNode("📄 Bài 11: useEffect Hook"));
-            section3.Nodes.Add(new TreeNode("📄 Bài 12: Custom Hooks"));
-
-            courseNode.Nodes.Add(section1);
-            courseNode.Nodes.Add(section2);
-            courseNode.Nodes.Add(section3);
-
-            this.tvContent.Nodes.Add(courseNode);
-            this.tvContent.ExpandAll();
-
-            this.tvContent.AfterSelect += (s, e) =>
-            {
-                if (e.Node.Level == 2) // Lesson selected
-                {
-                    this.txtLessonName.Text = e.Node.Text.Replace("📄 ", "");
-                    this.txtLessonDescription.Text = "Mô tả chi tiết của bài học...";
-                }
-            };
-
-            this.treeContainerPanel.Controls.Add(this.tvContent);
-
-            // detailPanel - Dùng Dock Fill để chiếm phần còn lại
-            this.detailPanel.Dock = DockStyle.Fill;
-            this.detailPanel.BackColor = Color.White;
-            this.detailPanel.Padding = new Padding(25);
-            this.detailPanel.AutoScroll = true;
-            this.detailPanel.Margin = new Padding(15, 0, 0, 0);
-
-            this.detailPanel.Paint += (s, e) =>
-            {
-                // Draw rounded rectangle border
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                using (var path = new System.Drawing.Drawing2D.GraphicsPath())
-                {
-                    int radius = 8;
-                    var rect = new Rectangle(0, 0, this.detailPanel.Width - 1, this.detailPanel.Height - 1);
-                    path.AddArc(rect.X, rect.Y, radius * 2, radius * 2, 180, 90);
-                    path.AddArc(rect.Right - radius * 2, rect.Y, radius * 2, radius * 2, 270, 90);
-                    path.AddArc(rect.Right - radius * 2, rect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
-                    path.AddArc(rect.X, rect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
-                    path.CloseFigure();
-
-                    using (var pen = new Pen(Color.FromArgb(230, 230, 230), 1))
-                    {
-                        e.Graphics.DrawPath(pen, path);
-                    }
-                }
-            };
-
-            // lblDetailTitle
-            this.lblDetailTitle.AutoSize = true;
-            this.lblDetailTitle.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
-            this.lblDetailTitle.ForeColor = Color.FromArgb(40, 40, 40);
-            this.lblDetailTitle.Text = "Chi tiết bài học";
-            this.lblDetailTitle.Location = new Point(25, 25);
-
-            // lblLessonName
-            this.lblLessonName.AutoSize = true;
-            this.lblLessonName.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
-            this.lblLessonName.ForeColor = Color.FromArgb(60, 60, 60);
-            this.lblLessonName.Text = "📝 Tên bài học:";
-            this.lblLessonName.Location = new Point(25, 80);
-
-            // txtLessonName
-            this.txtLessonName.Location = new Point(25, 110);
-            this.txtLessonName.Font = new Font("Segoe UI", 11F);
-            this.txtLessonName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            this.txtLessonName.BorderStyle = BorderStyle.FixedSingle;
-            this.txtLessonName.Width = this.detailPanel.Width - 50;
-
-            // lblLessonDesc
-            this.lblLessonDesc.AutoSize = true;
-            this.lblLessonDesc.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
-            this.lblLessonDesc.ForeColor = Color.FromArgb(60, 60, 60);
-            this.lblLessonDesc.Text = "📋 Mô tả nội dung:";
-            this.lblLessonDesc.Location = new Point(25, 160);
-
-            // txtLessonDescription
-            this.txtLessonDescription.Location = new Point(25, 190);
-            this.txtLessonDescription.Height = 150;
-            this.txtLessonDescription.Font = new Font("Segoe UI", 10.5F);
-            this.txtLessonDescription.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            this.txtLessonDescription.BorderStyle = BorderStyle.FixedSingle;
-            this.txtLessonDescription.Width = this.detailPanel.Width - 50;
-
-            // lblVideoUrl
-            this.lblVideoUrl.AutoSize = true;
-            this.lblVideoUrl.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
-            this.lblVideoUrl.ForeColor = Color.FromArgb(60, 60, 60);
-            this.lblVideoUrl.Text = "🎥 Link video bài giảng:";
-            this.lblVideoUrl.Location = new Point(25, 360);
-
-            // txtVideoUrl
-            this.txtVideoUrl.Location = new Point(25, 390);
-            this.txtVideoUrl.Font = new Font("Segoe UI", 11F);
-            this.txtVideoUrl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            this.txtVideoUrl.BorderStyle = BorderStyle.FixedSingle;
-            this.txtVideoUrl.Text = "https://youtube.com/...";
-            this.txtVideoUrl.Width = this.detailPanel.Width - 50;
-
-            // lblMaterials
-            this.lblMaterials.AutoSize = true;
-            this.lblMaterials.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
-            this.lblMaterials.ForeColor = Color.FromArgb(60, 60, 60);
-            this.lblMaterials.Text = "📎 Tài liệu đính kèm:";
-            this.lblMaterials.Location = new Point(25, 440);
-
-            // txtMaterials
-            this.txtMaterials.Location = new Point(25, 470);
-            this.txtMaterials.Font = new Font("Segoe UI", 11F);
-            this.txtMaterials.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            this.txtMaterials.BorderStyle = BorderStyle.FixedSingle;
-            this.txtMaterials.Text = "Chọn file...";
-            this.txtMaterials.ReadOnly = true;
-            this.txtMaterials.Cursor = Cursors.Hand;
-            this.txtMaterials.Width = this.detailPanel.Width - 50;
-            this.txtMaterials.Click += (s, e) => MessageBox.Show("Chọn file tài liệu");
-
-            // buttonPanel
-            this.buttonPanel.Location = new Point(25, 530);
-            this.buttonPanel.Size = new Size(500, 45);
-            this.buttonPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-
-            // btnSave
-            this.btnSave.Text = "💾 Lưu thay đổi";
-            this.btnSave.Size = new Size(150, 40);
-            this.btnSave.Location = new Point(0, 0);
-            this.btnSave.BackColor = Color.FromArgb(76, 175, 80);
-            this.btnSave.ForeColor = Color.White;
-            this.btnSave.FlatStyle = FlatStyle.Flat;
-            this.btnSave.FlatAppearance.BorderSize = 0;
-            this.btnSave.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            this.btnSave.Cursor = Cursors.Hand;
-
-            this.btnSave.MouseEnter += (s, e) => this.btnSave.BackColor = Color.FromArgb(56, 142, 60);
-            this.btnSave.MouseLeave += (s, e) => this.btnSave.BackColor = Color.FromArgb(76, 175, 80);
-            this.btnSave.Click += (s, e) => MessageBox.Show("Đã lưu thay đổi!");
-
-            // btnAddLesson
-            this.btnAddLesson.Text = "➕ Thêm bài học";
-            this.btnAddLesson.Size = new Size(150, 40);
-            this.btnAddLesson.Location = new Point(165, 0);
-            this.btnAddLesson.BackColor = Color.FromArgb(33, 150, 243);
-            this.btnAddLesson.ForeColor = Color.White;
-            this.btnAddLesson.FlatStyle = FlatStyle.Flat;
-            this.btnAddLesson.FlatAppearance.BorderSize = 0;
-            this.btnAddLesson.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            this.btnAddLesson.Cursor = Cursors.Hand;
-
-            this.btnAddLesson.MouseEnter += (s, e) => this.btnAddLesson.BackColor = Color.FromArgb(25, 118, 210);
-            this.btnAddLesson.MouseLeave += (s, e) => this.btnAddLesson.BackColor = Color.FromArgb(33, 150, 243);
-            this.btnAddLesson.Click += (s, e) => MessageBox.Show("Thêm bài học mới");
-
-            // btnDelete
-            this.btnDelete.Text = "🗑️ Xóa";
-            this.btnDelete.Size = new Size(120, 40);
-            this.btnDelete.Location = new Point(330, 0);
-            this.btnDelete.BackColor = Color.FromArgb(244, 67, 54);
-            this.btnDelete.ForeColor = Color.White;
-            this.btnDelete.FlatStyle = FlatStyle.Flat;
-            this.btnDelete.FlatAppearance.BorderSize = 0;
-            this.btnDelete.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            this.btnDelete.Cursor = Cursors.Hand;
-
-            this.btnDelete.MouseEnter += (s, e) => this.btnDelete.BackColor = Color.FromArgb(229, 57, 53);
-            this.btnDelete.MouseLeave += (s, e) => this.btnDelete.BackColor = Color.FromArgb(244, 67, 54);
-            this.btnDelete.Click += (s, e) =>
-            {
-                var result = MessageBox.Show("Bạn có chắc chắn muốn xóa bài học này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (result == DialogResult.Yes)
-                {
-                    MessageBox.Show("Đã xóa bài học!");
-                }
-            };
-
-            this.buttonPanel.Controls.Add(this.btnSave);
-            this.buttonPanel.Controls.Add(this.btnAddLesson);
-            this.buttonPanel.Controls.Add(this.btnDelete);
-
+            // 
+            this.mainContentPanel.BackColor = System.Drawing.Color.Transparent;
+            this.mainContentPanel.Controls.Add(this.detailPanel);
+            this.mainContentPanel.Controls.Add(this.treeContainerPanel);
+            this.mainContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainContentPanel.Location = new System.Drawing.Point(30, 150);
+            this.mainContentPanel.Name = "mainContentPanel";
+            this.mainContentPanel.Size = new System.Drawing.Size(1005, 556);
+            this.mainContentPanel.TabIndex = 0;
+            // 
+            // detailPanel - ✅ FIX LAYOUT: Dock Fill để chiếm 50% space
+            // 
+            this.detailPanel.BackColor = System.Drawing.Color.White;
             this.detailPanel.Controls.Add(this.lblDetailTitle);
             this.detailPanel.Controls.Add(this.lblLessonName);
             this.detailPanel.Controls.Add(this.txtLessonName);
@@ -420,14 +189,683 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             this.detailPanel.Controls.Add(this.lblMaterials);
             this.detailPanel.Controls.Add(this.txtMaterials);
             this.detailPanel.Controls.Add(this.buttonPanel);
-
-            this.mainContentPanel.Controls.Add(this.detailPanel);
-            this.mainContentPanel.Controls.Add(this.treeContainerPanel);
-
+            this.detailPanel.Dock = System.Windows.Forms.DockStyle.Fill;  // ✅ Fill remaining space (50%)
+            this.detailPanel.Location = new System.Drawing.Point(510, 0);
+            this.detailPanel.Name = "detailPanel";
+            this.detailPanel.Size = new System.Drawing.Size(495, 556);
+            this.detailPanel.TabIndex = 1;
+            // 
+            // lblDetailTitle
+            // 
+            this.lblDetailTitle.AutoSize = true;
+            this.lblDetailTitle.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
+            this.lblDetailTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.lblDetailTitle.Location = new System.Drawing.Point(25, 25);
+            this.lblDetailTitle.Name = "lblDetailTitle";
+            this.lblDetailTitle.Size = new System.Drawing.Size(207, 32);
+            this.lblDetailTitle.TabIndex = 0;
+            this.lblDetailTitle.Text = "Chi tiết bài học";
+            // 
+            // lblLessonName
+            // 
+            this.lblLessonName.AutoSize = true;
+            this.lblLessonName.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblLessonName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.lblLessonName.Location = new System.Drawing.Point(25, 80);
+            this.lblLessonName.Name = "lblLessonName";
+            this.lblLessonName.Size = new System.Drawing.Size(83, 19);
+            this.lblLessonName.TabIndex = 1;
+            this.lblLessonName.Text = "Tên bài học";
+            // 
+            // txtLessonName
+            // 
+            this.txtLessonName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtLessonName.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtLessonName.Location = new System.Drawing.Point(25, 105);
+            this.txtLessonName.Name = "txtLessonName";
+            this.txtLessonName.Size = new System.Drawing.Size(445, 25);
+            this.txtLessonName.TabIndex = 2;
+            // 
+            // lblLessonDesc
+            // 
+            this.lblLessonDesc.AutoSize = true;
+            this.lblLessonDesc.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblLessonDesc.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.lblLessonDesc.Location = new System.Drawing.Point(25, 145);
+            this.lblLessonDesc.Name = "lblLessonDesc";
+            this.lblLessonDesc.Size = new System.Drawing.Size(47, 19);
+            this.lblLessonDesc.TabIndex = 3;
+            this.lblLessonDesc.Text = "Mô tả";
+            // 
+            // txtLessonDescription
+            // 
+            this.txtLessonDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtLessonDescription.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtLessonDescription.Location = new System.Drawing.Point(25, 170);
+            this.txtLessonDescription.Name = "txtLessonDescription";
+            this.txtLessonDescription.Size = new System.Drawing.Size(445, 100);
+            this.txtLessonDescription.TabIndex = 4;
+            this.txtLessonDescription.Text = "";
+            // 
+            // lblVideoUrl
+            // 
+            this.lblVideoUrl.AutoSize = true;
+            this.lblVideoUrl.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblVideoUrl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.lblVideoUrl.Location = new System.Drawing.Point(25, 285);
+            this.lblVideoUrl.Name = "lblVideoUrl";
+            this.lblVideoUrl.Size = new System.Drawing.Size(101, 19);
+            this.lblVideoUrl.TabIndex = 5;
+            this.lblVideoUrl.Text = "Link video bài";
+            // 
+            // txtVideoUrl
+            // 
+            this.txtVideoUrl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtVideoUrl.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtVideoUrl.Location = new System.Drawing.Point(25, 310);
+            this.txtVideoUrl.Name = "txtVideoUrl";
+            this.txtVideoUrl.Size = new System.Drawing.Size(445, 25);
+            this.txtVideoUrl.TabIndex = 6;
+            // 
+            // lblMaterials
+            // 
+            this.lblMaterials.AutoSize = true;
+            this.lblMaterials.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblMaterials.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.lblMaterials.Location = new System.Drawing.Point(25, 350);
+            this.lblMaterials.Name = "lblMaterials";
+            this.lblMaterials.Size = new System.Drawing.Size(96, 19);
+            this.lblMaterials.TabIndex = 7;
+            this.lblMaterials.Text = "Tài liệu đính";
+            // 
+            // txtMaterials
+            // 
+            this.txtMaterials.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtMaterials.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.txtMaterials.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtMaterials.Location = new System.Drawing.Point(25, 375);
+            this.txtMaterials.Name = "txtMaterials";
+            this.txtMaterials.ReadOnly = true;
+            this.txtMaterials.Size = new System.Drawing.Size(445, 25);
+            this.txtMaterials.TabIndex = 8;
+            this.txtMaterials.Text = "Chọn file...";
+            // 
+            // buttonPanel
+            // 
+            this.buttonPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonPanel.Controls.Add(this.btnSave);
+            this.buttonPanel.Controls.Add(this.btnAddLesson);
+            this.buttonPanel.Controls.Add(this.btnDelete);
+            this.buttonPanel.Location = new System.Drawing.Point(25, 420);
+            this.buttonPanel.Name = "buttonPanel";
+            this.buttonPanel.Size = new System.Drawing.Size(445, 50);
+            this.buttonPanel.TabIndex = 9;
+            // 
+            // btnSave
+            // 
+            this.btnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
+            this.btnSave.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSave.FlatAppearance.BorderSize = 0;
+            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSave.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnSave.ForeColor = System.Drawing.Color.White;
+            this.btnSave.Location = new System.Drawing.Point(0, 0);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(100, 40);
+            this.btnSave.TabIndex = 0;
+            this.btnSave.Text = "💾 Lưu";
+            this.btnSave.UseVisualStyleBackColor = false;
+            // 
+            // btnAddLesson
+            // 
+            this.btnAddLesson.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
+            this.btnAddLesson.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddLesson.FlatAppearance.BorderSize = 0;
+            this.btnAddLesson.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddLesson.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnAddLesson.ForeColor = System.Drawing.Color.White;
+            this.btnAddLesson.Location = new System.Drawing.Point(110, 0);
+            this.btnAddLesson.Name = "btnAddLesson";
+            this.btnAddLesson.Size = new System.Drawing.Size(140, 40);
+            this.btnAddLesson.TabIndex = 1;
+            this.btnAddLesson.Text = "➕ Thêm bài";
+            this.btnAddLesson.UseVisualStyleBackColor = false;
+            // 
+            // btnDelete
+            // 
+            this.btnDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(67)))), ((int)(((byte)(54)))));
+            this.btnDelete.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDelete.FlatAppearance.BorderSize = 0;
+            this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDelete.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnDelete.ForeColor = System.Drawing.Color.White;
+            this.btnDelete.Location = new System.Drawing.Point(260, 0);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(100, 40);
+            this.btnDelete.TabIndex = 2;
+            this.btnDelete.Text = "🗑️ Xóa";
+            this.btnDelete.UseVisualStyleBackColor = false;
+            // 
+            // treeContainerPanel - ✅ FIX LAYOUT: Dock Left với Width 50%
+            // 
+            this.treeContainerPanel.BackColor = System.Drawing.Color.White;
+            this.treeContainerPanel.Controls.Add(this.tvContent);
+            this.treeContainerPanel.Dock = System.Windows.Forms.DockStyle.Left;  // ✅ Dock Left
+            this.treeContainerPanel.Location = new System.Drawing.Point(0, 0);
+            this.treeContainerPanel.Margin = new System.Windows.Forms.Padding(0, 0, 15, 0);
+            this.treeContainerPanel.Name = "treeContainerPanel";
+            this.treeContainerPanel.Padding = new System.Windows.Forms.Padding(15, 15, 8, 15);  // ✅ Padding for spacing
+            this.treeContainerPanel.Size = new System.Drawing.Size(495, 556);  // ✅ Fixed width 50%
+            this.treeContainerPanel.TabIndex = 0;
+            // 
+            // tvContent
+            // 
+            this.tvContent.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tvContent.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tvContent.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.tvContent.Location = new System.Drawing.Point(0, 0);
+            this.tvContent.Name = "tvContent";
+            this.tvContent.Size = new System.Drawing.Size(495, 556);
+            this.tvContent.TabIndex = 0;
+            // 
+            // ContentControl
+            // 
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(250)))), ((int)(((byte)(250)))), ((int)(((byte)(250)))));
             this.Controls.Add(this.mainContentPanel);
             this.Controls.Add(this.headerPanel);
-
+            this.Name = "ContentControl";
+            this.Padding = new System.Windows.Forms.Padding(30, 20, 30, 20);
+            this.Size = new System.Drawing.Size(1065, 726);
+            this.headerPanel.ResumeLayout(false);
+            this.headerPanel.PerformLayout();
+            this.mainContentPanel.ResumeLayout(false);
+            this.detailPanel.ResumeLayout(false);
+            this.detailPanel.PerformLayout();
+            this.buttonPanel.ResumeLayout(false);
+            this.treeContainerPanel.ResumeLayout(false);
             this.ResumeLayout(false);
+        }
+
+        // =============================================
+        // ✅ LOAD DATA KHI FORM MỞ
+        // =============================================
+        private void ContentControl_Load(object sender, EventArgs e)
+        {
+            LoadTeacherCourses();
+        }
+
+        private void LoadTeacherCourses()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("sp_GetTeacherCourses", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@TeacherID", currentTeacherID);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    cboCourse.Items.Clear();
+
+                    while (reader.Read())
+                    {
+                        cboCourse.Items.Add(new ComboBoxItem
+                        {
+                            Text = reader["CourseName"].ToString(),
+                            Value = reader["CourseID"].ToString()
+                        });
+                    }
+
+                    if (cboCourse.Items.Count > 0)
+                    {
+                        cboCourse.DisplayMember = "Text";
+                        cboCourse.ValueMember = "Value";
+                        cboCourse.SelectedIndex = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải danh sách khóa học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CboCourse_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cboCourse.SelectedItem != null)
+            {
+                ComboBoxItem selected = (ComboBoxItem)cboCourse.SelectedItem;
+                selectedCourseID = selected.Value;
+                LoadCourseStructure(selectedCourseID);
+                ClearLessonForm();
+            }
+        }
+
+        private void LoadCourseStructure(string courseID)
+        {
+            try
+            {
+                tvContent.Nodes.Clear();
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // Load Sections
+                    SqlCommand cmdSections = new SqlCommand(
+                        "SELECT SectionID, SectionTitle, SectionOrder FROM Sections WHERE CourseID = @CourseID ORDER BY SectionOrder", conn);
+                    cmdSections.Parameters.AddWithValue("@CourseID", courseID);
+                    SqlDataReader readerSections = cmdSections.ExecuteReader();
+
+                    while (readerSections.Read())
+                    {
+                        TreeNode sectionNode = new TreeNode(readerSections["SectionTitle"].ToString());
+                        sectionNode.Tag = new { Type = "Section", ID = readerSections["SectionID"].ToString() };
+                        tvContent.Nodes.Add(sectionNode);
+                    }
+                    readerSections.Close();
+
+                    // Load Lessons for each Section
+                    foreach (TreeNode sectionNode in tvContent.Nodes)
+                    {
+                        dynamic sectionData = sectionNode.Tag;
+                        string sectionID = sectionData.ID;
+
+                        SqlCommand cmdLessons = new SqlCommand(
+                            "SELECT LessonID, LessonTitle, LessonOrder FROM Lessons WHERE SectionID = @SectionID ORDER BY LessonOrder", conn);
+                        cmdLessons.Parameters.AddWithValue("@SectionID", sectionID);
+                        SqlDataReader readerLessons = cmdLessons.ExecuteReader();
+
+                        while (readerLessons.Read())
+                        {
+                            TreeNode lessonNode = new TreeNode(readerLessons["LessonTitle"].ToString());
+                            lessonNode.Tag = new { Type = "Lesson", ID = readerLessons["LessonID"].ToString() };
+                            sectionNode.Nodes.Add(lessonNode);
+                        }
+                        readerLessons.Close();
+                    }
+
+                    tvContent.ExpandAll();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải cấu trúc khóa học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // =============================================
+        // EVENT HANDLERS
+        // =============================================
+
+        private void TvContent_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node.Tag == null) return;
+
+            dynamic nodeData = e.Node.Tag;
+            string type = nodeData.Type;
+            string id = nodeData.ID;
+
+            if (type == "Section")
+            {
+                selectedSectionID = id;
+                selectedLessonID = "";
+                ClearLessonForm();
+            }
+            else if (type == "Lesson")
+            {
+                LoadLessonDetails(id);
+            }
+        }
+
+        private void LoadLessonDetails(string lessonID)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(
+                        "SELECT * FROM Lessons WHERE LessonID = @LessonID", conn);
+                    cmd.Parameters.AddWithValue("@LessonID", lessonID);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        txtLessonName.Text = reader["LessonTitle"].ToString();
+                        txtLessonDescription.Text = reader["Content"].ToString();
+                        txtVideoUrl.Text = reader["VideoUrl"].ToString();
+                        txtMaterials.Text = reader["AttachmentUrl"].ToString();
+
+                        selectedLessonID = lessonID;
+                        selectedSectionID = reader["SectionID"].ToString();
+                        isEditingLesson = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải chi tiết bài học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnAddSection_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(selectedCourseID))
+            {
+                MessageBox.Show("Vui lòng chọn khóa học trước!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string sectionTitle = Microsoft.VisualBasic.Interaction.InputBox(
+                "Nhập tên chương mới:", "Thêm chương", "", -1, -1);
+
+            if (string.IsNullOrWhiteSpace(sectionTitle)) return;
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // Get next section order
+                    SqlCommand cmdOrder = new SqlCommand(
+                        "SELECT ISNULL(MAX(SectionOrder), 0) + 1 FROM Sections WHERE CourseID = @CourseID", conn);
+                    cmdOrder.Parameters.AddWithValue("@CourseID", selectedCourseID);
+                    int nextOrder = (int)cmdOrder.ExecuteScalar();
+
+                    // Insert new section
+                    string newSectionID = "SEC" + Guid.NewGuid().ToString().Substring(0, 8);
+                    SqlCommand cmdInsert = new SqlCommand(
+                        "INSERT INTO Sections (SectionID, CourseID, SectionTitle, SectionOrder) VALUES (@SectionID, @CourseID, @SectionTitle, @SectionOrder)", conn);
+                    cmdInsert.Parameters.AddWithValue("@SectionID", newSectionID);
+                    cmdInsert.Parameters.AddWithValue("@CourseID", selectedCourseID);
+                    cmdInsert.Parameters.AddWithValue("@SectionTitle", sectionTitle);
+                    cmdInsert.Parameters.AddWithValue("@SectionOrder", nextOrder);
+                    cmdInsert.ExecuteNonQuery();
+
+                    MessageBox.Show("Thêm chương thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadCourseStructure(selectedCourseID);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi thêm chương: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnAddLesson_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(selectedSectionID))
+            {
+                MessageBox.Show("Vui lòng chọn chương trước!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            ClearLessonForm();
+            isEditingLesson = false;
+            txtLessonName.Focus();
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtLessonName.Text))
+            {
+                MessageBox.Show("Vui lòng nhập tên bài học!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(selectedSectionID))
+            {
+                MessageBox.Show("Vui lòng chọn chương!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    if (isEditingLesson && !string.IsNullOrEmpty(selectedLessonID))
+                    {
+                        // Update existing lesson
+                        SqlCommand cmd = new SqlCommand(
+                            "UPDATE Lessons SET LessonTitle = @Title, Content = @Content, VideoUrl = @VideoUrl, AttachmentUrl = @Attachment WHERE LessonID = @LessonID", conn);
+                        cmd.Parameters.AddWithValue("@LessonID", selectedLessonID);
+                        cmd.Parameters.AddWithValue("@Title", txtLessonName.Text);
+                        cmd.Parameters.AddWithValue("@Content", txtLessonDescription.Text);
+                        cmd.Parameters.AddWithValue("@VideoUrl", txtVideoUrl.Text);
+                        cmd.Parameters.AddWithValue("@Attachment", txtMaterials.Text);
+                        cmd.ExecuteNonQuery();
+
+                        MessageBox.Show("Cập nhật bài học thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        // Insert new lesson
+                        SqlCommand cmdOrder = new SqlCommand(
+                            "SELECT ISNULL(MAX(LessonOrder), 0) + 1 FROM Lessons WHERE SectionID = @SectionID", conn);
+                        cmdOrder.Parameters.AddWithValue("@SectionID", selectedSectionID);
+                        int nextOrder = (int)cmdOrder.ExecuteScalar();
+
+                        string newLessonID = "LES" + Guid.NewGuid().ToString().Substring(0, 8);
+                        SqlCommand cmd = new SqlCommand(
+                            "INSERT INTO Lessons (LessonID, CourseID, SectionID, LessonTitle, LessonOrder, Content, VideoUrl, AttachmentUrl) " +
+                            "VALUES (@LessonID, @CourseID, @SectionID, @Title, @Order, @Content, @VideoUrl, @Attachment)", conn);
+                        cmd.Parameters.AddWithValue("@LessonID", newLessonID);
+                        cmd.Parameters.AddWithValue("@CourseID", selectedCourseID);
+                        cmd.Parameters.AddWithValue("@SectionID", selectedSectionID);
+                        cmd.Parameters.AddWithValue("@Title", txtLessonName.Text);
+                        cmd.Parameters.AddWithValue("@Order", nextOrder);
+                        cmd.Parameters.AddWithValue("@Content", txtLessonDescription.Text);
+                        cmd.Parameters.AddWithValue("@VideoUrl", txtVideoUrl.Text);
+                        cmd.Parameters.AddWithValue("@Attachment", txtMaterials.Text);
+                        cmd.ExecuteNonQuery();
+
+                        MessageBox.Show("Thêm bài học thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
+                    LoadCourseStructure(selectedCourseID);
+                    ClearLessonForm();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi lưu bài học: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnDelete_Click(object sender, EventArgs e)
+        {
+            if (tvContent.SelectedNode == null || tvContent.SelectedNode.Tag == null)
+            {
+                MessageBox.Show("Vui lòng chọn mục cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            dynamic nodeData = tvContent.SelectedNode.Tag;
+            string type = nodeData.Type;
+            string id = nodeData.ID;
+
+            DialogResult result = MessageBox.Show(
+                $"Bạn có chắc chắn muốn xóa {(type == "Section" ? "chương" : "bài học")} này?",
+                "Xác nhận xóa",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.No) return;
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    if (type == "Section")
+                    {
+                        SqlCommand cmd = new SqlCommand("DELETE FROM Sections WHERE SectionID = @SectionID", conn);
+                        cmd.Parameters.AddWithValue("@SectionID", id);
+                        cmd.ExecuteNonQuery();
+                    }
+                    else if (type == "Lesson")
+                    {
+                        SqlCommand cmd = new SqlCommand("DELETE FROM Lessons WHERE LessonID = @LessonID", conn);
+                        cmd.Parameters.AddWithValue("@LessonID", id);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Xóa thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadCourseStructure(selectedCourseID);
+                    ClearLessonForm();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void TxtMaterials_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "All Files|*.*|PDF Files|*.pdf|Word Files|*.docx;*.doc";
+            openFileDialog.Title = "Chọn file tài liệu";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                txtMaterials.Text = openFileDialog.FileName;
+            }
+        }
+
+        private void ClearLessonForm()
+        {
+            txtLessonName.Text = "";
+            txtLessonDescription.Text = "";
+            txtVideoUrl.Text = "";
+            txtMaterials.Text = "Chọn file...";
+            isEditingLesson = false;
+            selectedLessonID = "";
+        }
+
+        // =============================================
+        // ✅ RESIZE EVENT - Maintain 50-50 split
+        // =============================================
+        private void ContentControl_Resize(object sender, EventArgs e)
+        {
+            // ✅ Calculate 50% width for both panels with spacing
+            if (mainContentPanel != null && mainContentPanel.Width > 30)
+            {
+                int spacing = 15; // Space between two panels
+                int availableWidth = mainContentPanel.Width - spacing;
+                int halfWidth = availableWidth / 2;
+
+                treeContainerPanel.Width = halfWidth;
+                // detailPanel will auto-fill the remaining space with Dock.Fill
+            }
+        }
+
+        // =============================================
+        // UI PAINT EVENTS
+        // =============================================
+
+        private void TreeContainerPanel_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            using (var path = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                int radius = 8;
+                var rect = new Rectangle(0, 0, this.treeContainerPanel.Width - 1, this.treeContainerPanel.Height - 1);
+                path.AddArc(rect.X, rect.Y, radius * 2, radius * 2, 180, 90);
+                path.AddArc(rect.Right - radius * 2, rect.Y, radius * 2, radius * 2, 270, 90);
+                path.AddArc(rect.Right - radius * 2, rect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
+                path.AddArc(rect.X, rect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
+                path.CloseFigure();
+
+                using (var pen = new Pen(Color.FromArgb(230, 230, 230), 1))
+                {
+                    e.Graphics.DrawPath(pen, path);
+                }
+            }
+        }
+
+        private void DetailPanel_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            using (var path = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                int radius = 8;
+                var rect = new Rectangle(0, 0, this.detailPanel.Width - 1, this.detailPanel.Height - 1);
+                path.AddArc(rect.X, rect.Y, radius * 2, radius * 2, 180, 90);
+                path.AddArc(rect.Right - radius * 2, rect.Y, radius * 2, radius * 2, 270, 90);
+                path.AddArc(rect.Right - radius * 2, rect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
+                path.AddArc(rect.X, rect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
+                path.CloseFigure();
+
+                using (var pen = new Pen(Color.FromArgb(230, 230, 230), 1))
+                {
+                    e.Graphics.DrawPath(pen, path);
+                }
+            }
+        }
+
+        // =============================================
+        // HOVER EFFECTS
+        // =============================================
+
+        private void BtnAddSection_MouseEnter(object sender, EventArgs e)
+        {
+            this.btnAddSection.BackColor = Color.FromArgb(56, 142, 60);
+        }
+
+        private void BtnAddSection_MouseLeave(object sender, EventArgs e)
+        {
+            this.btnAddSection.BackColor = Color.FromArgb(76, 175, 80);
+        }
+
+        private void BtnSave_MouseEnter(object sender, EventArgs e)
+        {
+            this.btnSave.BackColor = Color.FromArgb(56, 142, 60);
+        }
+
+        private void BtnSave_MouseLeave(object sender, EventArgs e)
+        {
+            this.btnSave.BackColor = Color.FromArgb(76, 175, 80);
+        }
+
+        private void BtnAddLesson_MouseEnter(object sender, EventArgs e)
+        {
+            this.btnAddLesson.BackColor = Color.FromArgb(25, 118, 210);
+        }
+
+        private void BtnAddLesson_MouseLeave(object sender, EventArgs e)
+        {
+            this.btnAddLesson.BackColor = Color.FromArgb(33, 150, 243);
+        }
+
+        private void BtnDelete_MouseEnter(object sender, EventArgs e)
+        {
+            this.btnDelete.BackColor = Color.FromArgb(229, 57, 53);
+        }
+
+        private void BtnDelete_MouseLeave(object sender, EventArgs e)
+        {
+            this.btnDelete.BackColor = Color.FromArgb(244, 67, 54);
+        }
+
+        // =============================================
+        // HELPER CLASS
+        // =============================================
+        private class ComboBoxItem
+        {
+            public string Text { get; set; }
+            public string Value { get; set; }
         }
     }
 }
