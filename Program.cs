@@ -24,7 +24,7 @@ namespace StudyProcessManagement
             Application.SetCompatibleTextRenderingDefault(false);
 
         
-            Application.Run(new CourseManagement());
+            Application.Run(new Login());
         }
     }
 }
