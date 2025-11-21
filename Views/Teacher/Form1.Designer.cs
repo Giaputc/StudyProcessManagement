@@ -29,14 +29,14 @@
         private void InitializeComponent()
         {
             this.panelSidebar = new System.Windows.Forms.Panel();
+            this.btnStudents = new System.Windows.Forms.Button();
+            this.btnGrading = new System.Windows.Forms.Button();
+            this.btnAssignments = new System.Windows.Forms.Button();
+            this.btnContent = new System.Windows.Forms.Button();
+            this.btnCourses = new System.Windows.Forms.Button();
+            this.btnDashboard = new System.Windows.Forms.Button();
             this.panelSidebarTop = new System.Windows.Forms.Panel();
             this.lblAppName = new System.Windows.Forms.Label();
-            this.btnDashboard = new System.Windows.Forms.Button();
-            this.btnCourses = new System.Windows.Forms.Button();
-            this.btnContent = new System.Windows.Forms.Button();
-            this.btnAssignments = new System.Windows.Forms.Button();
-            this.btnGrading = new System.Windows.Forms.Button();
-            this.btnStudents = new System.Windows.Forms.Button();
             this.panelLogout = new System.Windows.Forms.Panel();
             this.btnLogout = new System.Windows.Forms.Button();
             this.panelContent = new System.Windows.Forms.Panel();
@@ -62,106 +62,25 @@
             this.panelSidebar.Size = new System.Drawing.Size(260, 626);
             this.panelSidebar.TabIndex = 0;
             // 
-            // panelSidebarTop
+            // btnStudents
             // 
-            this.panelSidebarTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(47)))), ((int)(((byte)(60)))));
-            this.panelSidebarTop.Controls.Add(this.lblAppName);
-            this.panelSidebarTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelSidebarTop.Location = new System.Drawing.Point(0, 0);
-            this.panelSidebarTop.Name = "panelSidebarTop";
-            this.panelSidebarTop.Size = new System.Drawing.Size(260, 80);
-            this.panelSidebarTop.TabIndex = 0;
-            // 
-            // lblAppName
-            // 
-            this.lblAppName.AutoSize = true;
-            this.lblAppName.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.lblAppName.ForeColor = System.Drawing.Color.White;
-            this.lblAppName.Location = new System.Drawing.Point(16, 27);
-            this.lblAppName.Name = "lblAppName";
-            this.lblAppName.Size = new System.Drawing.Size(45, 28);
-            this.lblAppName.TabIndex = 0;
-            this.lblAppName.Text = "LMS";
-            // 
-            // btnDashboard
-            // 
-            this.btnDashboard.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnDashboard.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnDashboard.FlatAppearance.BorderSize = 0;
-            this.btnDashboard.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
-            this.btnDashboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDashboard.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnDashboard.ForeColor = System.Drawing.Color.White;
-            this.btnDashboard.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnDashboard.Location = new System.Drawing.Point(0, 80);
-            this.btnDashboard.Name = "btnDashboard";
-            this.btnDashboard.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
-            this.btnDashboard.Size = new System.Drawing.Size(260, 50);
-            this.btnDashboard.TabIndex = 1;
-            this.btnDashboard.Text = "Dashboard";
-            this.btnDashboard.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnDashboard.UseVisualStyleBackColor = true;
-            this.btnDashboard.Click += new System.EventHandler(this.btnDashboard_Click);
-            // 
-            // btnCourses
-            // 
-            this.btnCourses.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCourses.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnCourses.FlatAppearance.BorderSize = 0;
-            this.btnCourses.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
-            this.btnCourses.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCourses.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnCourses.ForeColor = System.Drawing.Color.White;
-            this.btnCourses.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCourses.Location = new System.Drawing.Point(0, 130);
-            this.btnCourses.Name = "btnCourses";
-            this.btnCourses.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
-            this.btnCourses.Size = new System.Drawing.Size(260, 50);
-            this.btnCourses.TabIndex = 2;
-            this.btnCourses.Text = "Quản lý khóa học";
-            this.btnCourses.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCourses.UseVisualStyleBackColor = true;
-            this.btnCourses.Click += new System.EventHandler(this.btnCourses_Click);
-            // 
-            // btnContent (ĐỔI TÊN TỪ btnAssignments)
-            // 
-            this.btnContent.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnContent.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnContent.FlatAppearance.BorderSize = 0;
-            this.btnContent.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
-            this.btnContent.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnContent.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnContent.ForeColor = System.Drawing.Color.White;
-            this.btnContent.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnContent.Location = new System.Drawing.Point(0, 180);
-            this.btnContent.Name = "btnContent";
-            this.btnContent.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
-            this.btnContent.Size = new System.Drawing.Size(260, 50);
-            this.btnContent.TabIndex = 3;
-            this.btnContent.Text = "Quản lý nội dung";
-            this.btnContent.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnContent.UseVisualStyleBackColor = true;
-            this.btnContent.Click += new System.EventHandler(this.btnContent_Click);
-            // 
-            // btnAssignments (BUTTON MỚI - Quản lý bài tập)
-            // 
-            this.btnAssignments.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAssignments.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnAssignments.FlatAppearance.BorderSize = 0;
-            this.btnAssignments.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
-            this.btnAssignments.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAssignments.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnAssignments.ForeColor = System.Drawing.Color.White;
-            this.btnAssignments.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAssignments.Location = new System.Drawing.Point(0, 230);
-            this.btnAssignments.Name = "btnAssignments";
-            this.btnAssignments.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
-            this.btnAssignments.Size = new System.Drawing.Size(260, 50);
-            this.btnAssignments.TabIndex = 4;
-            this.btnAssignments.Text = "Quản lý bài tập";
-            this.btnAssignments.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAssignments.UseVisualStyleBackColor = true;
-            this.btnAssignments.Click += new System.EventHandler(this.btnAssignments_Click);
+            this.btnStudents.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnStudents.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnStudents.FlatAppearance.BorderSize = 0;
+            this.btnStudents.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
+            this.btnStudents.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStudents.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnStudents.ForeColor = System.Drawing.Color.White;
+            this.btnStudents.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnStudents.Location = new System.Drawing.Point(0, 330);
+            this.btnStudents.Name = "btnStudents";
+            this.btnStudents.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
+            this.btnStudents.Size = new System.Drawing.Size(260, 50);
+            this.btnStudents.TabIndex = 6;
+            this.btnStudents.Text = "Quản lý học viên";
+            this.btnStudents.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnStudents.UseVisualStyleBackColor = true;
+            this.btnStudents.Click += new System.EventHandler(this.btnStudents_Click);
             // 
             // btnGrading
             // 
@@ -183,25 +102,106 @@
             this.btnGrading.UseVisualStyleBackColor = true;
             this.btnGrading.Click += new System.EventHandler(this.btnGrading_Click);
             // 
-            // btnStudents
+            // btnAssignments
             // 
-            this.btnStudents.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnStudents.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnStudents.FlatAppearance.BorderSize = 0;
-            this.btnStudents.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
-            this.btnStudents.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnStudents.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnStudents.ForeColor = System.Drawing.Color.White;
-            this.btnStudents.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnStudents.Location = new System.Drawing.Point(0, 330);
-            this.btnStudents.Name = "btnStudents";
-            this.btnStudents.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
-            this.btnStudents.Size = new System.Drawing.Size(260, 50);
-            this.btnStudents.TabIndex = 6;
-            this.btnStudents.Text = "Quản lý học viên";
-            this.btnStudents.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnStudents.UseVisualStyleBackColor = true;
-            this.btnStudents.Click += new System.EventHandler(this.btnStudents_Click);
+            this.btnAssignments.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAssignments.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnAssignments.FlatAppearance.BorderSize = 0;
+            this.btnAssignments.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
+            this.btnAssignments.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAssignments.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnAssignments.ForeColor = System.Drawing.Color.White;
+            this.btnAssignments.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAssignments.Location = new System.Drawing.Point(0, 230);
+            this.btnAssignments.Name = "btnAssignments";
+            this.btnAssignments.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
+            this.btnAssignments.Size = new System.Drawing.Size(260, 50);
+            this.btnAssignments.TabIndex = 4;
+            this.btnAssignments.Text = "Quản lý bài tập";
+            this.btnAssignments.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAssignments.UseVisualStyleBackColor = true;
+            this.btnAssignments.Click += new System.EventHandler(this.btnAssignments_Click);
+            // 
+            // btnContent
+            // 
+            this.btnContent.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnContent.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnContent.FlatAppearance.BorderSize = 0;
+            this.btnContent.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
+            this.btnContent.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnContent.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnContent.ForeColor = System.Drawing.Color.White;
+            this.btnContent.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnContent.Location = new System.Drawing.Point(0, 180);
+            this.btnContent.Name = "btnContent";
+            this.btnContent.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
+            this.btnContent.Size = new System.Drawing.Size(260, 50);
+            this.btnContent.TabIndex = 3;
+            this.btnContent.Text = "Quản lý nội dung";
+            this.btnContent.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnContent.UseVisualStyleBackColor = true;
+            this.btnContent.Click += new System.EventHandler(this.btnContent_Click);
+            // 
+            // btnCourses
+            // 
+            this.btnCourses.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCourses.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnCourses.FlatAppearance.BorderSize = 0;
+            this.btnCourses.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
+            this.btnCourses.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCourses.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnCourses.ForeColor = System.Drawing.Color.White;
+            this.btnCourses.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCourses.Location = new System.Drawing.Point(0, 130);
+            this.btnCourses.Name = "btnCourses";
+            this.btnCourses.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
+            this.btnCourses.Size = new System.Drawing.Size(260, 50);
+            this.btnCourses.TabIndex = 2;
+            this.btnCourses.Text = "Quản lý khóa học";
+            this.btnCourses.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCourses.UseVisualStyleBackColor = true;
+            this.btnCourses.Click += new System.EventHandler(this.btnCourses_Click);
+            // 
+            // btnDashboard
+            // 
+            this.btnDashboard.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDashboard.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnDashboard.FlatAppearance.BorderSize = 0;
+            this.btnDashboard.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(84)))), ((int)(((byte)(104)))));
+            this.btnDashboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDashboard.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnDashboard.ForeColor = System.Drawing.Color.White;
+            this.btnDashboard.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnDashboard.Location = new System.Drawing.Point(0, 80);
+            this.btnDashboard.Name = "btnDashboard";
+            this.btnDashboard.Padding = new System.Windows.Forms.Padding(16, 0, 0, 0);
+            this.btnDashboard.Size = new System.Drawing.Size(260, 50);
+            this.btnDashboard.TabIndex = 1;
+            this.btnDashboard.Text = "Dashboard";
+            this.btnDashboard.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnDashboard.UseVisualStyleBackColor = true;
+            this.btnDashboard.Click += new System.EventHandler(this.btnDashboard_Click);
+            // 
+            // panelSidebarTop
+            // 
+            this.panelSidebarTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(47)))), ((int)(((byte)(60)))));
+            this.panelSidebarTop.Controls.Add(this.lblAppName);
+            this.panelSidebarTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelSidebarTop.Location = new System.Drawing.Point(0, 0);
+            this.panelSidebarTop.Name = "panelSidebarTop";
+            this.panelSidebarTop.Size = new System.Drawing.Size(260, 80);
+            this.panelSidebarTop.TabIndex = 0;
+            // 
+            // lblAppName
+            // 
+            this.lblAppName.AutoSize = true;
+            this.lblAppName.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.lblAppName.ForeColor = System.Drawing.Color.White;
+            this.lblAppName.Location = new System.Drawing.Point(16, 27);
+            this.lblAppName.Name = "lblAppName";
+            this.lblAppName.Size = new System.Drawing.Size(52, 28);
+            this.lblAppName.TabIndex = 0;
+            this.lblAppName.Text = "LMS";
             // 
             // panelLogout
             // 
@@ -212,7 +212,6 @@
             this.panelLogout.Name = "panelLogout";
             this.panelLogout.Size = new System.Drawing.Size(260, 110);
             this.panelLogout.TabIndex = 7;
-            this.panelLogout.Padding = new System.Windows.Forms.Padding(0);
             this.panelLogout.Paint += new System.Windows.Forms.PaintEventHandler(this.panelLogout_Paint);
             // 
             // btnLogout
@@ -228,7 +227,6 @@
             this.btnLogout.Size = new System.Drawing.Size(228, 36);
             this.btnLogout.TabIndex = 0;
             this.btnLogout.Text = "🚪 Đăng xuất";
-            this.btnLogout.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.btnLogout.UseVisualStyleBackColor = false;
             this.btnLogout.Click += new System.EventHandler(this.btnLogout_Click);
             this.btnLogout.MouseEnter += new System.EventHandler(this.btnLogout_MouseEnter);
@@ -245,12 +243,12 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1306, 626);
             this.Controls.Add(this.panelContent);
             this.Controls.Add(this.panelSidebar);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Quản Lý Học Tập - LMS";
             this.panelSidebar.ResumeLayout(false);
             this.panelSidebarTop.ResumeLayout(false);
