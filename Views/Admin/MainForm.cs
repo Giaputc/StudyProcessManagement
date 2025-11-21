@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using StudyProcessManagement.Views.Login;
 namespace StudyProcessManagement.Views.Admin
 {
     public partial class MainForm : Form
@@ -94,6 +94,16 @@ namespace StudyProcessManagement.Views.Admin
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void btnLogout_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Bạn có chắc muốn đăng xuất?", "Xác nhận", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                this.Close();
+                var loginForm = new StudyProcessManagement.Views.Login.Login();
+                loginForm.Show();
+            }
         }
     }
 }

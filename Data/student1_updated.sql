@@ -3,6 +3,10 @@
 -- Đã sửa tất cả lỗi và hoàn thiện
 -- Date: November 20, 2025
 -- ============================================
+ALTER DATABASE StudyProcess
+SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+
+DROP DATABASE StudyProcess;
 
 -- Tạo database
 CREATE DATABASE [StudyProcess];
@@ -38,35 +42,7 @@ CREATE TABLE Users (
         FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
 );
 GO
-/* ======================
-   CẬP NHẬT RÀNG BUỘC KHÓA NGOẠI
-   ====================== */
--- 1. Xóa cái ràng buộc khóa ngoại cũ đang gây lỗi
-ALTER TABLE Users DROP CONSTRAINT FK_Users_Accounts;
-GO
 
--- 2. Tạo lại ràng buộc mới có thêm tính năng "ON DELETE CASCADE"
-ALTER TABLE Users ADD CONSTRAINT FK_Users_Accounts
-FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
-ON DELETE CASCADE;
-
-ALTER TABLE Enrollments DROP CONSTRAINT FK_Enrollments_Users;
-ALTER TABLE Enrollments ADD CONSTRAINT FK_Enrollments_Users
-    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
-GO
-
--- 2. Cho phép xóa User -> tự động xóa Submissions (Bài nộp)
-ALTER TABLE Submissions DROP CONSTRAINT FK_Submissions_Users;
-ALTER TABLE Submissions ADD CONSTRAINT FK_Submissions_Users
-    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
-GO
-
--- 3. Cho phép xóa User -> tự động xóa ActivityLogs (Nhật ký)
-ALTER TABLE ActivityLogs DROP CONSTRAINT FK_ActivityLogs_Users;
-ALTER TABLE ActivityLogs ADD CONSTRAINT FK_ActivityLogs_Users
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE;
-GO
-GO
 /* ======================
    DANH MỤC & KHÓA HỌC
    ====================== */
@@ -202,34 +178,7 @@ CREATE TABLE ActivityLogs (
         FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 GO
-/* ======================
-   CẬP NHẬT RÀNG BUỘC KHÓA NGOẠI
-   ====================== */
--- 1. Xóa cái ràng buộc khóa ngoại cũ đang gây lỗi
-ALTER TABLE Users DROP CONSTRAINT FK_Users_Accounts;
-GO
 
--- 2. Tạo lại ràng buộc mới có thêm tính năng "ON DELETE CASCADE"
-ALTER TABLE Users ADD CONSTRAINT FK_Users_Accounts
-FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
-ON DELETE CASCADE;
-
-ALTER TABLE Enrollments DROP CONSTRAINT FK_Enrollments_Users;
-ALTER TABLE Enrollments ADD CONSTRAINT FK_Enrollments_Users
-    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
-GO
-
--- 2. Cho phép xóa User -> tự động xóa Submissions (Bài nộp)
-ALTER TABLE Submissions DROP CONSTRAINT FK_Submissions_Users;
-ALTER TABLE Submissions ADD CONSTRAINT FK_Submissions_Users
-    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
-GO
-
--- 3. Cho phép xóa User -> tự động xóa ActivityLogs (Nhật ký)
-ALTER TABLE ActivityLogs DROP CONSTRAINT FK_ActivityLogs_Users;
-ALTER TABLE ActivityLogs ADD CONSTRAINT FK_ActivityLogs_Users
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE;
-GO
 PRINT '✅ Đã tạo tất cả các bảng thành công!';
 GO
 
@@ -465,7 +414,7 @@ VALUES
     ('STU029', N'Tô Văn Phong', '0929292929', '2000-05-20', N'Đà Nẵng'),
     ('STU030', N'Lạc Thị Thủy', '0930303030', '2001-06-25', N'Nha Trang');
 GO
-select *from Users;
+
 -- 3. TẠO CATEGORIES
 INSERT INTO Categories (CategoryName, Description)
 VALUES 
@@ -623,6 +572,27 @@ SELECT UserID, 3, DATEADD(DAY, -ABS(CHECKSUM(NEWID()) % 25), GETDATE()),
 FROM Users 
 WHERE AccountID IN ('STU010','STU011','STU012','STU013','STU014','STU015','STU016','STU017','STU018','STU019',
                     'STU020','STU025','STU026','STU027','STU028','STU029','STU030','STU003');
+
+-- ============================================
+-- CẬP NHẬT TRẠNG THÁI ENROLLMENTS
+-- ============================================
+
+-- B1: mặc định coi tất cả là đang học
+UPDATE Enrollments
+SET Status = N'Learning'
+WHERE Status IS NULL OR Status = N'Active';
+
+-- B2: một số bạn đã hoàn thành (ví dụ: tiến độ >= 80%)
+UPDATE Enrollments
+SET Status = N'Completed'
+WHERE ProgressPercent >= 80;
+
+-- B3: một số bạn tạm dừng (ví dụ: tiến độ <= 20% và đăng ký đã lâu)
+UPDATE Enrollments
+SET Status = N'Suspended'
+WHERE ProgressPercent <= 20
+  AND DATEDIFF(DAY, EnrollmentDate, GETDATE()) > 30;
+
 GO
 
 -- 8. TẠO ASSIGNMENTS
@@ -695,7 +665,30 @@ BEGIN
     SET @Counter = @Counter + 1;
 END
 GO
+ALTER TABLE Users DROP CONSTRAINT FK_Users_Accounts;
+GO
 
+-- 2. Tạo lại ràng buộc mới có thêm tính năng "ON DELETE CASCADE"
+ALTER TABLE Users ADD CONSTRAINT FK_Users_Accounts
+FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
+ON DELETE CASCADE;
+
+ALTER TABLE Enrollments DROP CONSTRAINT FK_Enrollments_Users;
+ALTER TABLE Enrollments ADD CONSTRAINT FK_Enrollments_Users
+    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
+
+-- 2. Cho phép xóa User -> tự động xóa Submissions (Bài nộp)
+ALTER TABLE Submissions DROP CONSTRAINT FK_Submissions_Users;
+ALTER TABLE Submissions ADD CONSTRAINT FK_Submissions_Users
+    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
+
+-- 3. Cho phép xóa User -> tự động xóa ActivityLogs (Nhật ký)
+ALTER TABLE ActivityLogs DROP CONSTRAINT FK_ActivityLogs_Users;
+ALTER TABLE ActivityLogs ADD CONSTRAINT FK_ActivityLogs_Users
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
 PRINT '';
 PRINT '========================================';
 PRINT 'HOÀN TẤT TẠO DATABASE!';
@@ -717,4 +710,62 @@ PRINT '   - ~80 Submissions';
 PRINT '';
 PRINT '🎉 Database StudyProcess đã sẵn sàng!';
 PRINT '🎉 Có thể test ứng dụng WinForms ngay!';
+GO
+ALTER TABLE Users DROP CONSTRAINT FK_Users_Accounts;
+GO
+
+-- 2. Tạo lại ràng buộc mới có thêm tính năng "ON DELETE CASCADE"
+ALTER TABLE Users ADD CONSTRAINT FK_Users_Accounts
+FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
+ON DELETE CASCADE;
+
+ALTER TABLE Enrollments DROP CONSTRAINT FK_Enrollments_Users;
+ALTER TABLE Enrollments ADD CONSTRAINT FK_Enrollments_Users
+    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
+
+-- 2. Cho phép xóa User -> tự động xóa Submissions (Bài nộp)
+ALTER TABLE Submissions DROP CONSTRAINT FK_Submissions_Users;
+ALTER TABLE Submissions ADD CONSTRAINT FK_Submissions_Users
+    FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
+
+-- 3. Cho phép xóa User -> tự động xóa ActivityLogs (Nhật ký)
+ALTER TABLE ActivityLogs DROP CONSTRAINT FK_ActivityLogs_Users;
+ALTER TABLE ActivityLogs ADD CONSTRAINT FK_ActivityLogs_Users
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE;
+GO
+-- 1. Xử lý bảng Sections (Chương) - Nguyên nhân lỗi hiện tại
+ALTER TABLE Sections DROP CONSTRAINT FK_Sections_Courses;
+ALTER TABLE Sections ADD CONSTRAINT FK_Sections_Courses
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID) ON DELETE CASCADE;
+GO
+
+-- 2. Xử lý bảng Enrollments (Học viên đăng ký) - Tránh lỗi tiếp theo
+ALTER TABLE Enrollments DROP CONSTRAINT FK_Enrollments_Courses;
+ALTER TABLE Enrollments ADD CONSTRAINT FK_Enrollments_Courses
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID) ON DELETE CASCADE;
+GO
+
+-- 3. Xử lý bảng Assignments (Bài tập) - Tránh lỗi tiếp theo
+ALTER TABLE Assignments DROP CONSTRAINT FK_Assignments_Courses;
+ALTER TABLE Assignments ADD CONSTRAINT FK_Assignments_Courses
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID) ON DELETE CASCADE;
+GO
+
+-- 4. Xử lý bảng Lessons (Bài học) - Xóa Chương thì xóa luôn Bài
+ALTER TABLE Lessons DROP CONSTRAINT FK_Lessons_Sections;
+ALTER TABLE Lessons ADD CONSTRAINT FK_Lessons_Sections
+    FOREIGN KEY (SectionID) REFERENCES Sections(SectionID) ON DELETE CASCADE;
+GO
+USE StudyProcess;
+GO
+
+-- Gỡ bỏ ràng buộc cũ gây lỗi
+ALTER TABLE Submissions DROP CONSTRAINT FK_Submissions_Assignments;
+GO
+
+-- Thêm ràng buộc mới có tính năng TỰ ĐỘNG XÓA (Cascade)
+ALTER TABLE Submissions ADD CONSTRAINT FK_Submissions_Assignments
+    FOREIGN KEY (AssignmentID) REFERENCES Assignments(AssignmentID) ON DELETE CASCADE;
 GO
