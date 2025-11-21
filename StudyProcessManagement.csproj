@@ -565,6 +565,7 @@
     <!-- <None Include="packages.config" /> -->
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data\student1_updated.sql" />
     <Content Include="Data\StudyProcess_Complete.sql" />
     <Content Include="Resource\picture\admin2.jpg" />
     <Content Include="Resource\picture\blue.jpg" />

@@ -9,44 +9,50 @@ namespace StudyProcessManagement.Business.Admin
     {
         private DataProcess dataProcess = new DataProcess();
 
-        // 1. Lấy thống kê cho 3 ô màu trên Dashboard
+        // 1. Lấy danh sách (Sửa convert ID sang Int)
+
         public Dictionary<string, int> GetDashboardStats()
         {
             var stats = new Dictionary<string, int>();
 
             try
             {
-                // Tổng khóa học
+                // Đếm tổng khóa học
                 DataTable dtCourse = dataProcess.ReadData("SELECT COUNT(*) FROM Courses");
                 stats.Add("Courses", Convert.ToInt32(dtCourse.Rows[0][0]));
 
-                // Tổng học viên (Role = Student)
+                // Đếm tổng học viên (Dựa vào Role trong bảng Accounts)
                 DataTable dtStudent = dataProcess.ReadData("SELECT COUNT(*) FROM Accounts WHERE Role = 'Student'");
                 stats.Add("Students", Convert.ToInt32(dtStudent.Rows[0][0]));
 
-                // Tổng bài học
+                // Đếm tổng bài học
                 DataTable dtLesson = dataProcess.ReadData("SELECT COUNT(*) FROM Lessons");
                 stats.Add("Lessons", Convert.ToInt32(dtLesson.Rows[0][0]));
             }
             catch
             {
-                stats.Add("Courses", 0); stats.Add("Students", 0); stats.Add("Lessons", 0);
+                // Nếu lỗi thì trả về 0 hết để không crash app
+                stats["Courses"] = 0;
+                stats["Students"] = 0;
+                stats["Lessons"] = 0;
             }
 
             return stats;
         }
-
-        // 2. Lấy danh sách khóa học (Kèm tên GV và Danh mục)
         public List<Course> GetAllCourses(string keyword = "")
         {
             List<Course> list = new List<Course>();
 
+            // SQL Mới: TeacherID trong Courses trỏ sang Accounts(AccountID)
+            // Nên ta phải JOIN: Courses -> Accounts -> Users (để lấy FullName)
             string sql = @"
-                SELECT c.CourseID, c.CourseName, c.Description, c.TotalLessons, c.Status,
-                       u.FullName AS TeacherName,
-                       cat.CategoryName
+                SELECT 
+                    c.CourseID, c.CourseName, c.Description, c.TotalLessons, c.Status,
+                    u.FullName AS TeacherName,
+                    cat.CategoryName
                 FROM Courses c
-                LEFT JOIN Users u ON c.TeacherID = u.AccountID 
+                LEFT JOIN Accounts a ON c.TeacherID = a.AccountID -- JOIN sang bảng Account trước
+                LEFT JOIN Users u ON a.AccountID = u.AccountID    -- Rồi mới JOIN sang User lấy tên
                 LEFT JOIN Categories cat ON c.CategoryID = cat.CategoryID
                 WHERE 1=1";
 
@@ -64,7 +70,8 @@ namespace StudyProcessManagement.Business.Admin
             {
                 list.Add(new Course()
                 {
-                    CourseID = row["CourseID"].ToString(),
+                    // Ép kiểu sang int
+                    CourseID = Convert.ToInt32(row["CourseID"]),
                     CourseName = row["CourseName"].ToString(),
                     Description = row["Description"].ToString(),
                     TotalLessons = row["TotalLessons"] != DBNull.Value ? Convert.ToInt32(row["TotalLessons"]) : 0,
@@ -76,12 +83,30 @@ namespace StudyProcessManagement.Business.Admin
             return list;
         }
 
-        // 3. Xóa khóa học
-        public bool DeleteCourse(string id)
+        // 2. Thêm khóa học (BỎ TỰ SINH ID)
+        public bool AddCourse(string name, string desc, int lessons, string status, string teacherId, int catId)
+        {
+            // Không tạo ID nữa, SQL tự tăng
+            string sql = @"
+                INSERT INTO Courses (CourseName, Description, TotalLessons, Status, TeacherID, CategoryID, CreatedAt)
+                VALUES (@Name, @Desc, @Lessons, @Status, @TeacherID, @CatID, GETDATE())";
+
+            var param = new Dictionary<string, object> {
+                { "@Name", name }, { "@Desc", desc }, { "@Lessons", lessons },
+                { "@Status", status }, { "@TeacherID", teacherId }, { "@CatID", catId }
+            };
+            return dataProcess.UpdateData(sql, param);
+        }
+
+        // 3. Sửa/Xóa (Dùng ID là int)
+        // Lưu ý: Tham số truyền vào đổi thành int
+        public bool DeleteCourse(string  id)
         {
             string sql = "DELETE FROM Courses WHERE CourseID = @ID";
             var param = new Dictionary<string, object> { { "@ID", id } };
             return dataProcess.UpdateData(sql, param);
         }
+
+        // Cập nhật hàm UpdateCourse và GetCourseById tương tự: đổi tham số string id -> int id
     }
 }

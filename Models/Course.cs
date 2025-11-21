@@ -8,7 +8,7 @@ namespace StudyProcessManagement.Models
 {
     public class Course
     {
-        public string CourseID { get; set; }
+        public int CourseID { get; set; }
         public string CourseName { get; set; }
         public string Description { get; set; }
         public string ImageCover { get; set; }

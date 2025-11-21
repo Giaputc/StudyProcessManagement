@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using StudyProcessManagement.Business.Admin;
 using StudyProcessManagement.Models;
@@ -15,10 +14,17 @@ namespace StudyProcessManagement.Views.Admin.Course
         public CourseManagement()
         {
             InitializeComponent();
-            LoadStats();      // Load số liệu 3 ô màu
-            LoadCourseData(); // Load danh sách thẻ
+            LoadStats();
+            LoadCourseData();
 
+            // Gắn sự kiện tìm kiếm chuẩn chỉ
             txtSearch.TextChanged += (s, e) => { if (txtSearch.Text != "Tìm kiếm khóa học...") LoadCourseData(); };
+            txtSearch.KeyDown += (s, e) => {
+                if (e.KeyCode == Keys.Enter) { LoadCourseData(); e.SuppressKeyPress = true; e.Handled = true; }
+            };
+            lblSearchIcon.Click += (s, e) => LoadCourseData();
+
+            // Placeholder events
             txtSearch.Enter += (s, e) => { if (txtSearch.Text.StartsWith("Tìm")) { txtSearch.Text = ""; txtSearch.ForeColor = Color.Black; } };
             txtSearch.Leave += (s, e) => { if (string.IsNullOrWhiteSpace(txtSearch.Text)) { txtSearch.Text = "Tìm kiếm khóa học..."; txtSearch.ForeColor = Color.Gray; } };
         }
@@ -40,39 +46,27 @@ namespace StudyProcessManagement.Views.Admin.Course
                 if (keyword.StartsWith("Tìm")) keyword = "";
 
                 List<Models.Course> list = courseService.GetAllCourses(keyword);
-                if (list.Count == 0 && !string.IsNullOrEmpty(keyword))
-                {
-                    MessageBox.Show("Không tìm thấy khóa học nào!");
-                }
+
                 foreach (var c in list)
                 {
-                    // Logic màu sắc theo danh mục
-                    Color color = Color.FromArgb(38, 198, 157); // Mặc định xanh ngọc
+                    Color color = Color.FromArgb(38, 198, 157); // Xanh ngọc
                     string icon = "📚";
                     if (c.CategoryName.Contains("Lập trình")) { color = Color.FromArgb(103, 116, 220); icon = "💻"; }
                     if (c.CategoryName.Contains("Ngoại ngữ")) { color = Color.FromArgb(255, 152, 0); icon = "🌏"; }
                     if (c.CategoryName.Contains("Thiết kế")) { color = Color.FromArgb(233, 30, 99); icon = "🎨"; }
 
-                    AddCourseCard(c.CourseID, c.CourseName, c.CategoryName, c.TeacherName, color, icon, c.DisplayStatus, c.IsApproved);
+                    AddCourseCard(c.CourseID.ToString(), c.CourseName, c.CategoryName, c.TeacherName, color, icon, c.DisplayStatus, c.IsApproved);
                 }
             }
-            catch (Exception ex) { MessageBox.Show("Lỗi tải khóa học: " + ex.Message); }
+            catch (Exception ex) { MessageBox.Show("Lỗi: " + ex.Message); }
         }
 
-        // HÀM VẼ THẺ "THẦN THÁNH"
         private void AddCourseCard(string courseId, string title, string category, string teacher, Color headerColor, string icon, string status, bool isApproved)
         {
-            // 1. Thẻ chính
-            Panel card = new Panel();
-            card.Size = new Size(320, 360);
-            card.Margin = new Padding(15);
-            card.BackColor = Color.White;
+            Panel card = new Panel { Size = new Size(320, 360), Margin = new Padding(15), BackColor = Color.White };
 
-            // 2. Header (Màu + Icon)
-            Panel pnlHeader = new Panel();
-            pnlHeader.Size = new Size(320, 150);
-            pnlHeader.Location = new Point(0, 0);
-            pnlHeader.BackColor = headerColor;
+            // Header
+            Panel pnlHeader = new Panel { Size = new Size(320, 150), Location = new Point(0, 0), BackColor = headerColor };
             pnlHeader.Paint += (s, e) => {
                 using (Font font = new Font("Segoe UI Emoji", 50F))
                 using (SolidBrush brush = new SolidBrush(Color.FromArgb(200, 255, 255, 255)))
@@ -83,11 +77,8 @@ namespace StudyProcessManagement.Views.Admin.Course
             };
             card.Controls.Add(pnlHeader);
 
-            // 3. Nội dung
-            Panel pnlContent = new Panel();
-            pnlContent.Size = new Size(320, 210);
-            pnlContent.Location = new Point(0, 150);
-            pnlContent.BackColor = Color.White;
+            // Content
+            Panel pnlContent = new Panel { Size = new Size(320, 210), Location = new Point(0, 150), BackColor = Color.White };
 
             Label lblCat = new Label { Text = category.ToUpper(), Font = new Font("Segoe UI", 8F, FontStyle.Bold), ForeColor = Color.Gray, Location = new Point(15, 15), AutoSize = true };
             Label lblName = new Label { Text = title, Font = new Font("Segoe UI", 13F, FontStyle.Bold), ForeColor = Color.FromArgb(40, 40, 40), AutoSize = false, Size = new Size(290, 55), Location = new Point(12, 35) };
@@ -108,8 +99,8 @@ namespace StudyProcessManagement.Views.Admin.Course
             Button btnVerify = new Button
             {
                 Text = "👁️ Xem & Duyệt",
-                Size = new Size(120, 35),
-                Location = new Point(180, 160),
+                Size = new Size(110, 35),
+                Location = new Point(190, 160),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.White,
                 ForeColor = Color.FromArgb(33, 150, 243),
@@ -117,35 +108,43 @@ namespace StudyProcessManagement.Views.Admin.Course
             };
             btnVerify.FlatAppearance.BorderSize = 1;
             btnVerify.FlatAppearance.BorderColor = Color.FromArgb(33, 150, 243);
-
             btnVerify.Click += (s, e) => {
                 CourseVerificationForm form = new CourseVerificationForm(courseId, title);
-                if (form.ShowDialog() == DialogResult.OK) LoadCourseData(); // Reload nếu duyệt thành công
+                if (form.ShowDialog() == DialogResult.OK) LoadCourseData();
             };
 
-            pnlContent.Controls.AddRange(new Control[] { lblCat, lblName, lblTeacher, lblStatus, btnVerify });
+            // Nút Xóa (Thêm vào cho đủ bộ CRUD Admin)
+            Button btnDelete = new Button
+            {
+                Text = "🗑️",
+                Size = new Size(35, 35),
+                Location = new Point(145, 160),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.White,
+                ForeColor = Color.Red,
+                Cursor = Cursors.Hand
+            };
+            btnDelete.FlatAppearance.BorderSize = 1;
+            btnDelete.FlatAppearance.BorderColor = Color.Red;
+            btnDelete.Click += (s, e) => {
+                if (MessageBox.Show("Xóa khóa học này?", "Xác nhận", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    if (courseService.DeleteCourse(courseId)) LoadCourseData();
+                }
+            };
+
+            pnlContent.Controls.AddRange(new Control[] { lblCat, lblName, lblTeacher, lblStatus, btnVerify, btnDelete });
             card.Controls.Add(pnlContent);
             flowCourses.Controls.Add(card);
         }
 
-        private void flowCourses_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
+        // Các hàm sự kiện rác (nếu có) có thể xóa hoặc để trống
+        private void flowCourses_Paint(object sender, PaintEventArgs e) { }
+        private void CourseManagement_KeyDown(object sender, KeyEventArgs e) { }
 
         private void lblSearchIcon_Click(object sender, EventArgs e)
         {
-            LoadCourseData();
-        }
 
-        private void CourseManagement_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                LoadCourseData();
-                e.SuppressKeyPress = true;
-                e.Handled = true;
-            }
         }
     }
 }

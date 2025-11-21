@@ -8,6 +8,7 @@
         private void InitializeComponent()
         {
             this.panelHeader = new System.Windows.Forms.Panel();
+            this.lblSearchIcon = new System.Windows.Forms.Label();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.lblTitle = new System.Windows.Forms.Label();
             this.panelStats = new System.Windows.Forms.Panel();
@@ -15,7 +16,6 @@
             this.lblStatStudents = new System.Windows.Forms.Label();
             this.lblStatCourses = new System.Windows.Forms.Label();
             this.flowCourses = new System.Windows.Forms.FlowLayoutPanel();
-            this.lblSearchIcon = new System.Windows.Forms.Label();
             this.panelHeader.SuspendLayout();
             this.panelStats.SuspendLayout();
             this.SuspendLayout();
@@ -31,6 +31,17 @@
             this.panelHeader.Name = "panelHeader";
             this.panelHeader.Size = new System.Drawing.Size(1100, 70);
             this.panelHeader.TabIndex = 2;
+            // 
+            // lblSearchIcon
+            // 
+            this.lblSearchIcon.AutoSize = true;
+            this.lblSearchIcon.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.lblSearchIcon.Location = new System.Drawing.Point(768, 26);
+            this.lblSearchIcon.Name = "lblSearchIcon";
+            this.lblSearchIcon.Size = new System.Drawing.Size(39, 28);
+            this.lblSearchIcon.TabIndex = 2;
+            this.lblSearchIcon.Text = "🔍";
+            this.lblSearchIcon.Click += new System.EventHandler(this.lblSearchIcon_Click);
             // 
             // txtSearch
             // 
@@ -115,17 +126,6 @@
             this.flowCourses.Size = new System.Drawing.Size(1100, 550);
             this.flowCourses.TabIndex = 0;
             this.flowCourses.Paint += new System.Windows.Forms.PaintEventHandler(this.flowCourses_Paint);
-            // 
-            // lblSearchIcon
-            // 
-            this.lblSearchIcon.AutoSize = true;
-            this.lblSearchIcon.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.lblSearchIcon.Location = new System.Drawing.Point(768, 26);
-            this.lblSearchIcon.Name = "lblSearchIcon";
-            this.lblSearchIcon.Size = new System.Drawing.Size(39, 28);
-            this.lblSearchIcon.TabIndex = 2;
-            this.lblSearchIcon.Text = "🔍";
-            this.lblSearchIcon.Click += new System.EventHandler(this.lblSearchIcon_Click);
             // 
             // CourseManagement
             // 
