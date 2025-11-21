@@ -96,6 +96,7 @@
             this.TxtPassword.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtPassword.Location = new System.Drawing.Point(282, 451);
             this.TxtPassword.Name = "TxtPassword";
+            this.TxtPassword.PasswordChar = '*';
             this.TxtPassword.Size = new System.Drawing.Size(251, 30);
             this.TxtPassword.TabIndex = 4;
             // 

@@ -35,7 +35,7 @@ namespace StudyProcessManagement.Business
             }
         }
 
-        // ✅ READ DATA (Lấy từ cả hai bên, logic đã thống nhất)
+      
         public DataTable ReadData(string sql)
         {
             DataTable dt = new DataTable();

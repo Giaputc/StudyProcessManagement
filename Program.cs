@@ -23,7 +23,7 @@ namespace StudyProcessManagement
             Application.SetCompatibleTextRenderingDefault(false);
 
         
-            Application.Run(new StudentManagement());
+            Application.Run(new Login());
         }
     }
 }

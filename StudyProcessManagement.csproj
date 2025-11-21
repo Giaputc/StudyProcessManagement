@@ -32,7 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-
   <!-- ************************************ -->
   <!-- BƯỚC 1: GỘP TẤT CẢ REFERENCES (THƯ VIỆN) -->
   <!-- ************************************ -->
@@ -50,11 +49,17 @@
     <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.IdentityModel.Abstractions.8.15.0\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=8.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.IdentityModel.JsonWebTokens.8.15.0\lib\net472\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.IdentityModel.Logging, Version=8.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.IdentityModel.Logging.8.15.0\lib\net472\Microsoft.IdentityModel.Logging.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.IdentityModel.Protocols, Version=8.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.IdentityModel.Protocols.8.15.0\lib\net472\Microsoft.IdentityModel.Protocols.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect, Version=8.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.IdentityModel.Protocols.OpenIdConnect.8.15.0\lib\net472\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.IdentityModel.Tokens, Version=8.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.IdentityModel.Tokens.8.15.0\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
@@ -73,6 +78,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=6.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Diagnostics.DiagnosticSource.6.0.2\lib\net461\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=8.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\System.IdentityModel.Tokens.Jwt.8.15.0\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
@@ -316,7 +324,6 @@
       <HintPath>packages\MySql.Data.8.0.26\lib\net48\Zstandard.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
-
   <!-- ************************************ -->
   <!-- BƯỚC 2: GỘP TẤT CẢ COMPILE INCLUDES (SOURCE CODE VÀ FORMS) -->
   <!-- ************************************ -->
@@ -454,7 +461,6 @@
       <DependentUpon>StudentListForm.cs</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <!-- ************************************ -->
   <!-- BƯỚC 3: GỘP TẤT CẢ EMBEDDED RESOURCES (RESX) -->
   <!-- ************************************ -->
@@ -515,18 +521,7 @@
       <DependentUpon>GradeSubmissionForm.cs</DependentUpon>
     </EmbeddedResource>
     <!-- Resx Forms Teacher còn thiếu (thêm theo pattern) -->
-    <EmbeddedResource Include="Views\Teacher\Forms\AssignmentForm.resx">
-      <DependentUpon>AssignmentForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\Teacher\Forms\CourseForm.resx">
-      <DependentUpon>CourseForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Views\Teacher\Forms\StudentListForm.resx">
-      <DependentUpon>StudentListForm.cs</DependentUpon>
-    </EmbeddedResource>
-
   </ItemGroup>
-
   <!-- ************************************ -->
   <!-- BƯỚC 4: GỘP NỘI DUNG VÀ PACKAGES -->
   <!-- ************************************ -->
@@ -561,7 +556,6 @@
     <!-- Thêm packages.config từ teacher-final (nếu có 2 cái packages.config) -->
     <!-- <None Include="packages.config" /> -->
   </ItemGroup>
-  
   <ItemGroup>
     <Content Include="Data\StudyProcess_Complete.sql" />
     <Content Include="Resource\picture\admin2.jpg" />

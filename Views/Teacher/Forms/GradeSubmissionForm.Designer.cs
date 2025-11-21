@@ -66,9 +66,10 @@
             this.panelHeader.Controls.Add(this.lblFormTitle);
             this.panelHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelHeader.Location = new System.Drawing.Point(0, 0);
+            this.panelHeader.Margin = new System.Windows.Forms.Padding(4);
             this.panelHeader.Name = "panelHeader";
-            this.panelHeader.Padding = new System.Windows.Forms.Padding(20);
-            this.panelHeader.Size = new System.Drawing.Size(954, 70);
+            this.panelHeader.Padding = new System.Windows.Forms.Padding(27, 25, 27, 25);
+            this.panelHeader.Size = new System.Drawing.Size(1274, 86);
             this.panelHeader.TabIndex = 0;
             // 
             // lblFormTitle
@@ -76,9 +77,10 @@
             this.lblFormTitle.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblFormTitle.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.lblFormTitle.ForeColor = System.Drawing.Color.White;
-            this.lblFormTitle.Location = new System.Drawing.Point(20, 20);
+            this.lblFormTitle.Location = new System.Drawing.Point(27, 25);
+            this.lblFormTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFormTitle.Name = "lblFormTitle";
-            this.lblFormTitle.Size = new System.Drawing.Size(914, 30);
+            this.lblFormTitle.Size = new System.Drawing.Size(1220, 36);
             this.lblFormTitle.TabIndex = 0;
             this.lblFormTitle.Text = "CHẤM ĐIỂM BÀI NỘP";
             this.lblFormTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -97,10 +99,11 @@
             this.panelInfo.Controls.Add(this.lblCourse);
             this.panelInfo.Controls.Add(this.lblStudentValue);
             this.panelInfo.Controls.Add(this.lblStudent);
-            this.panelInfo.Location = new System.Drawing.Point(20, 85);
+            this.panelInfo.Location = new System.Drawing.Point(27, 105);
+            this.panelInfo.Margin = new System.Windows.Forms.Padding(4);
             this.panelInfo.Name = "panelInfo";
-            this.panelInfo.Padding = new System.Windows.Forms.Padding(15);
-            this.panelInfo.Size = new System.Drawing.Size(860, 130);
+            this.panelInfo.Padding = new System.Windows.Forms.Padding(20, 18, 20, 18);
+            this.panelInfo.Size = new System.Drawing.Size(1147, 160);
             this.panelInfo.TabIndex = 1;
             // 
             // lblLateWarning
@@ -108,9 +111,10 @@
             this.lblLateWarning.AutoSize = true;
             this.lblLateWarning.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.lblLateWarning.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(67)))), ((int)(((byte)(54)))));
-            this.lblLateWarning.Location = new System.Drawing.Point(650, 90);
+            this.lblLateWarning.Location = new System.Drawing.Point(867, 111);
+            this.lblLateWarning.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblLateWarning.Name = "lblLateWarning";
-            this.lblLateWarning.Size = new System.Drawing.Size(0, 15);
+            this.lblLateWarning.Size = new System.Drawing.Size(0, 20);
             this.lblLateWarning.TabIndex = 10;
             this.lblLateWarning.Visible = false;
             // 
@@ -118,18 +122,20 @@
             // 
             this.lblDueDateValue.AutoSize = true;
             this.lblDueDateValue.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblDueDateValue.Location = new System.Drawing.Point(520, 90);
+            this.lblDueDateValue.Location = new System.Drawing.Point(693, 111);
+            this.lblDueDateValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDueDateValue.Name = "lblDueDateValue";
-            this.lblDueDateValue.Size = new System.Drawing.Size(0, 15);
+            this.lblDueDateValue.Size = new System.Drawing.Size(0, 20);
             this.lblDueDateValue.TabIndex = 9;
             // 
             // lblDueDate
             // 
             this.lblDueDate.AutoSize = true;
             this.lblDueDate.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblDueDate.Location = new System.Drawing.Point(450, 90);
+            this.lblDueDate.Location = new System.Drawing.Point(600, 111);
+            this.lblDueDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDueDate.Name = "lblDueDate";
-            this.lblDueDate.Size = new System.Drawing.Size(56, 15);
+            this.lblDueDate.Size = new System.Drawing.Size(72, 20);
             this.lblDueDate.TabIndex = 8;
             this.lblDueDate.Text = "Hạn nộp:";
             // 
@@ -137,18 +143,20 @@
             // 
             this.lblSubmitDateValue.AutoSize = true;
             this.lblSubmitDateValue.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblSubmitDateValue.Location = new System.Drawing.Point(120, 90);
+            this.lblSubmitDateValue.Location = new System.Drawing.Point(160, 111);
+            this.lblSubmitDateValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSubmitDateValue.Name = "lblSubmitDateValue";
-            this.lblSubmitDateValue.Size = new System.Drawing.Size(0, 15);
+            this.lblSubmitDateValue.Size = new System.Drawing.Size(0, 20);
             this.lblSubmitDateValue.TabIndex = 7;
             // 
             // lblSubmitDate
             // 
             this.lblSubmitDate.AutoSize = true;
             this.lblSubmitDate.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblSubmitDate.Location = new System.Drawing.Point(15, 90);
+            this.lblSubmitDate.Location = new System.Drawing.Point(20, 111);
+            this.lblSubmitDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSubmitDate.Name = "lblSubmitDate";
-            this.lblSubmitDate.Size = new System.Drawing.Size(62, 15);
+            this.lblSubmitDate.Size = new System.Drawing.Size(81, 20);
             this.lblSubmitDate.TabIndex = 6;
             this.lblSubmitDate.Text = "Ngày nộp:";
             // 
@@ -156,18 +164,20 @@
             // 
             this.lblAssignmentValue.AutoSize = true;
             this.lblAssignmentValue.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblAssignmentValue.Location = new System.Drawing.Point(120, 65);
+            this.lblAssignmentValue.Location = new System.Drawing.Point(160, 80);
+            this.lblAssignmentValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAssignmentValue.Name = "lblAssignmentValue";
-            this.lblAssignmentValue.Size = new System.Drawing.Size(0, 15);
+            this.lblAssignmentValue.Size = new System.Drawing.Size(0, 20);
             this.lblAssignmentValue.TabIndex = 5;
             // 
             // lblAssignment
             // 
             this.lblAssignment.AutoSize = true;
             this.lblAssignment.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblAssignment.Location = new System.Drawing.Point(15, 65);
+            this.lblAssignment.Location = new System.Drawing.Point(20, 80);
+            this.lblAssignment.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAssignment.Name = "lblAssignment";
-            this.lblAssignment.Size = new System.Drawing.Size(48, 15);
+            this.lblAssignment.Size = new System.Drawing.Size(62, 20);
             this.lblAssignment.TabIndex = 4;
             this.lblAssignment.Text = "Bài tập:";
             // 
@@ -175,18 +185,20 @@
             // 
             this.lblCourseValue.AutoSize = true;
             this.lblCourseValue.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblCourseValue.Location = new System.Drawing.Point(120, 40);
+            this.lblCourseValue.Location = new System.Drawing.Point(160, 49);
+            this.lblCourseValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCourseValue.Name = "lblCourseValue";
-            this.lblCourseValue.Size = new System.Drawing.Size(0, 15);
+            this.lblCourseValue.Size = new System.Drawing.Size(0, 20);
             this.lblCourseValue.TabIndex = 3;
             // 
             // lblCourse
             // 
             this.lblCourse.AutoSize = true;
             this.lblCourse.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblCourse.Location = new System.Drawing.Point(15, 40);
+            this.lblCourse.Location = new System.Drawing.Point(20, 49);
+            this.lblCourse.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCourse.Name = "lblCourse";
-            this.lblCourse.Size = new System.Drawing.Size(61, 15);
+            this.lblCourse.Size = new System.Drawing.Size(78, 20);
             this.lblCourse.TabIndex = 2;
             this.lblCourse.Text = "Khóa học:";
             // 
@@ -194,18 +206,20 @@
             // 
             this.lblStudentValue.AutoSize = true;
             this.lblStudentValue.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblStudentValue.Location = new System.Drawing.Point(120, 15);
+            this.lblStudentValue.Location = new System.Drawing.Point(160, 18);
+            this.lblStudentValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblStudentValue.Name = "lblStudentValue";
-            this.lblStudentValue.Size = new System.Drawing.Size(0, 15);
+            this.lblStudentValue.Size = new System.Drawing.Size(0, 20);
             this.lblStudentValue.TabIndex = 1;
             // 
             // lblStudent
             // 
             this.lblStudent.AutoSize = true;
             this.lblStudent.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblStudent.Location = new System.Drawing.Point(15, 15);
+            this.lblStudent.Location = new System.Drawing.Point(20, 18);
+            this.lblStudent.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblStudent.Name = "lblStudent";
-            this.lblStudent.Size = new System.Drawing.Size(59, 15);
+            this.lblStudent.Size = new System.Drawing.Size(73, 20);
             this.lblStudent.TabIndex = 0;
             this.lblStudent.Text = "Học viên:";
             // 
@@ -214,20 +228,22 @@
             this.panelAssignment.BackColor = System.Drawing.Color.White;
             this.panelAssignment.Controls.Add(this.txtAssignmentDescription);
             this.panelAssignment.Controls.Add(this.lblAssignmentReq);
-            this.panelAssignment.Location = new System.Drawing.Point(20, 230);
+            this.panelAssignment.Location = new System.Drawing.Point(27, 283);
+            this.panelAssignment.Margin = new System.Windows.Forms.Padding(4);
             this.panelAssignment.Name = "panelAssignment";
-            this.panelAssignment.Padding = new System.Windows.Forms.Padding(15);
-            this.panelAssignment.Size = new System.Drawing.Size(860, 120);
+            this.panelAssignment.Padding = new System.Windows.Forms.Padding(20, 18, 20, 18);
+            this.panelAssignment.Size = new System.Drawing.Size(1147, 148);
             this.panelAssignment.TabIndex = 2;
             // 
             // txtAssignmentDescription
             // 
             this.txtAssignmentDescription.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtAssignmentDescription.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtAssignmentDescription.Location = new System.Drawing.Point(15, 45);
+            this.txtAssignmentDescription.Location = new System.Drawing.Point(20, 55);
+            this.txtAssignmentDescription.Margin = new System.Windows.Forms.Padding(4);
             this.txtAssignmentDescription.Name = "txtAssignmentDescription";
             this.txtAssignmentDescription.ReadOnly = true;
-            this.txtAssignmentDescription.Size = new System.Drawing.Size(830, 60);
+            this.txtAssignmentDescription.Size = new System.Drawing.Size(1107, 74);
             this.txtAssignmentDescription.TabIndex = 1;
             this.txtAssignmentDescription.Text = "";
             // 
@@ -236,9 +252,10 @@
             this.lblAssignmentReq.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblAssignmentReq.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.lblAssignmentReq.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
-            this.lblAssignmentReq.Location = new System.Drawing.Point(15, 15);
+            this.lblAssignmentReq.Location = new System.Drawing.Point(20, 18);
+            this.lblAssignmentReq.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAssignmentReq.Name = "lblAssignmentReq";
-            this.lblAssignmentReq.Size = new System.Drawing.Size(830, 25);
+            this.lblAssignmentReq.Size = new System.Drawing.Size(1107, 31);
             this.lblAssignmentReq.TabIndex = 0;
             this.lblAssignmentReq.Text = "📋 YÊU CẦU BÀI TẬP";
             // 
@@ -250,10 +267,11 @@
             this.panelSubmission.Controls.Add(this.lblAttachment);
             this.panelSubmission.Controls.Add(this.txtSubmissionText);
             this.panelSubmission.Controls.Add(this.lblSubmissionTitle);
-            this.panelSubmission.Location = new System.Drawing.Point(20, 365);
+            this.panelSubmission.Location = new System.Drawing.Point(27, 449);
+            this.panelSubmission.Margin = new System.Windows.Forms.Padding(4);
             this.panelSubmission.Name = "panelSubmission";
-            this.panelSubmission.Padding = new System.Windows.Forms.Padding(15);
-            this.panelSubmission.Size = new System.Drawing.Size(860, 180);
+            this.panelSubmission.Padding = new System.Windows.Forms.Padding(20, 18, 20, 18);
+            this.panelSubmission.Size = new System.Drawing.Size(1147, 222);
             this.panelSubmission.TabIndex = 3;
             // 
             // btnOpenFile
@@ -264,9 +282,10 @@
             this.btnOpenFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOpenFile.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnOpenFile.ForeColor = System.Drawing.Color.White;
-            this.btnOpenFile.Location = new System.Drawing.Point(750, 130);
+            this.btnOpenFile.Location = new System.Drawing.Point(1000, 160);
+            this.btnOpenFile.Margin = new System.Windows.Forms.Padding(4);
             this.btnOpenFile.Name = "btnOpenFile";
-            this.btnOpenFile.Size = new System.Drawing.Size(95, 28);
+            this.btnOpenFile.Size = new System.Drawing.Size(127, 34);
             this.btnOpenFile.TabIndex = 4;
             this.btnOpenFile.Text = "📂 Mở file";
             this.btnOpenFile.UseVisualStyleBackColor = false;
@@ -276,18 +295,20 @@
             // 
             this.lblAttachmentValue.AutoSize = true;
             this.lblAttachmentValue.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblAttachmentValue.Location = new System.Drawing.Point(110, 135);
+            this.lblAttachmentValue.Location = new System.Drawing.Point(147, 166);
+            this.lblAttachmentValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAttachmentValue.Name = "lblAttachmentValue";
-            this.lblAttachmentValue.Size = new System.Drawing.Size(0, 15);
+            this.lblAttachmentValue.Size = new System.Drawing.Size(0, 20);
             this.lblAttachmentValue.TabIndex = 3;
             // 
             // lblAttachment
             // 
             this.lblAttachment.AutoSize = true;
             this.lblAttachment.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblAttachment.Location = new System.Drawing.Point(15, 135);
+            this.lblAttachment.Location = new System.Drawing.Point(20, 166);
+            this.lblAttachment.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblAttachment.Name = "lblAttachment";
-            this.lblAttachment.Size = new System.Drawing.Size(85, 15);
+            this.lblAttachment.Size = new System.Drawing.Size(106, 20);
             this.lblAttachment.TabIndex = 2;
             this.lblAttachment.Text = "File đính kèm:";
             // 
@@ -295,10 +316,11 @@
             // 
             this.txtSubmissionText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtSubmissionText.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtSubmissionText.Location = new System.Drawing.Point(15, 45);
+            this.txtSubmissionText.Location = new System.Drawing.Point(20, 55);
+            this.txtSubmissionText.Margin = new System.Windows.Forms.Padding(4);
             this.txtSubmissionText.Name = "txtSubmissionText";
             this.txtSubmissionText.ReadOnly = true;
-            this.txtSubmissionText.Size = new System.Drawing.Size(830, 80);
+            this.txtSubmissionText.Size = new System.Drawing.Size(1105, 98);
             this.txtSubmissionText.TabIndex = 1;
             this.txtSubmissionText.Text = "";
             // 
@@ -307,9 +329,10 @@
             this.lblSubmissionTitle.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblSubmissionTitle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.lblSubmissionTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(175)))), ((int)(((byte)(80)))));
-            this.lblSubmissionTitle.Location = new System.Drawing.Point(15, 15);
+            this.lblSubmissionTitle.Location = new System.Drawing.Point(20, 18);
+            this.lblSubmissionTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSubmissionTitle.Name = "lblSubmissionTitle";
-            this.lblSubmissionTitle.Size = new System.Drawing.Size(830, 25);
+            this.lblSubmissionTitle.Size = new System.Drawing.Size(1107, 31);
             this.lblSubmissionTitle.TabIndex = 0;
             this.lblSubmissionTitle.Text = "📝 BÀI LÀM CỦA HỌC VIÊN";
             // 
@@ -323,10 +346,11 @@
             this.panelGrading.Controls.Add(this.numScore);
             this.panelGrading.Controls.Add(this.lblScore);
             this.panelGrading.Controls.Add(this.lblGradingTitle);
-            this.panelGrading.Location = new System.Drawing.Point(20, 560);
+            this.panelGrading.Location = new System.Drawing.Point(27, 689);
+            this.panelGrading.Margin = new System.Windows.Forms.Padding(4);
             this.panelGrading.Name = "panelGrading";
-            this.panelGrading.Padding = new System.Windows.Forms.Padding(15);
-            this.panelGrading.Size = new System.Drawing.Size(860, 200);
+            this.panelGrading.Padding = new System.Windows.Forms.Padding(20, 18, 20, 18);
+            this.panelGrading.Size = new System.Drawing.Size(1147, 246);
             this.panelGrading.TabIndex = 4;
             // 
             // lblGradedAtValue
@@ -334,9 +358,10 @@
             this.lblGradedAtValue.AutoSize = true;
             this.lblGradedAtValue.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Italic);
             this.lblGradedAtValue.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(117)))), ((int)(((byte)(117)))), ((int)(((byte)(117)))));
-            this.lblGradedAtValue.Location = new System.Drawing.Point(15, 170);
+            this.lblGradedAtValue.Location = new System.Drawing.Point(20, 209);
+            this.lblGradedAtValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblGradedAtValue.Name = "lblGradedAtValue";
-            this.lblGradedAtValue.Size = new System.Drawing.Size(0, 13);
+            this.lblGradedAtValue.Size = new System.Drawing.Size(0, 19);
             this.lblGradedAtValue.TabIndex = 6;
             this.lblGradedAtValue.Visible = false;
             // 
@@ -344,9 +369,10 @@
             // 
             this.txtFeedback.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtFeedback.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtFeedback.Location = new System.Drawing.Point(15, 105);
+            this.txtFeedback.Location = new System.Drawing.Point(20, 129);
+            this.txtFeedback.Margin = new System.Windows.Forms.Padding(4);
             this.txtFeedback.Name = "txtFeedback";
-            this.txtFeedback.Size = new System.Drawing.Size(830, 60);
+            this.txtFeedback.Size = new System.Drawing.Size(1105, 73);
             this.txtFeedback.TabIndex = 5;
             this.txtFeedback.Text = "";
             // 
@@ -354,9 +380,10 @@
             // 
             this.lblFeedback.AutoSize = true;
             this.lblFeedback.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblFeedback.Location = new System.Drawing.Point(15, 85);
+            this.lblFeedback.Location = new System.Drawing.Point(20, 105);
+            this.lblFeedback.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFeedback.Name = "lblFeedback";
-            this.lblFeedback.Size = new System.Drawing.Size(57, 15);
+            this.lblFeedback.Size = new System.Drawing.Size(74, 20);
             this.lblFeedback.TabIndex = 4;
             this.lblFeedback.Text = "Phản hồi:";
             // 
@@ -364,9 +391,10 @@
             // 
             this.lblMaxScoreValue.AutoSize = true;
             this.lblMaxScoreValue.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.lblMaxScoreValue.Location = new System.Drawing.Point(155, 48);
+            this.lblMaxScoreValue.Location = new System.Drawing.Point(207, 59);
+            this.lblMaxScoreValue.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMaxScoreValue.Name = "lblMaxScoreValue";
-            this.lblMaxScoreValue.Size = new System.Drawing.Size(38, 20);
+            this.lblMaxScoreValue.Size = new System.Drawing.Size(47, 25);
             this.lblMaxScoreValue.TabIndex = 3;
             this.lblMaxScoreValue.Text = "/ 10";
             // 
@@ -374,18 +402,20 @@
             // 
             this.numScore.DecimalPlaces = 1;
             this.numScore.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.numScore.Location = new System.Drawing.Point(70, 45);
+            this.numScore.Location = new System.Drawing.Point(93, 55);
+            this.numScore.Margin = new System.Windows.Forms.Padding(4);
             this.numScore.Name = "numScore";
-            this.numScore.Size = new System.Drawing.Size(80, 27);
+            this.numScore.Size = new System.Drawing.Size(107, 32);
             this.numScore.TabIndex = 2;
             // 
             // lblScore
             // 
             this.lblScore.AutoSize = true;
             this.lblScore.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblScore.Location = new System.Drawing.Point(15, 50);
+            this.lblScore.Location = new System.Drawing.Point(20, 62);
+            this.lblScore.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblScore.Name = "lblScore";
-            this.lblScore.Size = new System.Drawing.Size(40, 15);
+            this.lblScore.Size = new System.Drawing.Size(50, 20);
             this.lblScore.TabIndex = 1;
             this.lblScore.Text = "Điểm:";
             // 
@@ -394,9 +424,10 @@
             this.lblGradingTitle.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblGradingTitle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.lblGradingTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(152)))), ((int)(((byte)(0)))));
-            this.lblGradingTitle.Location = new System.Drawing.Point(15, 15);
+            this.lblGradingTitle.Location = new System.Drawing.Point(20, 18);
+            this.lblGradingTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblGradingTitle.Name = "lblGradingTitle";
-            this.lblGradingTitle.Size = new System.Drawing.Size(830, 25);
+            this.lblGradingTitle.Size = new System.Drawing.Size(1107, 31);
             this.lblGradingTitle.TabIndex = 0;
             this.lblGradingTitle.Text = "⭐ CHẤM ĐIỂM VÀ PHẢN HỒI";
             // 
@@ -404,9 +435,10 @@
             // 
             this.panelButtons.Controls.Add(this.btnCancel);
             this.panelButtons.Controls.Add(this.btnSave);
-            this.panelButtons.Location = new System.Drawing.Point(20, 775);
+            this.panelButtons.Location = new System.Drawing.Point(27, 954);
+            this.panelButtons.Margin = new System.Windows.Forms.Padding(4);
             this.panelButtons.Name = "panelButtons";
-            this.panelButtons.Size = new System.Drawing.Size(860, 50);
+            this.panelButtons.Size = new System.Drawing.Size(1147, 62);
             this.panelButtons.TabIndex = 5;
             // 
             // btnCancel
@@ -417,9 +449,10 @@
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(750, 5);
+            this.btnCancel.Location = new System.Drawing.Point(1000, 6);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(4);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(100, 40);
+            this.btnCancel.Size = new System.Drawing.Size(133, 49);
             this.btnCancel.TabIndex = 1;
             this.btnCancel.Text = "✖ Hủy";
             this.btnCancel.UseVisualStyleBackColor = false;
@@ -433,9 +466,10 @@
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSave.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Location = new System.Drawing.Point(640, 5);
+            this.btnSave.Location = new System.Drawing.Point(853, 6);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(4);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(100, 40);
+            this.btnSave.Size = new System.Drawing.Size(133, 49);
             this.btnSave.TabIndex = 0;
             this.btnSave.Text = "💾 Lưu";
             this.btnSave.UseVisualStyleBackColor = false;
@@ -443,11 +477,11 @@
             // 
             // GradeSubmissionForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(971, 700);
+            this.ClientSize = new System.Drawing.Size(1295, 862);
             this.Controls.Add(this.panelButtons);
             this.Controls.Add(this.panelGrading);
             this.Controls.Add(this.panelSubmission);
@@ -455,6 +489,7 @@
             this.Controls.Add(this.panelInfo);
             this.Controls.Add(this.panelHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "GradeSubmissionForm";
