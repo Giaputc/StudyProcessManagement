@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using StudyProcessManagement.Views;
 using StudyProcessManagement.Views.Admin;
+using StudyProcessManagement.Views.Admin.Course;
 using StudyProcessManagement.Views.Admin.Dashboard;
 using StudyProcessManagement.Views.Admin.Student.StudentManagement;
 using StudyProcessManagement.Views.Admin.Teacher.TeacherMangement;
@@ -23,7 +24,7 @@ namespace StudyProcessManagement
             Application.SetCompatibleTextRenderingDefault(false);
 
         
-            Application.Run(new Login());
+            Application.Run(new CourseManagement());
         }
     }
 }

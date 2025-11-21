@@ -1,158 +1,151 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using StudyProcessManagement.Business.Admin;
+using StudyProcessManagement.Models;
 
 namespace StudyProcessManagement.Views.Admin.Course
 {
     public partial class CourseManagement : Form
     {
+        private CourseService courseService = new CourseService();
+
         public CourseManagement()
         {
             InitializeComponent();
-            LoadData();
+            LoadStats();      // Load số liệu 3 ô màu
+            LoadCourseData(); // Load danh sách thẻ
+
+            txtSearch.TextChanged += (s, e) => { if (txtSearch.Text != "Tìm kiếm khóa học...") LoadCourseData(); };
+            txtSearch.Enter += (s, e) => { if (txtSearch.Text.StartsWith("Tìm")) { txtSearch.Text = ""; txtSearch.ForeColor = Color.Black; } };
+            txtSearch.Leave += (s, e) => { if (string.IsNullOrWhiteSpace(txtSearch.Text)) { txtSearch.Text = "Tìm kiếm khóa học..."; txtSearch.ForeColor = Color.Gray; } };
         }
 
-        private void LoadData()
+        private void LoadStats()
         {
-            flowCourses.Controls.Clear();
-
-            // --- Dữ liệu mẫu Khóa học (Admin View) ---
-            AddCourseCard("Lập trình Web ReactJS", "CNTT", "GV. Nguyễn Văn A", Color.FromArgb(103, 116, 220), "⚛️", "Đã duyệt", true);
-            AddCourseCard("Python cho người mới", "CNTT", "GV. Trần Thị B", Color.FromArgb(38, 198, 157), "🐍", "Đã duyệt", true);
-            AddCourseCard("Tiếng Anh Giao Tiếp", "Ngoại Ngữ", "GV. John Smith", Color.FromArgb(255, 152, 0), "🇺🇸", "Chờ duyệt", false);
-            AddCourseCard("Digital Marketing", "Kinh Tế", "GV. Lê Văn C", Color.FromArgb(233, 30, 99), "📢", "Đã duyệt", true);
-            AddCourseCard("Thiết kế UI/UX", "Đa phương tiện", "GV. Phạm D", Color.FromArgb(156, 39, 176), "🎨", "Chờ duyệt", false);
-            AddCourseCard("Quản trị mạng Cisco", "CNTT", "GV. Hoàng E", Color.FromArgb(33, 150, 243), "🌐", "Đã duyệt", true);
+            var stats = courseService.GetDashboardStats();
+            lblStatCourses.Text = $"📘 Tổng khóa học: {stats["Courses"]}";
+            lblStatStudents.Text = $"👥 Tổng học viên: {stats["Students"]}";
+            lblStatLessons.Text = $"📖 Tổng bài học: {stats["Lessons"]}";
         }
 
-        // Hàm vẽ thẻ Khóa học "sang-xịn-mịn"
-        private void AddCourseCard(string title, string category, string teacher, Color headerColor, string icon, string status, bool isApproved)
+        private void LoadCourseData()
         {
-            // 1. Main Panel (Thẻ)
+            try
+            {
+                flowCourses.Controls.Clear();
+                string keyword = txtSearch.Text.Trim();
+                if (keyword.StartsWith("Tìm")) keyword = "";
+
+                List<Models.Course> list = courseService.GetAllCourses(keyword);
+                if (list.Count == 0 && !string.IsNullOrEmpty(keyword))
+                {
+                    MessageBox.Show("Không tìm thấy khóa học nào!");
+                }
+                foreach (var c in list)
+                {
+                    // Logic màu sắc theo danh mục
+                    Color color = Color.FromArgb(38, 198, 157); // Mặc định xanh ngọc
+                    string icon = "📚";
+                    if (c.CategoryName.Contains("Lập trình")) { color = Color.FromArgb(103, 116, 220); icon = "💻"; }
+                    if (c.CategoryName.Contains("Ngoại ngữ")) { color = Color.FromArgb(255, 152, 0); icon = "🌏"; }
+                    if (c.CategoryName.Contains("Thiết kế")) { color = Color.FromArgb(233, 30, 99); icon = "🎨"; }
+
+                    AddCourseCard(c.CourseID, c.CourseName, c.CategoryName, c.TeacherName, color, icon, c.DisplayStatus, c.IsApproved);
+                }
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi tải khóa học: " + ex.Message); }
+        }
+
+        // HÀM VẼ THẺ "THẦN THÁNH"
+        private void AddCourseCard(string courseId, string title, string category, string teacher, Color headerColor, string icon, string status, bool isApproved)
+        {
+            // 1. Thẻ chính
             Panel card = new Panel();
-            card.Size = new Size(320, 350); // Kích thước thẻ
+            card.Size = new Size(320, 360);
             card.Margin = new Padding(15);
             card.BackColor = Color.White;
-            card.Cursor = Cursors.Hand;
 
-            // Vẽ bo góc + Đổ bóng (Code thần thánh của bạn ông)
-            card.Paint += (s, e) =>
-            {
-                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                using (GraphicsPath path = new GraphicsPath())
-                {
-                    int radius = 15;
-                    Rectangle rect = new Rectangle(0, 0, card.Width - 1, card.Height - 1);
-                    path.AddArc(rect.X, rect.Y, radius * 2, radius * 2, 180, 90);
-                    path.AddArc(rect.Right - radius * 2, rect.Y, radius * 2, radius * 2, 270, 90);
-                    path.AddArc(rect.Right - radius * 2, rect.Bottom - radius * 2, radius * 2, radius * 2, 0, 90);
-                    path.AddArc(rect.X, rect.Bottom - radius * 2, radius * 2, radius * 2, 90, 90);
-                    path.CloseFigure();
-                    card.Region = new Region(path);
-
-                    using (Pen pen = new Pen(Color.FromArgb(20, 0, 0, 0), 1)) // Bóng mờ
-                    {
-                        e.Graphics.DrawPath(pen, path);
-                    }
-                }
-            };
-
-            // 2. Header (Màu nền + Icon)
+            // 2. Header (Màu + Icon)
             Panel pnlHeader = new Panel();
             pnlHeader.Size = new Size(320, 150);
             pnlHeader.Location = new Point(0, 0);
             pnlHeader.BackColor = headerColor;
-
-            pnlHeader.Paint += (s, e) =>
-            {
-                // Gradient chéo
-                using (LinearGradientBrush brush = new LinearGradientBrush(
-                    pnlHeader.ClientRectangle, headerColor, ControlPaint.Light(headerColor), 45f))
-                {
-                    e.Graphics.FillRectangle(brush, pnlHeader.ClientRectangle);
-                }
-                // Vẽ Icon to
-                e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+            pnlHeader.Paint += (s, e) => {
                 using (Font font = new Font("Segoe UI Emoji", 50F))
                 using (SolidBrush brush = new SolidBrush(Color.FromArgb(200, 255, 255, 255)))
                 {
                     SizeF iconSize = e.Graphics.MeasureString(icon, font);
-                    e.Graphics.DrawString(icon, font, brush,
-                        (pnlHeader.Width - iconSize.Width) / 2, (pnlHeader.Height - iconSize.Height) / 2);
+                    e.Graphics.DrawString(icon, font, brush, (pnlHeader.Width - iconSize.Width) / 2, (pnlHeader.Height - iconSize.Height) / 2);
                 }
             };
             card.Controls.Add(pnlHeader);
 
-            // 3. Content (Thông tin khóa học)
+            // 3. Nội dung
             Panel pnlContent = new Panel();
-            pnlContent.Size = new Size(320, 200);
+            pnlContent.Size = new Size(320, 210);
             pnlContent.Location = new Point(0, 150);
             pnlContent.BackColor = Color.White;
 
-            // Danh mục (Chữ nhỏ màu xám)
-            Label lblCat = new Label();
-            lblCat.Text = category.ToUpper();
-            lblCat.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
-            lblCat.ForeColor = Color.Gray;
-            lblCat.Location = new Point(15, 15);
-            lblCat.AutoSize = true;
+            Label lblCat = new Label { Text = category.ToUpper(), Font = new Font("Segoe UI", 8F, FontStyle.Bold), ForeColor = Color.Gray, Location = new Point(15, 15), AutoSize = true };
+            Label lblName = new Label { Text = title, Font = new Font("Segoe UI", 13F, FontStyle.Bold), ForeColor = Color.FromArgb(40, 40, 40), AutoSize = false, Size = new Size(290, 55), Location = new Point(12, 35) };
+            Label lblTeacher = new Label { Text = "👨‍🏫 " + teacher, Font = new Font("Segoe UI", 9.5F), ForeColor = Color.DimGray, Location = new Point(15, 95), AutoSize = true };
 
-            // Tên khóa học (Chữ to đậm)
-            Label lblName = new Label();
-            lblName.Text = title;
-            lblName.Font = new Font("Segoe UI", 13F, FontStyle.Bold);
-            lblName.ForeColor = Color.FromArgb(40, 40, 40);
-            lblName.AutoSize = false;
-            lblName.Size = new Size(290, 55); // Cho phép xuống dòng nếu tên dài
-            lblName.Location = new Point(12, 35);
+            Label lblStatus = new Label
+            {
+                Text = status,
+                Font = new Font("Segoe UI", 8F, FontStyle.Bold),
+                ForeColor = isApproved ? Color.FromArgb(27, 94, 32) : Color.FromArgb(230, 81, 0),
+                BackColor = isApproved ? Color.FromArgb(200, 230, 201) : Color.FromArgb(255, 224, 178),
+                AutoSize = true,
+                Padding = new Padding(5, 3, 5, 3),
+                Location = new Point(15, 125)
+            };
 
-            // Giảng viên phụ trách
-            Label lblTeacher = new Label();
-            lblTeacher.Text = "👨‍🏫 " + teacher;
-            lblTeacher.Font = new Font("Segoe UI", 9.5F);
-            lblTeacher.ForeColor = Color.DimGray;
-            lblTeacher.Location = new Point(15, 95);
-            lblTeacher.AutoSize = true;
+            // Nút Xem & Duyệt
+            Button btnVerify = new Button
+            {
+                Text = "👁️ Xem & Duyệt",
+                Size = new Size(120, 35),
+                Location = new Point(180, 160),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(33, 150, 243),
+                Cursor = Cursors.Hand
+            };
+            btnVerify.FlatAppearance.BorderSize = 1;
+            btnVerify.FlatAppearance.BorderColor = Color.FromArgb(33, 150, 243);
 
-            // Badge Trạng thái (Đã duyệt / Chờ duyệt)
-            Label lblStatus = new Label();
-            lblStatus.Text = status;
-            lblStatus.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
-            lblStatus.ForeColor = isApproved ? Color.FromArgb(27, 94, 32) : Color.FromArgb(230, 81, 0); // Xanh lá hoặc Cam
-            lblStatus.BackColor = isApproved ? Color.FromArgb(200, 230, 201) : Color.FromArgb(255, 224, 178); // Nền nhạt
-            lblStatus.AutoSize = true;
-            lblStatus.Padding = new Padding(5, 3, 5, 3);
-            lblStatus.Location = new Point(15, 125);
+            btnVerify.Click += (s, e) => {
+                CourseVerificationForm form = new CourseVerificationForm(courseId, title);
+                if (form.ShowDialog() == DialogResult.OK) LoadCourseData(); // Reload nếu duyệt thành công
+            };
 
-            // Nút bấm (Sửa / Xóa)
-            Button btnEdit = CreateButton("✏️", Color.White, Color.Orange, 230, 120);
-            Button btnDelete = CreateButton("🗑️", Color.White, Color.Red, 270, 120);
-
-            pnlContent.Controls.AddRange(new Control[] { lblCat, lblName, lblTeacher, lblStatus, btnEdit, btnDelete });
+            pnlContent.Controls.AddRange(new Control[] { lblCat, lblName, lblTeacher, lblStatus, btnVerify });
             card.Controls.Add(pnlContent);
-
-            // Hiệu ứng hover
-            card.MouseEnter += (s, e) => card.BackColor = Color.WhiteSmoke;
-            card.MouseLeave += (s, e) => card.BackColor = Color.White;
-
             flowCourses.Controls.Add(card);
         }
 
-        // Hàm tạo nút tròn nhỏ
-        private Button CreateButton(string text, Color backColor, Color foreColor, int x, int y)
+        private void flowCourses_Paint(object sender, PaintEventArgs e)
         {
-            Button btn = new Button();
-            btn.Text = text;
-            btn.Size = new Size(35, 35);
-            btn.Location = new Point(x, y);
-            btn.FlatStyle = FlatStyle.Flat;
-            btn.BackColor = backColor;
-            btn.ForeColor = foreColor;
-            btn.FlatAppearance.BorderColor = foreColor;
-            btn.FlatAppearance.BorderSize = 1;
-            btn.Cursor = Cursors.Hand;
-            return btn;
+
+        }
+
+        private void lblSearchIcon_Click(object sender, EventArgs e)
+        {
+            LoadCourseData();
+        }
+
+        private void CourseManagement_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                LoadCourseData();
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+            }
         }
     }
 }
