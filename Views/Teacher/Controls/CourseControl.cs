@@ -466,15 +466,13 @@ namespace StudyProcessManagement.Views.Teacher.Controls
 
             // Status badge
             Label lblStatus = new Label();
-            lblStatus.Text = status;
-            lblStatus.BackColor = status == "Active" ? Color.FromArgb(76, 175, 80) :
-                                  status == "Draft" ? Color.FromArgb(255, 152, 0) :
-                                  Color.FromArgb(158, 158, 158);
+            lblStatus.Text = MapStatusToVietnamese(status);
+            lblStatus.BackColor = GetStatusBadgeColor(status);
             lblStatus.ForeColor = Color.White;
             lblStatus.Font = new Font("Segoe UI", 7F, FontStyle.Bold);
-            lblStatus.Size = new Size(50, 18);
+            lblStatus.Size = new Size(80, 20);  // ✅ Tăng độ rộng để hiển thị đủ text
             lblStatus.TextAlign = ContentAlignment.MiddleCenter;
-            lblStatus.Location = new Point(225, 305);
+            lblStatus.Location = new Point(195, 305);  // ✅ Dịch sang trái một chút
 
             card.Controls.Add(topPanel);
             card.Controls.Add(lblCategory);
@@ -688,9 +686,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                 string status = dgvCourses.Rows[e.RowIndex].Cells["colStatus"].Value?.ToString();
                 if (!string.IsNullOrEmpty(status))
                 {
-                    Color badgeColor = status == "Active" ? Color.FromArgb(76, 175, 80) :
-                                      status == "Draft" ? Color.FromArgb(255, 152, 0) :
-                                      Color.FromArgb(158, 158, 158);
+                    Color badgeColor = GetStatusBadgeColor(status);
 
                     Rectangle badgeRect = new Rectangle(
                         e.CellBounds.X + 10,
@@ -705,7 +701,7 @@ namespace StudyProcessManagement.Views.Teacher.Controls
                     using (SolidBrush textBrush = new SolidBrush(Color.White))
                     {
                         StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-                        e.Graphics.DrawString(status, font, textBrush, badgeRect, sf);
+                        e.Graphics.DrawString(MapStatusToVietnamese(status), font, textBrush, badgeRect, sf);
                     }
                 }
             }
@@ -756,6 +752,70 @@ namespace StudyProcessManagement.Views.Teacher.Controls
             path.AddArc(rect.X, rect.Bottom - radius, radius, radius, 90, 90);
             path.CloseFigure();
             return path;
+        }
+
+        // ============================================
+        // STATUS MAPPING HELPER
+        // ============================================
+
+        /// <summary>
+        /// Mapping Status từ tiếng Anh sang tiếng Việt
+        /// </summary>
+        private string MapStatusToVietnamese(string statusInDB)
+        {
+            if (string.IsNullOrEmpty(statusInDB))
+                return "Chờ duyệt";
+
+            switch (statusInDB.Trim().ToLower())
+            {
+                case "pending":
+                    return "Chờ duyệt";
+
+                case "approved":
+                case "active":
+                    return "Hoạt động";  // ✅ Cả Approved và Active đều hiển thị "Hoạt động"
+
+                case "inactive":
+                    return "Tạm dừng";
+
+                case "draft":
+                    return "Nháp";
+
+                case "suspended":
+                    return "Đã đình chỉ";
+
+                default:
+                    return statusInDB;
+            }
+        }
+
+        /// <summary>
+        /// Lấy màu sắc cho badge Status
+        /// </summary>
+        private Color GetStatusBadgeColor(string statusInDB)
+        {
+            if (string.IsNullOrEmpty(statusInDB))
+                return Color.FromArgb(255, 152, 0); // Orange
+
+            switch (statusInDB.Trim().ToLower())
+            {
+                case "pending":
+                    return Color.FromArgb(255, 152, 0);   // Orange
+
+                case "approved":
+                case "active":
+                    return Color.FromArgb(76, 175, 80);   // Green
+
+                case "inactive":
+                case "suspended":
+                    return Color.FromArgb(158, 158, 158); // Gray
+
+                case "draft":
+                    return Color.FromArgb(33, 150, 243);  // Blue
+
+                default:
+                    return Color.FromArgb(158, 158, 158); // Gray
+            }
         }
 
         // ============================================
