@@ -116,8 +116,14 @@ namespace StudyProcessManagement.Views.Admin.User
             // --- XỬ LÝ NÚT SỬA ---
             else if (dataGridViewUsers.Columns[e.ColumnIndex].Name == "colEdit")
             {
-                // Gọi form sửa
-                OpenDetailForm(userId);
+               if(MessageBox.Show($"Bạn có chắc muốn sửa user '{userName}' (ID: {userId})?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    OpenDetailForm(userId);
+                }
+               else
+                {
+                    return;
+                }
             }
             // --- XỬ LÝ NÚT XEM ---
             else if (dataGridViewUsers.Columns[e.ColumnIndex].Name == "colView")

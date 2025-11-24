@@ -146,5 +146,10 @@ namespace StudyProcessManagement.Views.Admin.Course
         {
 
         }
+
+        private void lblStatCourses_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

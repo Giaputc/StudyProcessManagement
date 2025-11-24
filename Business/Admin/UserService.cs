@@ -17,7 +17,7 @@ namespace StudyProcessManagement.Business.Admin
                 SELECT u.UserID, u.FullName, a.Email, a.Role, a.IsActive
                 FROM Users u 
                 INNER JOIN Accounts a ON u.AccountID = a.AccountID
-                WHERE 1=1";
+                WHERE a.Role Not in ('Admin')";
 
             var parameters = new Dictionary<string, object>();
 
@@ -110,12 +110,14 @@ namespace StudyProcessManagement.Business.Admin
             }
             return false;
         }
-        public bool UpdateUser(Users user)
+
+        public bool UpdateUser(Users user, string newPassword = "")
         {
+            // Lấy User cũ để biết AccountID
             Users oldUser = GetUserById(user.UserID);
             if (oldUser == null) return false;
 
-            // Update Users (Bổ sung Address, DOB)
+            // 1. Update bảng Users (Thông tin cá nhân)
             string sqlUsr = @"UPDATE Users 
                       SET FullName = @Name, PhoneNumber = @Phone, Address = @Address, DateOfBirth = @Dob 
                       WHERE UserID = @UserID";
@@ -126,14 +128,35 @@ namespace StudyProcessManagement.Business.Admin
                 { "@Address", user.Address },
                 { "@Dob", user.DateOfBirth ?? (object)DBNull.Value },
                 { "@UserID", user.UserID }
-             };
+            };
             dataProcess.UpdateData(sqlUsr, pUsr);
 
-            // Update Accounts
-            string sqlAcc = "UPDATE Accounts SET Role = @Role, IsActive = @Active WHERE AccountID = @AccID";
-            var pAcc = new Dictionary<string, object> {
-                { "@Role", user.Role }, { "@Active", user.IsActive }, { "@AccID", oldUser.AccountID }
-            };
+            // 2. Update bảng Accounts (Role, Active và Mật khẩu)
+            string sqlAcc;
+            Dictionary<string, object> pAcc;
+
+            // Kiểm tra: Nếu có nhập mật khẩu mới thì cập nhật, không thì thôi
+            if (!string.IsNullOrWhiteSpace(newPassword))
+            {
+                // CÓ đổi mật khẩu
+                sqlAcc = "UPDATE Accounts SET Role = @Role, IsActive = @Active, PasswordHash = @Pass WHERE AccountID = @AccID";
+                pAcc = new Dictionary<string, object> {
+                    { "@Role", user.Role },
+                    { "@Active", user.IsActive },
+                    { "@AccID", oldUser.AccountID },
+                    { "@Pass", newPassword } // Truyền mật khẩu mới vào
+                };
+            }
+            else
+            {
+                // KHÔNG đổi mật khẩu (Giữ nguyên)
+                sqlAcc = "UPDATE Accounts SET Role = @Role, IsActive = @Active WHERE AccountID = @AccID";
+                pAcc = new Dictionary<string, object> {
+                    { "@Role", user.Role },
+                    { "@Active", user.IsActive },
+                    { "@AccID", oldUser.AccountID }
+                };
+            }
 
             return dataProcess.UpdateData(sqlAcc, pAcc);
         }

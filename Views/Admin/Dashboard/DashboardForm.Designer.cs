@@ -64,7 +64,6 @@ namespace StudyProcessManagement.Views.Admin.Dashboard
             this.panelStats.Padding = new System.Windows.Forms.Padding(10);
             this.panelStats.Size = new System.Drawing.Size(1000, 140);
             this.panelStats.TabIndex = 1;
-            //this.panelStats.Paint += new System.Windows.Forms.PaintEventHandler(this.panelStats_Paint);
             // 
             // cardPending
             // 
@@ -221,6 +220,7 @@ namespace StudyProcessManagement.Views.Admin.Dashboard
             this.lblNumUsers.Size = new System.Drawing.Size(150, 40);
             this.lblNumUsers.TabIndex = 0;
             this.lblNumUsers.Text = "0";
+            this.lblNumUsers.Click += new System.EventHandler(this.lblNumUsers_Click);
             // 
             // lblTitleUsers
             // 

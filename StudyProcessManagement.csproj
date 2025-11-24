@@ -331,6 +331,7 @@
     <!-- Từ Teacher-final: Business Logic -->
     <Compile Include="Business\Admin\ContentService.cs" />
     <Compile Include="Business\Admin\CourseService.cs" />
+    <Compile Include="Business\Admin\DashboardService.cs" />
     <Compile Include="Business\DataProcess.cs" />
     <Compile Include="Business\Teacher\AssignmentFormService.cs" />
     <Compile Include="Business\Teacher\AssignmentService.cs" />

@@ -114,6 +114,7 @@
             this.lblStatCourses.TabIndex = 2;
             this.lblStatCourses.Text = "Loading...";
             this.lblStatCourses.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblStatCourses.Click += new System.EventHandler(this.lblStatCourses_Click);
             // 
             // flowCourses
             // 

@@ -66,7 +66,10 @@ namespace StudyProcessManagement.Views.Admin.User
                     
                     lblTitle.Text = "CẬP NHẬT THÔNG TIN";
                     txtEmail.Enabled = false; // Không cho sửa Email
-                   
+                    lblPassword.Visible = true;
+                    txtPassword.Visible = true;
+                    txtPassword.Text = ""; // Xóa trống để người ta biết là không đổi thì thôi
+
                 }
             }
         }
@@ -133,7 +136,7 @@ namespace StudyProcessManagement.Views.Admin.User
                 }
                 else
                 {
-                    success = userService.UpdateUser(userModel);
+                    success = userService.UpdateUser(userModel, txtPassword.Text.Trim());
                 }
 
                 if (success)
@@ -153,6 +156,9 @@ namespace StudyProcessManagement.Views.Admin.User
             }
         }
 
+        private void UserDetailForm_Load(object sender, EventArgs e)
+        {
 
+        }
     }
 }

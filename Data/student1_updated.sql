@@ -376,7 +376,8 @@ VALUES
     ('STU029', 'student029@lms.com', 'hashed_password', 'Student', 1, GETDATE()),
     ('STU030', 'student030@lms.com', 'hashed_password', 'Student', 1, GETDATE());
 GO
-
+                
+               
 -- 2. TẠO USERS
 INSERT INTO Users (AccountID, FullName, PhoneNumber, DateOfBirth, Address)
 VALUES 
@@ -431,7 +432,7 @@ VALUES
     (N'Lập trình Web với ASP.NET Core', N'Xây dựng ứng dụng web hiện đại với ASP.NET Core MVC', 1, 'USR002', N'Active', 30, DATEADD(DAY, -45, GETDATE())),
     (N'Thiết kế UI/UX chuyên nghiệp', N'Học thiết kế giao diện người dùng và trải nghiệm người dùng', 2, 'USR003', N'Active', 20, DATEADD(DAY, -30, GETDATE()));
 GO
-
+select * from Courses;
 -- 5. TẠO SECTIONS
 INSERT INTO Sections (CourseID, SectionTitle, SectionOrder, Description, CreatedAt)
 VALUES 

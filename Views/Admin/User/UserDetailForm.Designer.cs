@@ -267,6 +267,7 @@
             this.Name = "UserDetailForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Chi tiết người dùng";
+            this.Load += new System.EventHandler(this.UserDetailForm_Load);
             this.pnlHeader.ResumeLayout(false);
             this.gbAccount.ResumeLayout(false);
             this.gbAccount.PerformLayout();
