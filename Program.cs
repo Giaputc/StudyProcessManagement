@@ -1,12 +1,12 @@
 
-﻿using StudyProcessManagement.Views.Login;
+using StudyProcessManagement.Views.Login;
 using StudyProcessManagement.Views.Student.assignments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-﻿using System;
+using System;
 using System.Windows.Forms;
 using StudyProcessManagement.Views;
 
@@ -29,7 +29,7 @@ namespace StudyProcessManagement
 
             // Ông đang chạy MainForm (Giao diện Admin) để test đúng không?
             // Nếu muốn chạy từ màn hình Đăng nhập thì sửa thành: new Login()
-            
+
 
         }
     }

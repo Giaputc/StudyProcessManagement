@@ -1,4 +1,4 @@
-﻿using StudyProcessManagement.Views.Student.assignments;
+using StudyProcessManagement.Views.Student.assignments;
 using StudyProcessManagement.Views.Student.information;
 using System;
 using System.Collections.Generic;

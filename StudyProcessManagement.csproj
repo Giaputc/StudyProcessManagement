@@ -308,7 +308,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Business\DataProcess.cs" />
+    <Compile Include="Business\Student\DataProcess.cs" />
     <Compile Include="Model\AssignmentViewModel.cs" />
     <Compile Include="Model\GradesDataAccess.cs" />
     <Compile Include="Model\StudentSession.cs" />

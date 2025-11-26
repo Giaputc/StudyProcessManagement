@@ -1,4 +1,4 @@
-﻿using StudyProcessManagement.Data;
+using StudyProcessManagement.Data;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -28,7 +28,7 @@ namespace StudyProcessManagement.Business
         }
         public StudentInfoModel LoginAndGetStudentInfo(string email, string passwordHash)
         {
-            
+
             StudentInfoModel studentInfo = null;
             string sqlQuery = @"
         SELECT 
@@ -52,7 +52,7 @@ namespace StudyProcessManagement.Business
                     {
                         if (reader.Read())
                         {
-                            
+
                             studentInfo = new StudentInfoModel
                             {
                                 UserID = reader["UserID"].ToString(),
@@ -108,29 +108,29 @@ namespace StudyProcessManagement.Business
                                 ResourceID = Convert.ToInt32(reader["ResourceID"]), // Giả định không NULL
                                 TenTaiNguyen = reader["TenTaiNguyen"].ToString(),
                                 MoTa = reader["MoTa"] == DBNull.Value ? null : reader["MoTa"].ToString(),
-                                
+
                                 // === Thông tin Liên kết (Links) ===
                                 LinkVideo = reader["LinkVideo"] == DBNull.Value ? null : reader["LinkVideo"].ToString(),
                                 LinkTaiLieu = reader["LinkTaiLieu"] == DBNull.Value ? null : reader["LinkTaiLieu"].ToString(),
                                 LoaiChiTiet = reader["LoaiChiTiet"].ToString(),
-                                
+
                                 // === Thông tin Khóa học và Chương ===
                                 CourseID = Convert.ToInt32(reader["CourseID"]), // Giả định không NULL
                                 TenKhoaHoc = reader["TenKhoaHoc"].ToString(),
                                 AnhKhoaHoc = reader["AnhKhoaHoc"] == DBNull.Value ? null : reader["AnhKhoaHoc"].ToString(),
-                                
+
                                 // SectionID là kiểu int? (Nullable int)
                                 SectionID = reader["SectionID"] == DBNull.Value ? (int?)null : Convert.ToInt32(reader["SectionID"]),
-                                
+
                                 TenChuong = reader["TenChuong"].ToString(),
                                 TenGiangVien = reader["TenGiangVien"].ToString(),
-                                
+
                                 // === Trạng thái và Sắp xếp ===
                                 TrangThai = reader["TrangThai"].ToString(),
-                                
+
                                 // NgayDang là kiểu DateTime? (Nullable DateTime)
                                 NgayDang = reader["NgayDang"] == DBNull.Value ? (DateTime?)null : (DateTime)reader["NgayDang"],
-                                
+
                                 ThuTuChuong = Convert.ToInt32(reader["ThuTuChuong"]), // Giả định không NULL
                                 ThuTu = Convert.ToInt32(reader["ThuTu"])             // Giả định không NULL
                             });
@@ -513,11 +513,9 @@ namespace StudyProcessManagement.Business
             }
 
             return stats;
-        
-    }
+
+        }
 
     }
 }
-
-    
 
