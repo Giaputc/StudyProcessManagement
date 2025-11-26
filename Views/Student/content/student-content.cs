@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace StudyProcessManagement.Views.SinhVien.discover
+namespace StudyProcessManagement.Views.Student.content
 {
-    public partial class student_discover : Form
+    public partial class studient_content : Form
     {
-        public student_discover()
+        public studient_content()
         {
             InitializeComponent();
         }

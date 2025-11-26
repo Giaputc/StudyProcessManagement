@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khóa học của tôi - Học Viên</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar Styles (Giữ nguyên) --- */
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            text-align: center;
+            border-bottom: 1px solid #465a6d;
+        }
+
+            .sidebar-header h2 {
+                font-size: 18px;
+                margin-bottom: 5px;
+            }
+
+            .sidebar-header p {
+                font-size: 12px;
+                color: #95a5a6;
+            }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 10px 20px;
+            font-size: 11px;
+            color: #95a5a6;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ecf0f1;
+            font-size: 14px;
+        }
+
+            .menu-item:hover {
+                background: #34495e;
+                border-left: 3px solid #3498db;
+            }
+
+            /* Đánh dấu mục "Khóa học của tôi" là active */
+            .menu-item.active {
+                background: #34495e;
+                border-left: 3px solid #3498db;
+            }
+
+        .sidebar-footer {
+            padding: 15px 20px;
+            background: #34495e;
+            border-top: 1px solid #465a6d;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            overflow: hidden; /* Quan trọng để chứa ảnh */
+        }
+
+            .user-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: #95a5a6;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 8px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            background: white;
+            padding: 15px 25px;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .topbar h1 {
+                font-size: 20px;
+                color: #333;
+                margin-bottom: 5px;
+            }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+        }
+
+        .filter-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+            .filter-bar select {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 13px;
+                min-width: 150px;
+            }
+
+        .search-box input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 300px;
+            font-size: 13px;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            /* Flex fallback cho trường hợp không có khóa học */
+            min-height: 200px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+            .course-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        .course-image {
+            height: 150px;
+            background-color: #f0f0f0;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .course-body {
+            padding: 15px;
+        }
+
+        .course-category {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .course-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            /* Giới hạn 2 dòng */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .course-teacher {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- Custom Progress Styles --- */
+        .progress-container {
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar-wrap {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            transition: width 0.4s ease, background-color 0.4s ease;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        /* Progress bar colors based on ProgressColor field from DB */
+        .progress-bar.success {
+            background-color: #28a745;
+        }
+        /* Green */
+        .progress-bar.warning {
+            background-color: #ffc107;
+        }
+        /* Yellow/Orange */
+        .progress-bar.info {
+            background-color: #17a2b8;
+        }
+        /* Cyan/Blue */
+        .progress-bar.danger {
+            background-color: #dc3545;
+        }
+        /* Red */
+
+        /* Status Badges */
+        .status-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .status-Learning {
+            background: #e3f2fd;
+            color: #1e88e5;
+        }
+
+        .status-Completed {
+            background: #e8f5e9;
+            color: #43a047;
+        }
+
+        .status-Suspended {
+            background: #fff3e0;
+            color: #fb8c00;
+        }
+
+        .status-NotStarted {
+            background: #fbecec;
+            color: #e53935;
+        }
+        /* --- End Custom Progress Styles --- */
+
+        .no-courses {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px;
+            color: #999;
+            font-size: 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>🎓 LMS Student</h2>
+            <p>Learning Management System</p>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-title">TỔNG QUAN</div>
+
+                <div class="menu-item" onclick="navigateTo('INFORMATION')">
+                    <span>👤</span>
+                    <span>Thông tin cá nhân</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">HỌC TẬP</div>
+
+                <div class="menu-item" onclick="location.href='../courses/student-my-courses.html'">
+                    <span>📚</span>
+                    <span>Khóa học của tôi</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">BÀI TẬP & KIỂM TRA</div>
+                <div class="menu-item" onclick="navigateToAssignment()">
+                    <span>📝</span>
+                    <span>Bài tập</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KẾT QUẢ</div>
+
+                <div class="menu-item" onclick="navigateTo('GRADES')">
+                    <span>🏆</span>
+                    <span>Điểm số</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KHÁC</div>
+                <div class="menu-item" onclick="navigateTo('CONTENT')">
+                    <span>📁</span>
+                    <span>Tài nguyên</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">S</div>
+                <div class="user-details">
+                    <div class="user-name">Student</div>
+                    <div class="user-role">Học viên</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h1>Khóa học của tôi</h1>
+            <div class="breadcrumb">Trang chủ / Học tập / Khóa học của tôi</div>
+        </div>
+
+        <div class="content-area">
+            <div class="filter-bar">
+                <select id="category-filter">
+                    <option value="">Tất cả danh mục</option>
+                </select>
+                <select id="status-filter">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="Learning">Đang học</option>
+                    <option value="Completed">Đã hoàn thành</option>
+                    <option value="Suspended">Tạm dừng</option>
+                    <option value="Not Started">Chưa bắt đầu</option>
+                </select>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="🔍 Tìm kiếm khóa học..." onkeyup="filterCourses()">
+                </div>
+                <div id="course-count" style="font-size: 13px; color: #666; margin-left: auto;">Đã tải 0 khóa học</div>
+            </div>
+
+            <div class="courses-grid" id="courses-list">
+                <div class="no-courses" id="loading-message">
+                    Đang tải dữ liệu khóa học...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const coursesList = document.getElementById('courses-list');
+        let allCoursesData = [];
+
+        // --- Hàm Nhận Dữ liệu từ C# ---
+        function updateMyCourses(jsonString) {
+            try {
+                // Xử lý chuỗi JSON an toàn
+                const safeJsonString = jsonString
+                    .replace(/\\\\/g, '\\') // Khôi phục escape cho dấu gạch chéo
+                    .replace(/\\"/g, '"'); // Khôi phục escape cho dấu nháy kép
+
+                const data = JSON.parse(safeJsonString);
+                allCoursesData = data; // Lưu dữ liệu gốc
+                renderCourses(allCoursesData);
+            } catch (error) {
+                console.error("Lỗi khi parsing dữ liệu khóa học:", error);
+                document.getElementById('loading-message').innerText = "Lỗi khi tải dữ liệu. Vui lòng thử lại.";
+            }
+        }
+
+        // --- Hàm Render UI ---
+        function renderCourses(courses) {
+            coursesList.innerHTML = '';
+
+            if (courses.length === 0) {
+                coursesList.innerHTML = '<div class="no-courses">Bạn chưa đăng ký khóa học nào. Hãy vào mục Khám phá để tìm khóa học mới!</div>';
+                document.getElementById('course-count').innerText = "Đã tải 0 khóa học";
+                return;
+            }
+
+            courses.forEach(course => {
+                const card = createCourseCard(course);
+                coursesList.appendChild(card);
+            });
+
+            document.getElementById('course-count').innerText = `Đã tải ${courses.length} khóa học`;
+            updateFilterOptions(courses);
+        }
+
+        // --- Hàm tạo thẻ Khóa học ---
+        function createCourseCard(course) {
+            const card = document.createElement('div');
+            card.className = 'course-card';
+            // Gắn sự kiện để xem chi tiết khóa học
+            card.onclick = () => viewCourseDetail(course.CourseID, course.TenKhoaHoc);
+
+            // Xử lý ảnh bìa. Nếu không có, dùng màu ngẫu nhiên.
+            let imageContent = '';
+            if (course.AnhBia && course.AnhBia.trim() !== "") {
+                imageContent = `<div class="course-image" style="background-image: url('${course.AnhBia}');"></div>`;
+            } else {
+                // Dùng logic màu ngẫu nhiên dựa trên CourseID hoặc CategoryID để cố định màu
+                const colors = ['green', 'orange', 'blue', 'red', 'teal'];
+                const colorClass = colors[course.CourseID.charCodeAt(0) % colors.length];
+                imageContent = `<div class="course-image ${colorClass}">${course.TenKhoaHoc.charAt(0)}</div>`;
+            }
+
+            // Xử lý trạng thái và màu progress bar
+            const progressPercent = course.TienDoHoc;
+            const progressColor = course.ProgressColor || 'info'; // 'success', 'warning', 'info', 'danger'
+            const statusClass = `status-${course.TrangThai.replace(/\s/g, '') || 'NotStarted'}`;
+            const statusText = course.TrangThaiText || 'Chưa bắt đầu';
+
+            card.innerHTML = `
+                    ${imageContent}
+                    <div class="course-body">
+                        <div class="course-category">📁 ${course.DanhMuc || 'Chưa xác định'}</div>
+                        <div class="course-title">${course.TenKhoaHoc}</div>
+                        <div class="course-teacher">
+                            <span>👨‍🏫 ${course.TenGiangVien || 'Chưa xác định'}</span>
+                            <span class="status-badge ${statusClass}" style="margin-left: auto;">${statusText}</span>
+                        </div>
+
+                        <div class="progress-container">
+                            <div class="progress-info">
+                                <span>Tiến độ</span>
+                                <span>${course.PhanTramText || '0%'}</span>
+                            </div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar ${progressColor}" style="width: ${progressPercent}%;"></div>
+                            </div>
+                            <div class="progress-info" style="font-weight: normal; color: #999;">
+                                <span>${course.TienDoText || '0/0 bài'}</span>
+                                <span>Điểm TB: <strong>${course.DiemTrungBinh.toFixed(1)}</strong></span>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+            return card;
+        }
+
+        // --- Hàm Lọc và Sắp xếp ---
+        function updateFilterOptions(courses) {
+            const categoryFilter = document.getElementById('category-filter');
+            const categories = [...new Set(courses.map(c => c.DanhMuc))].filter(c => c);
+
+            // Xóa các option cũ trừ option đầu tiên
+            while (categoryFilter.options.length > 1) {
+                categoryFilter.remove(1);
+            }
+
+            // Thêm các category mới
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.text = cat;
+                categoryFilter.appendChild(option);
+            });
+
+            // Gắn sự kiện
+            categoryFilter.onchange = filterCourses;
+            document.getElementById('status-filter').onchange = filterCourses;
+        }
+
+        function filterCourses() {
+            const category = document.getElementById('category-filter').value;
+            const status = document.getElementById('status-filter').value;
+            const search = document.getElementById('search-input').value.toLowerCase();
+
+            const filtered = allCoursesData.filter(course => {
+                const matchesCategory = !category || course.DanhMuc === category;
+                const matchesStatus = !status || (course.TrangThai || 'Not Started') === status;
+                const matchesSearch = !search ||
+                    course.TenKhoaHoc.toLowerCase().includes(search) ||
+                    course.TenGiangVien.toLowerCase().includes(search);
+
+                return matchesCategory && matchesStatus && matchesSearch;
+            });
+
+            renderCourses(filtered);
+        }
+
+        // --- Hàm Xử lý sự kiện Người dùng ---
+        function viewCourseDetail(courseId, courseName) {
+            alert(`Mở khóa học: ${courseName}\n(CourseID: ${courseId})\n\n[Tính năng đang được phát triển]`);
+        }
+
+        // Hàm: Gửi tin nhắn điều hướng đến C# (Giữ nguyên)
+        function navigateTo(page) {
+            window.chrome.webview.postMessage(page);
+        }
+
+        // Hàm: Đăng xuất (Giữ nguyên)
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                window.chrome.webview.postMessage("LOGOUT");
+            }
+        }
+        function navigateToAssignment() {
+            if (window.chrome && window.chrome.webview) {
+                // Gửi thông điệp "ASSIGNMENT" về C#
+                window.chrome.webview.postMessage("ASSIGNMENT");
+            }
+        }
+    </script>
+</body>
+</html>

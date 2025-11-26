@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điểm Số - Học Viên</title>
+    <style>
+
+        /* CSS Styling (Không thay đổi, giữ nguyên) */
+                * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+
+        }
+
+                body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        background: #f5f5f5;
+                        display: flex;
+                        height: 100vh;
+                        overflow: hidden;
+
+        }
+
+                .sidebar {
+                        width: 250px;
+                        background: #2c3e50;
+                        color: white;
+                        display: flex;
+                        flex-direction: column;
+                        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+
+        }
+
+                .sidebar-header {
+                        padding: 20px;
+                        background: #34495e;
+                        text-align: center;
+                        border-bottom: 1px solid #465a6d;
+
+        }
+
+                    .sidebar-header h2 {
+                            font-size: 18px;
+                            margin-bottom: 5px;
+
+        }
+
+                    .sidebar-header p {
+                            font-size: 12px;
+                            color: #95a5a6;
+
+        }
+
+                .sidebar-menu {
+                        flex: 1;
+                        overflow-y: auto;
+                        padding: 10px 0;
+
+        }
+
+                .menu-section {
+                        margin-bottom: 20px;
+
+        }
+
+                .menu-title {
+                        padding: 10px 20px;
+                        font-size: 11px;
+                        color: #95a5a6;
+                        text-transform: uppercase;
+                        font-weight: 600;
+
+        }
+
+                .menu-item {
+                        padding: 12px 20px;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        color: #ecf0f1;
+                        font-size: 14px;
+
+        }
+
+                    .menu-item:hover {
+                            background: #34495e;
+                            border-left: 3px solid #3498db;
+
+        }
+
+                    .menu-item.active {
+                            background: #34495e;
+                            border-left: 3px solid #3498db;
+
+        }
+
+                .sidebar-footer {
+                        padding: 15px 20px;
+                        background: #34495e;
+                        border-top: 1px solid #465a6d;
+
+        }
+
+                .user-info {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        margin-bottom: 10px;
+
+        }
+
+                .user-avatar {
+                        width: 35px;
+                        height: 35px;
+                        background: #3498db;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: bold;
+
+        }
+
+                .user-details {
+                        flex: 1;
+
+        }
+
+                .user-name {
+                        font-size: 13px;
+                        font-weight: 600;
+
+        }
+
+                .user-role {
+                        font-size: 11px;
+                        color: #95a5a6;
+
+        }
+
+                .btn-logout {
+                        width: 100%;
+                        padding: 8px;
+                        background: #e74c3c;
+                        border: none;
+                        border-radius: 4px;
+                        color: white;
+                        font-size: 13px;
+                        cursor: pointer;
+                        font-weight: 600;
+
+        }
+
+                .main-content {
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+
+        }
+
+                .topbar {
+                        background: white;
+                        padding: 15px 25px;
+                        border-bottom: 1px solid #ddd;
+
+        }
+
+                    .topbar h1 {
+                            font-size: 20px;
+                            color: #333;
+                            margin-bottom: 5px;
+
+        }
+
+                .breadcrumb {
+                        font-size: 13px;
+                        color: #666;
+
+        }
+
+                .content-area {
+                        flex: 1;
+                        overflow-y: auto;
+                        padding: 25px;
+
+        }
+
+
+        /* Đã xóa .stats-grid và .stat-card CSS vì không còn sử dụng */
+                .card {
+                        background: white;
+                        border-radius: 8px;
+                        border: 1px solid #e0e0e0;
+                        margin-bottom: 20px;
+
+        }
+
+                .card-header {
+                        padding: 15px 20px;
+                        border-bottom: 1px solid #e0e0e0;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+
+        }
+
+                    .card-header h3 {
+                            font-size: 16px;
+                            color: #333;
+
+        }
+
+                table {
+                        width: 100%;
+                        border-collapse: collapse;
+
+        }
+
+                    table th {
+                            background: #f9f9f9;
+                            padding: 12px;
+                            text-align: left;
+                            font-size: 13px;
+                            color: #333;
+                            font-weight: 600;
+                            border-bottom: 1px solid #e0e0e0;
+
+        }
+
+                    table td {
+                            padding: 12px;
+                            font-size: 13px;
+                            color: #666;
+                            border-bottom: 1px solid #f5f5f5;
+
+        }
+
+                    table tr:hover {
+                            background: #f9f9f9;
+
+        }
+
+                .grade-display {
+                        font-size: 18px;
+                        font-weight: bold;
+                        padding: 8px 16px;
+                        border-radius: 8px;
+                        text-align: center;
+                        display: inline-block;
+                        min-width: 60px;
+
+        }
+
+                .grade-excellent {
+                        background: #e8f5e9;
+                        color: #2e7d32;
+
+        }
+
+                .grade-good {
+                        background: #e3f2fd;
+                        color: #1976d2;
+
+        }
+
+                .grade-average {
+                        background: #fff3e0;
+                        color: #f57c00;
+
+        }
+
+                #grades-detail-card {
+                        display: none;
+
+        }
+
+                #main-content {
+                        visibility: hidden;
+                        opacity: 0;
+                        transition: opacity 0.1s ease-in;
+
+        }
+
+                    #main-content.loaded {
+                            visibility: visible;
+                            opacity: 1;
+
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>🎓 LMS Student</h2>
+            <p>Learning Management System</p>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-title">TỔNG QUAN</div>
+                <div class="menu-item" onclick="navigateTo('INFORMATION')">
+                    <span>👤</span>
+                    <span>Thông tin cá nhân</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">HỌC TẬP</div>
+                <div class="menu-item" onclick="navigateTo('MY_COURSES')">
+                    <span>📚</span>
+                    <span>Khóa học của tôi</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">BÀI TẬP & KIỂM TRA</div>
+                <div class="menu-item" onclick="navigateTo('ASSIGNMENT')">
+                    <span>📝</span>
+                    <span>Bài tập</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KẾT QUẢ</div>
+                <div class="menu-item active" onclick="navigateTo('GRADES')">
+                    <span>🏆</span>
+                    <span>Điểm số</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KHÁC</div>
+                <div class="menu-item" onclick="navigateTo('CONTENT')">
+                    <span>📁</span>
+                    <span>Tài nguyên</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">S</div>
+                <div class="user-details">
+                    <div class="user-name">Student</div>
+                    <div class="user-role">Học viên</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div class="topbar">
+            <h1>Điểm Số</h1>
+            <div class="breadcrumb">Trang chủ / Kết quả / Điểm số</div>
+        </div>
+
+        <div class="content-area">
+            <div class="card" id="grades-detail-card">
+                <div class="card-header">
+                    <h3>Điểm theo khóa học (Chi tiết từng bài)</h3>
+                </div>
+                <div style="padding: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Khóa học</th>
+                                <th>Bài tập</th>
+                                <th>Điểm</th>
+                                <th>Ngày chấm</th>
+                                <th>Nhận xét</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grades-table-body">
+                            <tr><td colspan="5" style="text-align: center; font-style: italic;">Không có dữ liệu chi tiết từng bài tập được gửi từ C#. Vui lòng xem bảng Tóm tắt.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Tổng kết theo khóa học</h3>
+                </div>
+                <div style="padding: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Khóa học</th>
+                                <th>Số bài đã chấm</th>
+                                <th>Điểm TB</th>
+                                <th>Điểm cao nhất</th>
+                                <th>Điểm thấp nhất</th>
+                            </tr>
+                        </thead>
+                        <tbody id="course-summary-table-body">
+                            <tr><td colspan="5" style="text-align: center; font-style: italic;">Đang tải dữ liệu...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    ---
+
+    <script>
+        // Hàm: Gửi tin nhắn điều hướng đến C# (Giữ nguyên)
+        function navigateTo(page) {
+            window.chrome.webview.postMessage(page);
+        }
+
+        // Hàm: Đăng xuất (Giữ nguyên)
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                window.chrome.webview.postMessage("LOGOUT");
+            }
+        }
+
+        // ------------------------------------------------------------
+        // ## LOGIC CẬP NHẬT & HIỂN THỊ DỮ LIỆU ĐIỂM SỐ
+        // ------------------------------------------------------------
+
+        // Hàm: Reset tất cả các phần tử UI về trạng thái mặc định (CHỈ CÒN RESET BẢNG)
+        function resetUI() {
+            console.log("[RESET] Clearing courses data...");
+
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) {
+                mainContent.classList.add('loaded');
+            }
+
+            // **QUAN TRỌNG: XÓA HOÀN TOÀN NỘI DUNG BẢNG TỔNG KẾT**
+            const summaryBody = document.getElementById('course-summary-table-body');
+            if (summaryBody) {
+                summaryBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">Đang tải dữ liệu...</td></tr>';
+            }
+
+            // Xóa bảng chi tiết (Giữ nguyên)
+            const detailBody = document.getElementById('grades-table-body');
+            if (detailBody) {
+                detailBody.innerHTML = '<tr><td colspan="5" style="text-align: center; font-style: italic;">Không có dữ liệu chi tiết từng bài tập được gửi từ C#. Vui lòng xem bảng Tóm tắt.</td></tr>';
+            }
+
+            console.log("[RESET] UI cleared successfully");
+        }
+
+        // ⚡️ CHỐNG CACHE: Reset UI ngay lập tức + Xóa mọi dữ liệu cũ (Giữ nguyên)
+        (function () {
+            console.log("[ANTI-CACHE] Forcing complete UI reset on load");
+            resetUI();
+            try {
+                sessionStorage.clear();
+                localStorage.clear();
+            } catch (e) {
+                console.log("[ANTI-CACHE] No storage to clear");
+            }
+        })();
+
+        // Hàm: Cập nhật dữ liệu từ C#
+        window.updateGradesAndSummary = function (jsonString) {
+            console.log("[UPDATE] Received data from C#, resetting UI first...");
+
+            // BƯỚC 1: LUÔN RESET UI ĐỂ XÓA DỮ LIỆU CŨ
+            resetUI();
+
+            // BƯỚC 2: Delay nhỏ để đảm bảo DOM đã reset hoàn toàn
+            setTimeout(() => {
+                try {
+                    console.log("[UPDATE] Parsing JSON data...");
+                    const data = JSON.parse(jsonString);
+
+                    // Hàm helper để format số (Giữ nguyên)
+                    const formatSummaryScore = (score) => (score !== null && score !== undefined && !Number.isNaN(score)) ? score.toFixed(1) : '0.0';
+
+                    // Hàm helper để tạo class màu cho điểm (Giữ nguyên)
+                    const getGradeClass = (score) => {
+                        const numericScore = (score !== null && score !== undefined && !Number.isNaN(score)) ? score : 0;
+                        if (numericScore >= 8.5) return 'grade-excellent';
+                        if (numericScore >= 7.0) return 'grade-good';
+                        return 'grade-average';
+                    };
+
+                    // **ĐÃ XÓA LOGIC CẬP NHẬT THỐNG KÊ TỔNG QUAN**
+
+                    // 2. CẬP NHẬT BẢNG TỔNG KẾT KHÓA HỌC
+                    const courses = data.courses || [];
+                    const summaryBody = document.getElementById('course-summary-table-body');
+                    summaryBody.innerHTML = ''; // **XÓA HOÀN TOÀN TRƯỚC KHI THÊM MỚI**
+
+                    if (courses.length === 0) {
+                        summaryBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">Không có dữ liệu tổng kết khóa học.</td></tr>';
+                    } else {
+                        courses.forEach(course => {
+                            const tr = document.createElement('tr');
+                            const diemTB = formatSummaryScore(course.diemTB);
+                            const diemCaoNhat = formatSummaryScore(course.diemCaoNhat);
+                            const diemThapNhat = formatSummaryScore(course.diemThapNhat);
+                            const soBaiDaCham = course.soBaiDaCham !== null && course.soBaiDaCham !== undefined ? course.soBaiDaCham : 0;
+
+                            tr.innerHTML = `
+                                                <td><strong>${course.khoaHoc || 'N/A'}</strong></td>
+                                                <td>${soBaiDaCham} bài</td>
+                                                <td><div class="grade-display ${getGradeClass(course.diemTB)}">${diemTB}</div></td>
+                                                <td>${diemCaoNhat}</td>
+                                                <td>${diemThapNhat}</td>
+                                            `;
+                            summaryBody.appendChild(tr);
+                        });
+                    }
+
+                    console.log("[UPDATE] Data updated successfully");
+                } catch (error) {
+                    console.error("[ERROR] Failed to parse/update grades data:", error);
+                    const summaryBody = document.getElementById('course-summary-table-body');
+                    summaryBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #e74c3c; font-weight: bold;">LỖI: Không thể tải dữ liệu điểm số.</td></tr>';
+                }
+            }, 50); // Delay 50ms để đảm bảo DOM đã reset
+        };
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-﻿namespace StudyProcessManagement.Views.SinhVien.assignments
+﻿namespace StudyProcessManagement.Views.Student.content
 {
-    partial class assignments
+    partial class studient_content
     {
         /// <summary>
         /// Required designer variable.
@@ -28,17 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.SuspendLayout();
-            // 
-            // assignments
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1308, 634);
-            this.Name = "assignments";
-            this.Text = "assignments";
-            this.ResumeLayout(false);
-
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Text = "studient_content";
         }
 
         #endregion

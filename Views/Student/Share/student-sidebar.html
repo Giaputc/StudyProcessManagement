@@ -1,0 +1,84 @@
+﻿
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>🎓 LMS Student</h2>
+            <p>Learning Management System</p>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-title">TỔNG QUAN</div>
+                <div class="menu-item" onclick="location.href='student-main.html'">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item">
+                    <span>👤</span>
+                    <span>Thông tin cá nhân</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">HỌC TẬP</div>
+                <div class="menu-item" onclick="location.href='../discover/student-discover.html'">
+                    <span>🔍</span>
+                    <span>Khám phá khóa học</span>
+                </div>
+                <div class="menu-item" onclick="location.href='../courses/student-my-courses.html'">
+                    <span>📚</span>
+                    <span>Khóa học của tôi</span>
+                </div>
+                <div class="menu-item">
+                    <span>📖</span>
+                    <span>Đang học</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">BÀI TẬP & KIỂM TRA</div>
+                <div class="menu-item" onclick="navigateTo('student-assignments.html')">
+                    <span>📝</span>
+                    <span>Bài tập</span>
+                </div>
+                <div class="menu-item">
+                    <span>❓</span>
+                    <span>Quiz</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KẾT QUẢ</div>
+                <div class="menu-item">
+                    <span>📈</span>
+                    <span>Tiến độ học tập</span>
+                </div>
+                <div class="menu-item" onclick="location.href='../grades/student-grades.html'">
+                    <span>🏆</span>
+                    <span>Điểm số</span>
+                </div>
+                <div class="menu-item">
+                    <span>📜</span>
+                    <span>Chứng chỉ</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KHÁC</div>
+                <div class="menu-item">
+                    <span>📢</span>
+                    <span>Thông báo</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">S</div>
+                <div class="user-details">
+                    <div class="user-name">Student</div>
+                    <div class="user-role">Học viên</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Đăng xuất</button>
+        </div>
+    </div>

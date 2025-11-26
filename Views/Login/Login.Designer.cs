@@ -52,6 +52,7 @@
             this.label1.Size = new System.Drawing.Size(470, 27);
             this.label1.TabIndex = 0;
             this.label1.Text = "TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2
             // 
@@ -69,7 +70,7 @@
             // 
             this.textBox1.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.Location = new System.Drawing.Point(212, 292);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(2);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(189, 26);
             this.textBox1.TabIndex = 2;
@@ -101,7 +102,7 @@
             // 
             this.textBox2.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox2.Location = new System.Drawing.Point(212, 366);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox2.Margin = new System.Windows.Forms.Padding(2);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(189, 26);
             this.textBox2.TabIndex = 4;
@@ -110,7 +111,7 @@
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.Location = new System.Drawing.Point(266, 150);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(100, 100);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -120,7 +121,7 @@
             // BtnSignIn
             // 
             this.BtnSignIn.Location = new System.Drawing.Point(212, 435);
-            this.BtnSignIn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BtnSignIn.Margin = new System.Windows.Forms.Padding(2);
             this.BtnSignIn.Name = "BtnSignIn";
             this.BtnSignIn.Size = new System.Drawing.Size(74, 34);
             this.BtnSignIn.TabIndex = 7;
@@ -131,7 +132,7 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(326, 435);
-            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(74, 34);
             this.button1.TabIndex = 8;
@@ -143,7 +144,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(625, 505);
+            this.ClientSize = new System.Drawing.Size(882, 622);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.BtnSignIn);
             this.Controls.Add(this.pictureBox1);
@@ -154,7 +155,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Đăng nhập quản lý tiến trình";

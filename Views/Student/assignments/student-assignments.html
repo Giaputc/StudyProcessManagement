@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập - Học Viên</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            text-align: center;
+            border-bottom: 1px solid #465a6d;
+        }
+
+            .sidebar-header h2 {
+                font-size: 18px;
+                margin-bottom: 5px;
+            }
+
+            .sidebar-header p {
+                font-size: 12px;
+                color: #95a5a6;
+            }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .menu-section {
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            padding: 10px 20px;
+            font-size: 11px;
+            color: #95a5a6;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ecf0f1;
+            font-size: 14px;
+        }
+
+            .menu-item:hover {
+                background: #34495e;
+                border-left: 3px solid #3498db;
+            }
+
+            .menu-item.active {
+                background: #34495e;
+                border-left: 3px solid #3498db;
+            }
+
+        .sidebar-footer {
+            padding: 15px 20px;
+            background: #34495e;
+            border-top: 1px solid #465a6d;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: #95a5a6;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 8px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            background: white;
+            padding: 15px 25px;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .topbar h1 {
+                font-size: 20px;
+                color: #333;
+                margin-bottom: 5px;
+            }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+        }
+
+        .filter-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+            .filter-bar select {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 13px;
+                min-width: 200px;
+            }
+
+        .assignments-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .assignment-card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+            .assignment-card:hover {
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .assignment-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .assignment-course {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .assignment-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .assignment-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .info-item {
+            font-size: 12px;
+        }
+
+        .info-label {
+            color: #999;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .assignment-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .badge-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .score-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+            .modal.active {
+                display: flex;
+            }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .modal-header h3 {
+                font-size: 18px;
+                color: #333;
+            }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                color: #333;
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 30px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .file-upload:hover {
+                border-color: #4CAF50;
+                background: #f9f9f9;
+            }
+
+            .file-upload i {
+                font-size: 48px;
+                color: #4CAF50;
+                margin-bottom: 10px;
+            }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-video {
+            background: #e74c3c;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .btn-video:hover {
+                background: #c0392b;
+            }
+
+        /* CSS cho tài liệu đính kèm */
+        .attachment-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 13px;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+            .attachment-link:hover {
+                background: #bbdefb;
+            }
+
+        /* CSS cho feedback */
+        .feedback-box {
+            background: #fff3e0;
+            border-left: 4px solid #f57c00;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+
+        .feedback-title {
+            font-weight: 600;
+            color: #f57c00;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .feedback-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* CSS cho badge động */
+        .badge.badge-danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .badge.badge-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge.badge-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge.badge-info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        /* CSS cho feedback */
+        .feedback-box {
+            background: #fff3e0;
+            border-left: 4px solid #f57c00;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+
+        .feedback-title {
+            font-weight: 600;
+            color: #f57c00;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .feedback-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .assignment-score {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e74c3c; /* Màu đỏ cho điểm số */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ⭐ THAY THẾ: Dùng placeholder cho sidebar -->
+    <div id="sidebar-placeholder"></div>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>🎓 LMS Student</h2>
+            <p>Learning Management System</p>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-title">TỔNG QUAN</div>
+
+                <div class="menu-item" onclick="navigateTo('INFORMATION')">
+                    <span>👤</span>
+                    <span>Thông tin cá nhân</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">HỌC TẬP</div>
+
+                <div class="menu-item" onclick="location.href='../courses/student-my-courses.html'">
+                    <span>📚</span>
+                    <span>Khóa học của tôi</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">BÀI TẬP & KIỂM TRA</div>
+                <div class="menu-item" onclick="navigateToAssignment()">
+                    <span>📝</span>
+                    <span>Bài tập</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KẾT QUẢ</div>
+
+                <div class="menu-item" onclick="navigateTo('GRADES')">
+                    <span>🏆</span>
+                    <span>Điểm số</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KHÁC</div>
+                <div class="menu-item" onclick="navigateTo('CONTENT')">
+                    <span>📁</span>
+                    <span>Tài nguyên</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">S</div>
+                <div class="user-details">
+                    <div class="user-name">Student</div>
+                    <div class="user-role">Học viên</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Đăng xuất</button>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="topbar">
+            <h1>Bài Tập</h1>
+            <div class="breadcrumb">Trang chủ / Bài tập & Kiểm tra / Bài tập</div>
+        </div>
+
+        <div class="content-area">
+            <div class="filter-bar">
+                <select id="courseFilter" onchange="filterAssignments()">
+                    <option value="">Tất cả khóa học</option>
+                </select>
+                <select id="statusFilter" onchange="filterAssignments()">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="Chưa nộp">Chưa nộp</option>
+                    <option value="Chờ chấm">Chờ chấm</option>
+                    <option value="Đã chấm">Đã chấm</option>
+                    <option value="Quá hạn">Quá hạn</option>
+                </select>
+            </div>
+
+            <div class="assignments-grid" id="assignmentsContainer">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="submitModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nộp bài tập</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="currentAssignmentId">
+                <div class="form-group">
+                    <label>Tên bài tập</label>
+                    <input type="text" class="form-control" id="assignmentName" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Khóa học</label>
+                    <input type="text" class="form-control" id="courseName" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Hạn nộp</label>
+                    <input type="text" class="form-control" id="dueDate" disabled>
+                </div>
+                <div class="form-group">
+                    <label>File nộp bài *</label>
+                    <input type="file" class="form-control" id="fileUpload" accept=".zip,.rar,.pdf">
+                </div>
+                <div class="form-group">
+                    <label>Ghi chú</label>
+                    <textarea class="form-control" id="studentNote" rows="4" placeholder="Nhập ghi chú nếu có..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: #999; color: white;" onclick="closeModal()">Hủy</button>
+                <button class="btn btn-success" onclick="submitAssignment()">📤 Nộp bài</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-button" onclick="closeDetailModal()">&times;</span>
+            <h3 id="detailModalTitle" style="color: #2980b9;">Chi Tiết Bài Tập</h3>
+
+            <div class="detail-section">
+                <p><strong>Bài tập:</strong> <span id="detailAssignmentName" class="detail-value"></span></p>
+                <p><strong>Khóa học:</strong> <span id="detailCourseName" class="detail-value"></span></p>
+                <p><strong>Trạng thái:</strong> <span id="detailStatus" class="detail-value"></span></p>
+            </div>
+
+            <div class="detail-section">
+                <h4>Mô tả</h4>
+                <div id="detailDescription" class="detail-value note-display"></div>
+            </div>
+
+            <div id="detailScoreSection" class="detail-section" style="display:none;">
+                <h4>Kết quả chấm điểm</h4>
+                <p><strong>Điểm đạt:</strong> <span id="detailScore" class="detail-value"></span></p>
+            </div>
+
+            <div id="detailTeacherNoteSection" class="detail-section" style="display:none;">
+                <h4>Ghi chú Giáo viên</h4>
+                <div id="detailTeacherNote" class="detail-value note-display teacher-note-highlight"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="closeDetailModal()" style="margin-top: 20px;">Đóng</button>
+        </div>
+    </div>
+
+    <div class="modal" id="feedbackModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nhận xét từ Giảng viên</h3>
+                <button class="close-btn" onclick="closeFeedbackModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="feedbackContent">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeFeedbackModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let assignmentData = [];
+
+        window.updateAssignments = function (jsonString) {
+            try {
+                assignmentData = JSON.parse(jsonString);
+                loadAssignments(assignmentData);
+            } catch (e) {
+                console.error("Lỗi khi parse dữ liệu bài tập từ C#:", e);
+                // Có thể hiển thị thông báo lỗi cho người dùng nếu cần
+            }
+        }
+        // ⭐ HÀM NỘP BÀI MỚI (CẦN TÊN KHÓA HỌC) ⭐
+        function submitAssignment(assignmentId) {
+            // Đảm bảo ID input file và textarea ghi chú của bạn đúng
+            const fileInput = document.getElementById('submissionFile');
+            const studentNoteElement = document.getElementById('studentNote');
+
+            // Giả sử assignmentData là mảng/object global đã được C# tải vào trang
+            // BẠN PHẢI ĐẢM BẢO assignmentData TỒN TẠI VÀ CÓ TRƯỜNG 'tenKhoaHoc'
+            const assignment = assignmentData.find(a => a.assignmentID == assignmentId);
+
+            if (!assignment) {
+                alert('Lỗi: Không tìm thấy bài tập (ID ' + assignmentId + ').');
+                return;
+            }
+
+            if (!fileInput || fileInput.files.length === 0) {
+                alert('Vui lòng chọn file để nộp bài.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            // Sử dụng hàm đóng modal của bạn
+            const closeModalFunc = typeof closeSubmitModal === 'function' ? closeSubmitModal : closeModal;
+
+            reader.onload = function (event) {
+                // Lấy Base64 string (loại bỏ phần header "data:mime/type;base64,")
+                const base64Data = event.target.result.split(',').pop();
+
+                // 1. TẠO ĐỐI TƯỢNG JSON VỚI ACTION VÀ DỮ LIỆU ĐẦY ĐỦ
+                const submissionData = {
+                    Action: "SUBMIT_ASSIGNMENT_SAVE_LOCAL", // ⭐ Action mà C# đang lắng nghe
+                    AssignmentID: assignmentId,
+                    FileName: file.name,
+                    FileBase64: base64Data,
+                    StudentNote: studentNoteElement ? studentNoteElement.value : "",
+                    CourseName: assignment.tenKhoaHoc // ⭐ Dữ liệu bắt buộc C# cần để tạo folder
+                };
+
+                const jsonString = JSON.stringify(submissionData);
+
+                // 2. Gửi thông điệp đến C#
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage(jsonString);
+
+                    closeModalFunc();
+                    alert(`Bài tập "${assignment.tenBaiTap}" đang được gửi... Vui lòng đợi thông báo xác nhận.`);
+
+                } else {
+                    alert('Lỗi: Ứng dụng không chạy trong môi trường WebView2. Không thể nộp file.');
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        // ⭐ HÀM PHẢN HỒI TỪ C# ⭐
+        // C# sẽ gọi hàm này sau khi lưu file và cập nhật DB để hiển thị kết quả cuối cùng
+        function handleSubmissionResponse(assignmentId, isSuccess, message) {
+            // Tùy chỉnh việc hiển thị kết quả và tải lại dữ liệu tại đây
+            if (isSuccess) {
+                alert("NỘP BÀI THÀNH CÔNG!\n" + message);
+                // Ví dụ: Gọi hàm điều hướng để tải lại trang danh sách bài tập
+                // navigateTo('ASSIGNMENT'); 
+            } else {
+                alert("NỘP BÀI THẤT BẠI!\n" + message);
+            }
+        }
+        function getBadgeClass(status) {
+            switch (status) {
+                case 'Đã chấm': return 'badge-success';
+                case 'Chờ chấm': return 'badge-warning';
+                case 'Chưa nộp': return 'badge-info';
+                case 'Quá hạn': return 'badge-danger';
+                default: return 'badge-info';
+            }
+        }
+
+        function renderAssignmentCard(assignment) {
+            const badgeClass = assignment.statusColor;
+            let infoDetails = '';
+            let actionButtons = '';
+            let scoreSection = '';
+            let teacherNoteButton = ''; // <-- THÊM: Biến lưu trữ nút Ghi chú
+            let HanNopDisplay = assignment.hanNopFormat;
+            let GiaoNgayDisplay = assignment.ngayGiaoFormat;
+
+            // Xử lý hiển thị điểm
+            if (assignment.diemDat !== null) {
+                scoreSection = `
+            <div class="score-display">
+                <div class="score-number">${assignment.diemDat}</div>
+                <div class="score-label">Điểm / <span style="font-weight: normal;">${assignment.diemToiDa}</span></div>
+            </div>
+        `;
+
+                // ⭐ LOGIC MỚI: TẠO NÚT GHI CHÚ GIÁO VIÊN ⭐
+                // Giả định thuộc tính ghi chú giáo viên là 'ghiChuGiaoVien'
+                if (assignment.nhanXetGiaoVien) {
+                    teacherNoteButton = `
+                <button class="btn btn-info" onclick="showTeacherNote('${assignment.assignmentID}')" style="background-color: #3498db; color: white; margin-right: 10px;">💬 Ghi chú Giáo viên</button>
+            `;
+                }
+            }
+
+            // Xử lý hiển thị chi tiết nộp/hạn nộp (Giữ nguyên)
+            if (assignment.ngayNopFormat) {
+                infoDetails += `
+            <div class="info-item">
+                <div class="info-label">Đã nộp:</div>
+                <div class="info-value">${assignment.ngayNopFormat} ${assignment.daNopTre ? '<span style="color: #c0392b;">(Nộp trễ)</span>' : ''}</div>
+            </div>
+        `;
+                // Nếu đã nộp, hiển thị Hạn nộp
+                infoDetails += `
+            <div class="info-item">
+                <div class="info-label">Hạn nộp:</div>
+                <div class="info-value">${HanNopDisplay}</div>
+            </div>
+        `;
+            } else {
+                // Nếu chưa nộp, hiển thị Thời gian còn lại và Hạn nộp
+                infoDetails += `
+            <div class="info-item">
+                <div class="info-label">${assignment.trangThai === 'Quá hạn' ? 'Đã quá hạn:' : 'Thời gian còn:'}</div>
+                <div class="info-value" style="color: ${assignment.trangThai === 'Quá hạn' ? '#c62828' : '#1976d2'};">${assignment.thoiGianConLai}</div>
+            </div>
+        `;
+                infoDetails += `
+            <div class="info-item">
+                <div class="info-label">Hạn nộp:</div>
+                <div class="info-value" style="color: ${assignment.trangThai === 'Quá hạn' ? '#c62828' : '#333'};">${HanNopDisplay}</div>
+            </div>
+        `;
+            }
+
+            // Xử lý nút hành động
+            if (assignment.diemDat !== null) {
+                // ⭐ SỬA ĐỔI: Đã chấm điểm, hiển thị Ghi chú (nếu có) và Xem chi tiết ⭐
+                actionButtons = `
+            ${teacherNoteButton}
+            <button class="btn btn-primary" onclick="openDetailModal('${assignment.assignmentID}')">👁️ Xem chi tiết</button>
+        `;
+            } else if (assignment.daHoanThanh) {
+                // Đã nộp, chờ chấm
+                actionButtons = `
+            <button class="btn btn-success" disabled>✅ Đã nộp</button>
+            <button class="btn btn-primary" onclick="openDetailModal(${assignment.assignmentID})">👁️ Xem bài nộp</button>
+        `;
+            } else {
+                // Chưa nộp / Quá hạn
+                actionButtons = `
+            <button class="btn btn-success" onclick="openSubmitModal(${assignment.assignmentID})">📤 Nộp bài</button>
+            <button class="btn btn-primary" onclick="openDetailModal(${assignment.assignmentID})">📋 Chi tiết</button>
+        `;
+            }
+
+            // ... (Phần HTML trả về - Giữ nguyên)
+            return `
+        <div class="assignment-card" data-assignment-id="${assignment.assignmentID}" data-course="${assignment.tenKhoaHoc}" data-status="${assignment.trangThai}">
+            <div class="assignment-header">
+                <div>
+                    <div class="assignment-title">${assignment.tenBaiTap}</div>
+                    <div class="assignment-course">📚 ${assignment.tenKhoaHoc}</div>
+                </div>
+                <span class="badge ${badgeClass}">${assignment.trangThai}</span>
+            </div>
+
+            ${scoreSection}
+
+            <div class="assignment-desc">
+                ${assignment.moTa}
+                ${assignment.taiLieuDinhKem ? `<a href="#" class="attachment-link" onclick="event.preventDefault(); alert('Đang tải tài liệu: ${assignment.taiLieuDinhKem}');">📎 Tải Tài liệu đính kèm</a>` : ''}
+            </div>
+
+            <div class="assignment-info">
+                <div class="info-item">
+                    <div class="info-label">Giao ngày:</div>
+                    <div class="info-value">${GiaoNgayDisplay}</div>
+                </div>
+                ${infoDetails}
+            </div>
+
+            <div class="assignment-actions">
+                ${actionButtons}
+            </div>
+        </div>
+    `;
+        }
+
+        function loadAssignments(data) {
+            const container = document.getElementById('assignmentsContainer');
+            container.innerHTML = data.map(renderAssignmentCard).join('');
+
+            populateCourseFilter(data);
+        }
+
+        function populateCourseFilter(data) {
+            const select = document.getElementById('courseFilter');
+            const courses = [...new Set(data.map(a => a.tenKhoaHoc))];
+
+            select.innerHTML = '<option value="">Tất cả khóa học</option>';
+
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course;
+                option.textContent = course;
+                select.appendChild(option);
+            });
+        }
+
+        function filterAssignments() {
+            const course = document.getElementById('courseFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const cards = document.querySelectorAll('.assignment-card');
+
+            cards.forEach(card => {
+                const cardCourse = card.getAttribute('data-course');
+                const cardStatus = card.getAttribute('data-status');
+
+                const courseMatch = !course || cardCourse === course;
+                const statusMatch = !status || cardStatus === status;
+
+                card.style.display = (courseMatch && statusMatch) ? 'block' : 'none';
+            });
+        }
+
+        function openSubmitModal(assignmentIdString) {
+            // ⭐ BƯỚC 1: GÁN ID NGAY LẬP TỨC CHO INPUT ẨN ⭐
+            document.getElementById('currentAssignmentId').value = assignmentIdString;
+
+            // Kiểm tra chuỗi bị lỗi từ C# (khi C# gửi null và nó bị stringify thành 'null')
+            if (assignmentIdString === 'null' || assignmentIdString === 'undefined' || !assignmentIdString) {
+                alert('Lỗi DỮ LIỆU C#: ID bài tập bị thiếu hoặc không phải là số. Vui lòng kiểm tra dữ liệu trả về từ C#.');
+                return;
+            }
+
+            // Chuyển chuỗi thành số để kiểm tra và tìm kiếm
+            const assignmentId = parseInt(assignmentIdString);
+
+            // Kiểm tra tính hợp lệ của ID sau khi parse (NaN)
+            if (isNaN(assignmentId)) {
+                // Lỗi này xảy ra khi chuỗi là NaN (ví dụ: 'abc')
+                alert('Lỗi nội bộ: ID bài tập không phải là số hợp lệ. Vui lòng tải lại trang.');
+                return;
+            }
+
+            const assignment = assignmentData.find(a => a.assignmentID === assignmentId);
+
+            if (assignment) {
+                document.getElementById('assignmentName').value = assignment.tenBaiTap;
+                document.getElementById('courseName').value = assignment.tenKhoaHoc;
+                document.getElementById('dueDate').value = assignment.hanNopFormat;
+                document.getElementById('studentNote').value = assignment.ghiChuSinhVien || '';
+            } else {
+                console.error('LỖI DỮ LIỆU: Không tìm thấy chi tiết bài tập trong assignmentData (ID: ' + assignmentId + ').');
+                document.getElementById('assignmentName').value = 'LỖI TẢI DỮ LIỆU';
+                document.getElementById('courseName').value = 'LỖI TẢI DỮ LIỆU';
+                document.getElementById('dueDate').value = '';
+                document.getElementById('studentNote').value = '';
+            }
+
+            document.getElementById('fileUpload').value = '';
+            document.getElementById('submitModal').classList.add('active');
+        }
+        // ⭐ HÀM MỚI: Mở modal nhận xét giáo viên ⭐
+        function openFeedbackModal(assignmentId) {
+            const assignment = assignmentData.find(a => a.assignmentID === assignmentId);
+            if (!assignment) return;
+
+            const feedbackContent = document.getElementById('feedbackContent');
+
+            let html = `
+                            <h4>Nhận xét bài tập: ${assignment.tenBaiTap}</h4>
+                            <hr style="margin: 10px 0;">
+                            <p><strong>Khóa học:</strong> ${assignment.tenKhoaHoc}</p>
+
+                            <br>
+
+                            <h5 style="margin-top: 15px;">💬 Nhận xét của Giảng viên:</h5>
+                            <div class="feedback-box" style="margin-top: 0;">
+                                <div class="feedback-text">${assignment.nhanXetGiaoVien || 'Giảng viên chưa gửi nhận xét chi tiết cho bài tập này.'}</div>
+                            </div>
+                        `;
+
+            feedbackContent.innerHTML = html;
+            document.getElementById('feedbackModal').classList.add('active');
+        }
+
+        // ⭐ HÀM MỚI: Đóng modal nhận xét ⭐
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').classList.remove('active');
+        }
+
+        // Hàm mở modal chi tiết bài tập (Dành cho Xem bài nộp và Chi tiết chung)
+        function openDetailModal(assignmentId) {
+            const assignment = assignmentData.find(a => a.assignmentID === assignmentId);
+            if (!assignment) return;
+
+            const detailContent = document.getElementById('detailContent');
+
+            // Xây dựng nội dung chi tiết
+            let html = `
+                            <h4>${assignment.tenBaiTap} - ${assignment.tenKhoaHoc}</h4>
+                            <hr style="margin: 10px 0;">
+                            <p><strong>Mô tả:</strong> ${assignment.moTa}</p>
+                            <p><strong>Hạn nộp:</strong> ${assignment.hanNopFormat}</p>
+                            <p><strong>Điểm tối đa:</strong> ${assignment.diemToiDa}</p>
+                            <p><strong>Trạng thái:</strong> <span class="badge ${assignment.statusColor}">${assignment.trangThai}</span></p>
+                            <br>
+                        `;
+
+            if (assignment.fileBaiNop) {
+                html += `
+                                <h5>📂 Thông tin bài nộp:</h5>
+                                <p><strong>File nộp:</strong> <a href="#" onclick="event.preventDefault(); alert('Tải file ${assignment.fileBaiNop}');">${assignment.fileBaiNop}</a></p>
+                                <p><strong>Ngày nộp:</strong> ${assignment.ngayNopFormat} ${assignment.daNopTre ? '(Nộp trễ)' : ''}</p>
+                                ${assignment.ghiChuSinhVien ? `<p><strong>Ghi chú:</strong> ${assignment.ghiChuSinhVien}</p>` : ''}
+                            `;
+            } else {
+                html += `<p><strong>Trạng thái nộp:</strong> Chưa có bài nộp.</p>`;
+            }
+
+            if (assignment.diemDat !== null) {
+                html += `
+                                <h5 style="margin-top: 15px;">💯 Kết quả:</h5>
+                                <div class="score-display" style="background: #e8f5e9; border: 1px solid #4CAF50;">
+                                    <div class="score-number" style="color: #4CAF50;">${assignment.diemDat}</div>
+                                    <div class="score-label">Điểm đạt / ${assignment.diemToiDa}</div>
+                                </div>
+                            `;
+                // Vẫn hiển thị nhận xét trong modal chi tiết nếu có
+                if (assignment.nhanXetGiaoVien) {
+                    html += `
+                                    <h5 style="margin-top: 15px;">💬 Nhận xét của Giảng viên (Chi tiết):</h5>
+                                    <div class="feedback-box">
+                                        <div class="feedback-text">${assignment.nhanXetGiaoVien}</div>
+                                    </div>
+                                `;
+                }
+            }
+
+            detailContent.innerHTML = html;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function submitAssignment() {
+            console.log('1. CLICK EVENT ĐÃ ĐƯỢC KÍCH HOẠT. BẮT ĐẦU KIỂM TRA ĐIỀU KIỆN.');
+
+            // Đọc giá trị từ input (đây là chuỗi, có thể là "" nếu chưa được gán)
+            const assignmentIdString = document.getElementById('currentAssignmentId').value;
+            const fileInput = document.getElementById('fileUpload').files[0];
+            const studentNote = document.getElementById('studentNote').value;
+
+            // Chuyển chuỗi ID thành số và kiểm tra tính hợp lệ
+            const assignmentId = parseInt(assignmentIdString);
+
+            console.log('DEBUG: AssignmentID từ input (string):', assignmentIdString);
+            console.log('DEBUG: AssignmentID đã parse (number):', assignmentId);
+
+            // ⭐ BƯỚC KHẮC PHỤC: KIỂM TRA ID HỢP LỆ (Không phải NaN hoặc chuỗi rỗng) ⭐
+            if (isNaN(assignmentId) || !assignmentIdString) {
+                console.error('2. DỪNG: ID bài tập không hợp lệ (NaN/Empty). Quá trình gán ID bị lỗi.');
+                alert('Lỗi: Không tìm thấy ID bài tập. Vui lòng mở lại modal thông qua nút "Nộp bài" trên thẻ bài tập.');
+                closeModal();
+                return;
+            }
+
+            // Tìm đối tượng bài tập bằng ID đã parse
+            const index = assignmentData.findIndex(a => a.assignmentID === assignmentId);
+            const assignment = assignmentData[index];
+
+            console.log('DEBUG: Assignment Object:', assignment);
+
+            // Kiểm tra đối tượng bài tập có tồn tại không
+            if (!assignment) {
+                console.error('2. DỪNG: Không tìm thấy đối tượng bài tập trong assignmentData.');
+                alert('Lỗi: Không tìm thấy chi tiết bài tập trong dữ liệu hệ thống. Vui lòng tải lại trang.');
+                closeModal();
+                return;
+            }
+
+            // 1. Logic chặn quá hạn (Bây giờ đã chắc chắn có đối tượng assignment)
+            if (assignment.trangThai === 'Quá hạn') {
+                console.log('2. DỪNG: Bài tập đã quá hạn.');
+                alert(`Bài tập "${assignment.tenBaiTap}" đã quá hạn nộp (${assignment.hanNopFormat}).\n\nHệ thống đã khóa chức năng nộp bài. Vui lòng liên hệ Giảng viên để được hỗ trợ.`);
+                closeModal();
+                return;
+            }
+
+            if (!fileInput) {
+                console.log('2. DỪNG: Thiếu file bài nộp.');
+                alert('Vui lòng chọn file bài nộp.');
+                return;
+            }
+
+            if (!(window.chrome && window.chrome.webview)) {
+                console.log('3. DỪNG: Môi trường không phải WebView2.');
+                alert('Lỗi: Chức năng nộp bài chỉ hoạt động trong môi trường ứng dụng (WebView2).');
+                return;
+            }
+
+            console.log('4. THÀNH CÔNG: Đã vượt qua mọi kiểm tra. Bắt đầu đọc file...');
+            // ⭐ BẮT ĐẦU ĐỌC FILE VÀ CHUYỂN THÀNH BASE64 ⭐
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const base64Content = e.target.result.split(',')[1];
+                const submitTime = new Date().toISOString();
+
+                // ⭐ BƯỚC 1: GỬI DỮ LIỆU ĐỂ C# LƯU FILE VÀ TẠO ĐƯỜNG DẪN SQL ⭐
+                const submissionData = {
+                    Action: "SUBMIT_ASSIGNMENT_SAVE_LOCAL",
+                    AssignmentID: assignmentId, // Dùng biến số đã parse
+                    FileName: fileInput.name,
+                    FileBase64: base64Content,
+                    StudentNote: studentNote,
+                    SubmissionTime: submitTime,
+                    CourseName: assignment.tenKhoaHoc,
+                    // ⭐ ĐƯỜNG DẪN GỐC CẦN LƯU (C# sẽ xử lý) ⭐
+                    RootPath: "C:\\Submissions\\"
+                };
+
+                // Gửi JSON chứa Base64 và các thông tin cần thiết sang C#
+                window.chrome.webview.postMessage(JSON.stringify(submissionData));
+
+                // Giả lập cập nhật trạng thái FE và thông báo
+                if (index !== -1) {
+                    assignmentData[index].trangThai = 'Chờ chấm';
+                    assignmentData[index].statusColor = 'badge-warning';
+                    assignmentData[index].daHoanThanh = true;
+                    assignmentData[index].ngayNopFormat = new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                    assignmentData[index].fileBaiNop = fileInput.name;
+                    assignmentData[index].ghiChuSinhVien = studentNote;
+
+                    // ⭐ GIẢ LẬP ĐƯỜNG DẪN MÀ C# SẼ LƯU ⭐
+                    const estimatedPath = `C:\\Submissions\\${assignment.tenKhoaHoc}\\${assignment.tenBaiTap}_${fileInput.name}`;
+                    console.log(`[FE Estimation] C# sẽ lưu file tại: ${estimatedPath}`);
+                }
+
+                alert(`Nộp bài thành công!\n\nBài tập "${assignment.tenBaiTap}" đã được gửi đến giảng viên. C# đang xử lý lưu file cục bộ tại thư mục C:\\Submissions\\...`);
+                closeModal();
+                loadAssignments(assignmentData);
+            };
+
+            reader.readAsDataURL(fileInput);
+        }
+        function uploadFileToServer(file) {
+            return new Promise((resolve, reject) => {
+                // Giả lập một độ trễ 1 giây cho quá trình upload
+                setTimeout(() => {
+                    if (file.name.includes('error')) {
+                        reject('Upload failed for simulated error file.');
+                    } else {
+                        // Tạo một URL giả lập cho file
+                        const fileUrl = `https://storage.example.com/assignments/${Date.now()}_${file.name}`;
+                        resolve({
+                            fileUrl: fileUrl,
+                            fileName: file.name
+                        });
+                    }
+                }, 1000); // Đợi 1 giây
+            });
+        }
+        // Hàm mới để hiển thị ghi chú của giáo viên
+        function showTeacherNote(assignmentIdString) {
+            const assignmentId = parseInt(assignmentIdString);
+            const assignment = assignmentData.find(a => a.assignmentID === assignmentId);
+
+            if (assignment && assignment.nhanXetGiaoVien) {
+                // Sử dụng alert để hiển thị ghi chú
+                alert(`Ghi chú của Giáo viên cho bài tập "${assignment.tenBaiTap}":\n\n${assignment.nhanXetGiaoVien}`);
+            } else if (assignment) {
+                alert(`Bài tập "${assignment.tenBaiTap}" chưa có ghi chú từ giáo viên.`);
+            } else {
+                alert('Lỗi: Không tìm thấy bài tập này.');
+            }
+        }
+        // ⭐ HÀM MỚI: Xử lý hiển thị chi tiết bài tập ⭐
+        function openDetailModal(assignmentIdString) {
+            const assignmentId = parseInt(assignmentIdString);
+            // Tìm đối tượng bài tập trong mảng assignmentData
+            const assignment = assignmentData.find(a => a.assignmentID === assignmentId);
+
+            if (assignment) {
+                let details = `
+            Tên bài tập: ${assignment.tenBaiTap}
+            Khóa học: ${assignment.tenKhoaHoc}
+            Hạn nộp: ${assignment.hanNopFormat}
+            Trạng thái: ${assignment.trangThai}
+            
+            --- Mô tả Chi tiết ---
+            ${assignment.moTa || 'Không có mô tả.'}
+        `;
+
+                // 1. Kiểm tra và thêm thông tin kết quả (điểm và ghi chú)
+                if (assignment.diemDat !== null) {
+                    details += `
+                
+                --- Kết quả chấm điểm ---
+                Điểm đạt: ${assignment.diemDat} / ${assignment.diemToiDa}
+            `;
+
+                    // 2. Trả lời câu hỏi của bạn: Ghi chú Giáo viên
+                    // Thuộc tính ghi chú giáo viên là 'ghiChuGiaoVien'
+                    if (assignment.nhanXetGiaoVien) {
+                        details += `
+                Nhận xet Giáo viên: ${assignment.nhanXetGiaoVien}`;
+                    } else {
+                        details += `
+                Nhận xét Giáo viên: Không có.`;
+                    }
+                } else if (assignment.daHoanThanh) {
+                    details += `
+            
+            Bài tập đã được nộp vào: ${assignment.ngayNopFormat}. Đang chờ giáo viên chấm điểm.`;
+                }
+
+                // Hiện chi tiết bài tập bằng hộp thoại đơn giản (alert)
+                alert("CHI TIẾT BÀI TẬP\n\n" + details);
+
+                // Lưu ý: Nếu bạn muốn hiển thị chi tiết trong một Modal đẹp mắt, 
+                // bạn cần tạo thêm mã HTML cho modal đó (ví dụ: <div id="detailModal" class="modal">...) 
+                // và thay thế alert() bằng code hiển thị modal.
+
+            } else {
+                alert('Lỗi: Không tìm thấy chi tiết bài tập này.');
+            }
+        }
+        // Hàm đóng Modal chi tiết
+        function closeModal() {
+            console.log("hello")
+            document.getElementById('submitModal').classList.remove('active');
+        }
+       
+        // Hàm mở Modal Chi Tiết Bài Tập (Đã sửa lỗi tên thuộc tính và dùng Modal)
+        function openDetailModal(assignmentIdString, highlightNote = false) {
+            const assignmentId = parseInt(assignmentIdString);
+            const assignment = assignmentData.find(a => a.assignmentID === assignmentId);
+
+            if (!assignment) {
+                alert('Lỗi: Không tìm thấy chi tiết bài tập này.');
+                return;
+            }
+
+            // ⭐ Đổ dữ liệu vào Modal ⭐
+            document.getElementById('detailAssignmentName').textContent = assignment.tenBaiTap;
+            document.getElementById('detailCourseName').textContent = assignment.tenKhoaHoc;
+            document.getElementById('detailStatus').textContent = assignment.trangThai;
+            document.getElementById('detailDescription').innerHTML = assignment.moTa || 'Không có mô tả chi tiết.';
+
+            const scoreSection = document.getElementById('detailScoreSection');
+            const teacherNoteSection = document.getElementById('detailTeacherNoteSection');
+            const detailTeacherNote = document.getElementById('detailTeacherNote');
+
+            // Xử lý phần điểm và ghi chú (diemDat !== null)
+            if (assignment.diemDat !== null) {
+                scoreSection.style.display = 'block';
+                document.getElementById('detailScore').textContent = `${assignment.diemDat} / ${assignment.diemToiDa}`;
+
+                // Kiểm tra Ghi chú Giáo viên (Dùng NhanXetGiaoVien)
+                if (assignment.NhanXetGiaoVien) {
+                    teacherNoteSection.style.display = 'block';
+                    detailTeacherNote.innerHTML = assignment.NhanXetGiaoVien;
+                } else {
+                    teacherNoteSection.style.display = 'none';
+                }
+            } else {
+                scoreSection.style.display = 'none';
+                teacherNoteSection.style.display = 'none';
+            }
+
+            // Hiển thị Modal
+            document.getElementById('detailModal').classList.add('active');
+
+            // ⭐ Logic cuộn (nếu được gọi từ nút Ghi chú Giáo viên) ⭐
+            if (highlightNote) {
+                setTimeout(() => {
+                    teacherNoteSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    detailTeacherNote.classList.add('highlight-pulse'); // Thêm hiệu ứng nhấp nháy (cần CSS)
+                    setTimeout(() => {
+                        detailTeacherNote.classList.remove('highlight-pulse');
+                    }, 1500);
+                }, 100);
+            }
+        }
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage("LOGOUT");
+                } else {
+                    alert("Chức năng đăng xuất chỉ hoạt động trong môi trường WebView2.");
+                }
+            }
+        }
+        // Hàm: Gửi tin nhắn điều hướng đến C# (Giữ nguyên)
+        function navigateTo(page) {
+            window.chrome.webview.postMessage(page);
+        }
+
+        // Hàm: Đăng xuất (Giữ nguyên)
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                window.chrome.webview.postMessage("LOGOUT");
+            }
+        }
+        function navigateToAssignment() {
+            if (window.chrome && window.chrome.webview) {
+                // Gửi thông điệp "ASSIGNMENT" về C#
+                window.chrome.webview.postMessage("ASSIGNMENT");
+            }
+        }
+    </script>
+</body>
+</html>
