@@ -309,11 +309,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Business\Student\DataProcess.cs" />
-    <Compile Include="Model\AssignmentViewModel.cs" />
-    <Compile Include="Model\GradesDataAccess.cs" />
-    <Compile Include="Model\StudentSession.cs" />
-    <Compile Include="Model\StudentContent.cs" />
-    <Compile Include="Model\StudentCourseViewModel.cs" />
+    <Compile Include="Model\StudentsModel\AssignmentViewModel.cs" />
+    <Compile Include="Model\StudentsModel\GradesDataAccess.cs" />
+    <Compile Include="Model\StudentsModel\StudentSession.cs" />
+    <Compile Include="Model\StudentsModel\StudentContent.cs" />
+    <Compile Include="Model\StudentsModel\StudentCourseViewModel.cs" />
     <Compile Include="Views\Login\Login.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -399,7 +399,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Data\" />
     <Folder Include="Resource\submit\" />
   </ItemGroup>
   <ItemGroup>
