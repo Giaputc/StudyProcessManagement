@@ -9,7 +9,7 @@ namespace StudyProcessManagement.Business.Admin
 {
     public class DashboardService
     {
-        private  DataProcess dataProcess = new DataProcess();
+        private  DataProcessDAL dataProcess = new DataProcessDAL();
         public Dictionary<string, int> GetDashboardStatus()
         {
             var stats = new Dictionary<string, int>();

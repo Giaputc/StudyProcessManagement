@@ -6,7 +6,7 @@ namespace StudyProcessManagement.Business.Admin
 {
     public class ContentService
     {
-        private DataProcess dataProcess = new DataProcess();
+        private DataProcessDAL dataProcess = new DataProcessDAL();
 
         // Lấy Chương
         public DataTable GetSections(string courseId)

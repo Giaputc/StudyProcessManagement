@@ -7,12 +7,12 @@ namespace StudyProcessManagement.Business.Teacher
 {
     public class GradeSubmissionFormService
     {
-        private DataProcess dataProcess;
+        private DataProcessDAL dataProcess;
 
         public GradeSubmissionFormService()
         {
             // Khởi tạo đúng biến dataProcess
-            dataProcess = new DataProcess();
+            dataProcess = new DataProcessDAL();
         }
 
         public DataTable GetSubmissionDetails(string submissionID)

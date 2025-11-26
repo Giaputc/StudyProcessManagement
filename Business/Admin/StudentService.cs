@@ -8,7 +8,7 @@ namespace StudyProcessManagement.Business.Admin
 {
     public class StudentService
     {
-        private DataProcess dataProcess = new DataProcess();
+        private DataProcessDAL dataProcess = new DataProcessDAL();
 
         // Hàm lấy danh sách Student THẬT
         public List<Users> GetAllStudents(string keyword = "")

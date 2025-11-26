@@ -7,11 +7,11 @@ namespace StudyProcessManagement.Business.Teacher
 {
     public class GradingService
     {
-        private DataProcess dataProcess;
+        private DataProcessDAL dataProcess;
 
         public GradingService()
         {
-            dataProcess = new DataProcess();
+            dataProcess = new DataProcessDAL();
         }
 
         /// <summary>

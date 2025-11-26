@@ -7,7 +7,7 @@ namespace StudyProcessManagement.Business.Admin
 {
     public class TeacherService
     {
-        private DataProcess dataProcess = new DataProcess();
+        private DataProcessDAL dataProcess = new DataProcessDAL();
 
         public List<Users> GetAllTeachers(string keyword = "")
         {

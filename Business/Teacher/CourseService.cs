@@ -6,11 +6,11 @@ namespace StudyProcessManagement.Business.Teacher
 {
     public class CourseService
     {
-        private DataProcess dataProcess;
+        private DataProcessDAL dataProcess;
 
         public CourseService()
         {
-            dataProcess = new DataProcess();
+            dataProcess = new DataProcessDAL();
         }
 
         // =============================================

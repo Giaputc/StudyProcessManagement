@@ -6,11 +6,11 @@ namespace StudyProcessManagement.Business.Teacher
 {
     public class AssignmentService
     {
-        private DataProcess dataProcess;
+        private DataProcessDAL dataProcess;
 
         public AssignmentService()
         {
-            dataProcess = new DataProcess();
+            dataProcess = new DataProcessDAL();
         }
 
         // Lấy danh sách khóa học của giáo viên

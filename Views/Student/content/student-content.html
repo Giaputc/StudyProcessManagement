@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài Nguyên Học Tập Của Tôi</title>
+    <style>
+        /* CSS gốc của bạn đã được đưa vào đây */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 250px; background: #2c3e50; color: white; display: flex; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .sidebar-header { padding: 20px; background: #34495e; text-align: center; border-bottom: 1px solid #465a6d; }
+        .sidebar-header h2 { font-size: 18px; margin-bottom: 5px; }
+        .sidebar-header p { font-size: 12px; color: #95a5a6; }
+        .sidebar-menu { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .menu-section { margin-bottom: 20px; }
+        .menu-title { padding: 10px 20px; font-size: 11px; color: #95a5a6; text-transform: uppercase; font-weight: 600; }
+        .menu-item { padding: 12px 20px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; color: #ecf0f1; font-size: 14px; }
+        .menu-item:hover { background: #34495e; border-left: 3px solid #3498db; }
+        .menu-item.active { background: #34495e; border-left: 3px solid #3498db; }
+        .sidebar-footer { padding: 15px 20px; background: #34495e; border-top: 1px solid #465a6d; }
+        .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .user-avatar { width: 35px; height: 35px; background: #3498db; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .user-details { flex: 1; }
+        .user-name { font-size: 13px; font-weight: 600; }
+        .user-role { font-size: 11px; color: #95a5a6; }
+        .btn-logout { width: 100%; padding: 8px; background: #e74c3c; border: none; border-radius: 4px; color: white; font-size: 13px; cursor: pointer; font-weight: 600; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { background: white; padding: 15px 25px; border-bottom: 1px solid #ddd; }
+        .topbar h1 { font-size: 20px; color: #333; margin-bottom: 5px; }
+        .breadcrumb { font-size: 13px; color: #666; }
+        .content-area { flex: 1; overflow-y: auto; padding: 25px; }
+        .profile-container { max-width: 1200px; margin: 0 auto; }
+        .info-card { background: white; border-radius: 8px; padding: 25px; border: 1px solid #e0e0e0; margin-bottom: 20px; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #e8f5e9; color: #2e7d32; }
+        .badge-danger { background: #ffebee; color: #c62828; }
+        .badge-warning { background: #fff3e0; color: #f57c00; }
+        .badge-info { background: #e3f2fd; color: #1e88e5; }
+        .badge-primary { background: #e1f5fe; color: #039be5; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 600; text-align: center; }
+        .btn-primary { background: #3498db; color: white; }
+        /* NEW STYLES for Resource Page */
+        .resource-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .resource-controls select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        .resource-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .resource-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+            border-left: 5px solid;
+            display: flex;
+            flex-direction: column;
+        }
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        .resource-lesson { border-left-color: #3498db; }
+        .resource-assignment { border-left-color: #e67e22; }
+
+        .resource-body {
+            padding: 15px;
+            flex-grow: 1;
+        }
+        .resource-type {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .resource-card h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .resource-chapter, .resource-course {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .resource-description {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 10px;
+            height: 40px; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .resource-footer {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fcfcfc;
+        }
+        .resource-date {
+            font-size: 11px;
+            color: #999;
+        }
+        .action-button {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-view { background: #2ecc71; color: white; }
+        .btn-view:hover { background: #27ae60; }
+        
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>🎓 LMS Student</h2>
+            <p>Learning Management System</p>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-title">TỔNG QUAN</div>
+
+                <div class="menu-item" onclick="navigateTo('INFORMATION')">
+                    <span>👤</span>
+                    <span>Thông tin cá nhân</span>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">HỌC TẬP</div>
+
+                <div class="menu-item" onclick="location.href='../courses/student-my-courses.html'">
+                    <span>📚</span>
+                    <span>Khóa học của tôi</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">BÀI TẬP & KIỂM TRA</div>
+                <div class="menu-item" onclick="navigateToAssignment()">
+                    <span>📝</span>
+                    <span>Bài tập</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KẾT QUẢ</div>
+
+                <div class="menu-item" onclick="navigateTo('GRADES')">
+                    <span>🏆</span>
+                    <span>Điểm số</span>
+                </div>
+
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">KHÁC</div>
+                <div class="menu-item" onclick="navigateTo('CONTENT')">
+                    <span>📁</span>
+                    <span>Tài nguyên</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">S</div>
+                <div class="user-details">
+                    <div class="user-name">Student</div>
+                    <div class="user-role">Học viên</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h1>Tất Cả Tài Nguyên Học Tập</h1>
+            <div class="breadcrumb">Trang chủ / Học tập / Tài nguyên học tập</div>
+        </div>
+
+        <div class="content-area">
+            <div class="profile-container">
+                
+                <div class="resource-controls">
+                    <div>
+                        <label for="filterCourse">Khóa học:</label>
+                        <select id="filterCourse" onchange="filterResources()">
+                            <option value="">Tất cả Khóa học</option>
+                            </select>
+                    </div>
+                    <div>
+                        <label for="filterType">Loại Tài nguyên:</label>
+                        <select id="filterType" onchange="filterResources()">
+                            <option value="">Tất cả Loại</option>
+                            <option value="Lesson">Bài học</option>
+                            <option value="Assignment">Bài tập</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filterStatus">Trạng thái:</label>
+                        <select id="filterStatus" onchange="filterResources()">
+                            <option value="">Tất cả Trạng thái</option>
+                            <option value="Hoàn thành">Hoàn thành</option>
+                            <option value="Chưa bắt đầu">Chưa bắt đầu</option>
+                            <option value="Đang làm">Đang làm</option>
+                            <option value="Chưa nộp">Chưa nộp</option>
+                            <option value="Đã nộp">Đã nộp</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="resource-list" id="jsResourceList">
+                    <div style="text-align: center; padding: 50px; color: #999;">Đang tải tài nguyên...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MÔ PHỎNG DỮ LIỆU StudentContent từ C#
+        let allResources = [];
+
+        // ⭐ HÀM NHẬN DỮ LIỆU TỪ C# VÀ HIỂN THỊ LÊN FE ⭐
+        window.renderResources = function (jsonString) {
+            try {
+                const data = JSON.parse(jsonString);
+                allResources = data;
+
+                // Sắp xếp theo thứ tự học tập: CourseID > ThuTuChuong > ThuTu
+                data.sort((a, b) => {
+                    if (a.CourseID !== b.CourseID) return a.CourseID - b.CourseID;
+                    if (a.ThuTuChuong !== b.ThuTuChuong) return a.ThuTuChuong - b.ThuTuChuong;
+                    return a.ThuTu - b.ThuTu;
+                });
+
+                loadCourseOptions(allResources);
+
+                const listContainer = document.getElementById('jsResourceList');
+                if (!data || data.length === 0) {
+                    listContainer.innerHTML = '<div style="text-align: center; padding: 50px; color: #999;">Không tìm thấy tài nguyên nào.</div>';
+                    return;
+                }
+
+                listContainer.innerHTML = data.map(renderResourceCard).join('');
+
+            } catch (e) {
+                console.error("Lỗi khi phân tích JSON từ C#:", e);
+                document.getElementById('jsResourceList').innerHTML = '<div style="text-align: center; padding: 50px; color: red;">Lỗi tải dữ liệu. Vui lòng thử lại.</div>';
+            }
+        };
+
+        // Hàm tải các tùy chọn Khóa học vào bộ lọc (Giữ nguyên)
+        function loadCourseOptions(resources) {
+            const courseSelect = document.getElementById('filterCourse');
+            courseSelect.innerHTML = '<option value="">Tất cả Khóa học</option>';
+
+            const uniqueCoursesMap = new Map();
+            resources.forEach(r => {
+                if (!uniqueCoursesMap.has(r.CourseID)) {
+                    uniqueCoursesMap.set(r.CourseID, r.TenKhoaHoc);
+                }
+            });
+
+            uniqueCoursesMap.forEach((name, id) => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = name;
+                courseSelect.appendChild(option);
+            });
+        }
+
+        // ⭐ SỬA ĐỔI QUAN TRỌNG: Gửi ResourceID, Type và Action về C# ⭐
+        function renderResourceCard(resource) {
+            const isLesson = resource.LoaiTaiNguyen === 'Lesson';
+            let badgeClass, statusText, actionText;
+
+            // 1. Xác định nút hành động
+            switch (resource.TrangThai) {
+                case 'Hoàn thành':
+                    badgeClass = 'badge-success';
+                    statusText = 'Hoàn thành';
+                    actionText = 'Xem lại';
+                    break;
+                case 'Đang học':
+                case 'Đang làm':
+                    badgeClass = 'badge-warning';
+                    statusText = resource.TrangThai;
+                    actionText = 'Tiếp tục';
+                    break;
+                case 'Đã nộp':
+                    badgeClass = 'badge-info';
+                    statusText = 'Đã nộp';
+                    actionText = 'Chi tiết';
+                    break;
+                case 'Chưa nộp':
+                    badgeClass = 'badge-danger';
+                    statusText = 'Chưa nộp';
+                    actionText = 'Nộp bài'; // Đổi thành Nộp bài cho Assignment
+                    break;
+                case 'Chưa bắt đầu':
+                default:
+                    badgeClass = 'badge-primary';
+                    statusText = 'Chưa bắt đầu';
+                    actionText = 'Bắt đầu';
+                    break;
+            }
+
+            const resourceDate = resource.NgayDang ? new Date(resource.NgayDang).toLocaleDateString('vi-VN') : 'N/A';
+            const dateLabel = isLesson ? 'Ngày đăng' : 'Hạn nộp:';
+            const typeLabel = isLesson ? 'Bài học' : 'Bài tập';
+            const typeEmoji = isLesson ? '📖' : '📝';
+
+            // Xác định hành động (Action) sẽ gửi đi: VIEW_LESSON hoặc VIEW_ASSIGNMENT
+            const action = isLesson ? 'VIEW_LESSON' : 'VIEW_ASSIGNMENT';
+
+            return `
+            <div class="resource-card resource-${isLesson ? 'lesson' : 'assignment'}">
+                <div class="resource-body">
+                    <div class="resource-type">${typeEmoji} ${typeLabel} <span class="badge ${badgeClass}">${statusText}</span></div>
+                    <h4>${resource.TenTaiNguyen}</h4>
+                    <span class="resource-course">Khóa học: ${resource.TenKhoaHoc}</span>
+                    <span class="resource-chapter">Chương: ${resource.TenChuong || 'Chưa xác định'}</span>
+                    <p class="resource-description">${resource.MoTa || 'Không có mô tả.'}</p>
+                </div>
+                <div class="resource-footer">
+                    <div class="resource-date"> </div>
+                    <button class="action-button btn-view" 
+                        onclick="viewResource('${action}', ${resource.ResourceID})">
+                        ${actionText}
+                    </button>
+                </div>
+            </div>
+        `;
+        }
+
+        // Hàm lọc tài nguyên (Giữ nguyên)
+        function filterResources() {
+            const courseId = document.getElementById('filterCourse').value;
+            const type = document.getElementById('filterType').value;
+            const status = document.getElementById('filterStatus').value;
+
+            const filteredData = allResources.filter(r => {
+                const matchCourse = courseId === "" || r.CourseID.toString() === courseId;
+                const matchType = type === "" || r.LoaiTaiNguyen === type;
+                const matchStatus = status === "" || r.TrangThai === status;
+                return matchCourse && matchType && matchStatus;
+            });
+
+            const listContainer = document.getElementById('jsResourceList');
+            if (!filteredData || filteredData.length === 0) {
+                listContainer.innerHTML = '<div style="text-align: center; padding: 50px; color: #999;">Không tìm thấy tài nguyên nào phù hợp với bộ lọc.</div>';
+                return;
+            }
+
+            listContainer.innerHTML = filteredData.map(renderResourceCard).join('');
+        }
+
+        // Gán hàm filterResources vào sự kiện onchange của các thẻ select
+        document.getElementById('filterCourse').onchange = filterResources;
+        document.getElementById('filterType').onchange = filterResources;
+        document.getElementById('filterStatus').onchange = filterResources;
+
+        // ⭐ SỬA ĐỔI QUAN TRỌNG: Gửi thông tin về C# để C# mở URL ⭐
+        function viewResource(action, resourceId) {
+            // 1. Tìm resource trong mảng toàn cục
+            const resource = allResources.find(r => r.ResourceID === resourceId);
+
+            if (!resource) {
+                alert(`Lỗi: Không tìm thấy tài nguyên ID ${resourceId}`);
+                return;
+            }
+
+            // 2. Xử lý logic Lesson/Assignment
+            if (action === 'VIEW_LESSON') {
+                // Đối với Bài học, ưu tiên LinkVideo (YouTube), nếu không có, dùng LinkTaiLieu
+                const urlToOpen = resource.LinkVideo || resource.LinkTaiLieu;
+
+                if (urlToOpen) {
+                    // Gửi Action URL và URL về C#
+                    if (window.chrome && window.chrome.webview) {
+                        window.chrome.webview.postMessage(JSON.stringify({
+                            Action: "OPEN_URL",
+                            URL: urlToOpen,
+                            ResourceType: "Lesson"
+                        }));
+                    } else {
+                        console.warn(`Mở Bài học: ${urlToOpen}`);
+                        window.open(urlToOpen, '_blank');
+                    }
+                } else {
+                    alert("Bài học này chưa có tài nguyên liên kết.");
+                }
+            }
+            else if (action === 'VIEW_ASSIGNMENT') {
+                // Đối với Bài tập, gửi yêu cầu về C# để mở Form Assignment
+                if (window.chrome && window.chrome.webview) {
+                    // Gửi Action Assignment và ID bài tập về C#
+                    window.chrome.webview.postMessage(JSON.stringify({
+                        Action: "OPEN_ASSIGNMENT_DETAIL",
+                        AssignmentID: resourceId
+                    }));
+                } else {
+                    alert(`Mở chi tiết/Form nộp Bài tập ID ${resourceId}`);
+                }
+            }
+        }
+
+        // CÁC HÀM POSTMESSAGE GỐC (Giữ nguyên)
+        function logout() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage("LOGOUT");
+            } else {
+                console.warn("Đăng xuất (Web mode)");
+            }
+        }
+        function navigateTo(target) {
+            if (window.chrome && window.chrome.webview) {
+                if (target.includes("student-discover.html")) window.chrome.webview.postMessage("DISCOVER");
+                else window.chrome.webview.postMessage(target.split('/').pop().split('-').pop().replace('.html', '').toUpperCase());
+            } else {
+                console.warn(`Điều hướng tới: ${target} (Web mode)`);
+            }
+        }
+        function navigateToAssignment() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage("ASSIGNMENT");
+            } else {
+                console.warn("Điều hướng tới Bài tập (Web mode)");
+            }
+        }
+        
+        // CÁC HÀM POSTMESSAGE GỐC
+        // Hàm: Gửi tin nhắn điều hướng đến C# (Giữ nguyên)
+        function navigateTo(page) {
+            window.chrome.webview.postMessage(page);
+        }
+
+        // Hàm: Đăng xuất (Giữ nguyên)
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                window.chrome.webview.postMessage("LOGOUT");
+            }
+        }
+        function navigateToAssignment() {
+            if (window.chrome && window.chrome.webview) {
+                // Gửi thông điệp "ASSIGNMENT" về C#
+                window.chrome.webview.postMessage("ASSIGNMENT");
+            }
+        }
+        function navigateToAssignment() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage("ASSIGNMENT");
+            } else {
+                console.warn("Điều hướng tới Bài tập (Web mode)");
+            }
+        }
+    </script>
+</body>
+</html>

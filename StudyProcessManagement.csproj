@@ -12,6 +12,8 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -65,6 +67,19 @@
       <HintPath>packages\Microsoft.IdentityModel.Tokens.8.15.0\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.3595.46, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Web.WebView2.1.0.3595.46\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.DevToolsProtocolExtension, Version=1.0.2901.0, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Web.WebView2.DevToolsProtocolExtension.1.0.2901\lib\net462\Microsoft.Web.WebView2.DevToolsProtocolExtension.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.3595.46, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Web.WebView2.1.0.3595.46\lib\net462\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.3595.46, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Web.WebView2.1.0.3595.46\lib\net462\Microsoft.Web.WebView2.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.dll</HintPath>
     </Reference>
@@ -333,6 +348,7 @@
     <Compile Include="Business\Admin\CourseService.cs" />
     <Compile Include="Business\Admin\DashboardService.cs" />
     <Compile Include="Business\DataProcess.cs" />
+    <Compile Include="Business\Student\DataProcessDAL.cs" />
     <Compile Include="Business\Teacher\AssignmentFormService.cs" />
     <Compile Include="Business\Teacher\AssignmentService.cs" />
     <Compile Include="Business\Teacher\CourseContentService.cs" />
@@ -348,6 +364,11 @@
     <Compile Include="Business\Admin\StudentService.cs" />
     <Compile Include="Business\Admin\TeacherService.cs" />
     <Compile Include="Business\Admin\UserService.cs" />
+    <Compile Include="Models\StudentsModel\AssignmentViewModel.cs" />
+    <Compile Include="Models\StudentsModel\GradesDataAccess.cs" />
+    <Compile Include="Models\StudentsModel\StudentContent.cs" />
+    <Compile Include="Models\StudentsModel\StudentCourseViewModel.cs" />
+    <Compile Include="Models\StudentsModel\StudentSession.cs" />
     <!-- Từ Teacher-final: DataSet -->
     <Compile Include="StudyProcessDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -405,12 +426,6 @@
       <DependentUpon>UserManagement.cs</DependentUpon>
     </Compile>
     <!-- Từ Master & Teacher: Forms Chung & Teacher UI -->
-    <Compile Include="Views\Login\Login.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Views\Login\Login.Designer.cs">
-      <DependentUpon>Login.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\Admin\MainForm.cs">
@@ -418,6 +433,42 @@
     </Compile>
     <Compile Include="Views\Admin\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Login\Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Login\Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Student\content\student-content.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Student\content\student-content.Designer.cs">
+      <DependentUpon>student-content.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Student\courses\student-my-courses.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Student\courses\student-my-courses.Designer.cs">
+      <DependentUpon>student-my-courses.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Student\grades\student-grades.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Student\grades\student-grades.Designer.cs">
+      <DependentUpon>student-grades.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Student\information\studient-information.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Student\information\studient-information.Designer.cs">
+      <DependentUpon>studient-information.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Student\main\main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\Student\main\main.Designer.cs">
+      <DependentUpon>main.cs</DependentUpon>
     </Compile>
     <!-- Forms Teacher (User Controls) -->
     <Compile Include="Views\Teacher\Controls\AssessmentControl.cs">
@@ -497,13 +548,22 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <!-- Từ Teacher-final & Master: Resx Teacher -->
-    <EmbeddedResource Include="Views\Login\Login.resx">
-      <DependentUpon>Login.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\Login\Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\Student\grades\student-grades.resx">
+      <DependentUpon>student-grades.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\Student\information\studient-information.resx">
+      <DependentUpon>studient-information.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\Student\main\main.resx">
+      <DependentUpon>main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Views\Teacher\Controls\AssessmentControl.resx">
       <DependentUpon>AssessmentControl.cs</DependentUpon>
@@ -568,8 +628,35 @@
   <ItemGroup>
     <Content Include="Data\student1_updated.sql" />
     <Content Include="Data\StudyProcess_Complete.sql" />
+    <Content Include="Models\StudentsModel\Process1.sql" />
+    <Content Include="Models\StudentsModel\student1_updated.sql" />
     <Content Include="Resource\picture\admin2.jpg" />
     <Content Include="Resource\picture\blue.jpg" />
+    <Content Include="Views\Student\assignments\student-assignments.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Student\content\student-content.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Student\courses\student-my-courses.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Student\grades\student-grades.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Student\information\studient-information.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Student\Share\navigation.js" />
+    <Content Include="Views\Student\Share\student-sidebar.html" />
+    <Content Include="Views\Student\Share\utils.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\Microsoft.Web.WebView2.1.0.3595.46\build\Microsoft.Web.WebView2.targets" Condition="Exists('packages\Microsoft.Web.WebView2.1.0.3595.46\build\Microsoft.Web.WebView2.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.Web.WebView2.1.0.3595.46\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Web.WebView2.1.0.3595.46\build\Microsoft.Web.WebView2.targets'))" />
+  </Target>
 </Project>

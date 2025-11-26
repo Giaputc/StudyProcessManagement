@@ -6,11 +6,11 @@ namespace StudyProcessManagement.Business.Teacher
 {
     public class AssignmentFormService
     {
-        private DataProcess dataProcess;
+        private DataProcessDAL dataProcess;
 
         public AssignmentFormService()
         {
-            dataProcess = new DataProcess();
+            dataProcess = new DataProcessDAL();
         }
 
         public DataTable GetTeacherCourses(string teacherID)

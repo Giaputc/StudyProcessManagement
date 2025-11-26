@@ -6,7 +6,7 @@ namespace StudyProcessManagement.Business.Admin
 {
     public class UserService
     {
-        private DataProcess dataProcess = new DataProcess();
+        private DataProcessDAL dataProcess = new DataProcessDAL();
 
         // Đổi kiểu trả về: DataTable -> List<User>
         public List<Users> GetAllUsers(string keyword = "")

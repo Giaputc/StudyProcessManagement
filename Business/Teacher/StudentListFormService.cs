@@ -9,11 +9,11 @@ namespace StudyProcessManagement.Business.Teacher
     /// </summary>
     public class StudentListFormService
     {
-        private DataProcess dataProcess;
+        private DataProcessDAL dataProcess;
 
         public StudentListFormService()
         {
-            dataProcess = new DataProcess();
+            dataProcess = new DataProcessDAL();
         }
 
         // =============================================

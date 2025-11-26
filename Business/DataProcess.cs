@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 
 namespace StudyProcessManagement.Business
 {
-    public class DataProcess
+    public class DataProcessDAL
     {
         // ✅ GIỮ BẢN TỪ App.config (Teacher-final) để lấy chuỗi kết nối từ file cấu hình
         private string ConnectString = ConfigurationManager.ConnectionStrings["StudyProcessConnection"].ConnectionString;

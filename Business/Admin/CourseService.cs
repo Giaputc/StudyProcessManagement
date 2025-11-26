@@ -7,7 +7,7 @@ namespace StudyProcessManagement.Business.Admin
 {
     public class CourseService
     {
-        private DataProcess dataProcess = new DataProcess();
+        private DataProcessDAL dataProcess = new DataProcessDAL();
 
         // 1. Lấy danh sách (Sửa convert ID sang Int)
 

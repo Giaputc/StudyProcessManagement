@@ -9,7 +9,7 @@ namespace StudyProcessManagement.Business.Admin
 {
     public class AccountService
     {
-        private DataProcess dataProcess = new DataProcess();
+        private DataProcessDAL dataProcess = new DataProcessDAL();
 
         // Hàm kiểm tra đăng nhập
         // Trả về DataRow chứa thông tin user nếu đúng, trả về null nếu sai
